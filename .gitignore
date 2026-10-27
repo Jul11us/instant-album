@@ -1,0 +1,18 @@
+# 本地检查记录：脚本和日志里有本机路径，还有从官网下载的页面和图片（版权归原厂），不上传
+_audit/
+
+# 本地预览版，由 build.py 生成
+preview.html
+
+# 不属于这个项目的文件
+黄昏快门.html
+design-demos/shots$f.png
+
+# 系统和编辑器杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.vscode/
+.idea/

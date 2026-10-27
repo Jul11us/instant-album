@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>拍立得转换 · 六个候选</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;700;900&family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@500;900&family=Long+Cang&family=Noto+Serif+SC:wght@600&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#d9d9d6;font-family:"Noto Sans SC",sans-serif;padding:40px;color:#111}
+h1{font-size:22px;margin-bottom:24px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px 28px}
+.cell .cap{font-size:13px;margin-top:10px;line-height:1.5}
+.cell .cap b{font-size:14px}
+.ph{width:100%;aspect-ratio:390/600;border-radius:28px;overflow:hidden;position:relative;border:6px solid #111}
+.photo{background:url(__IMG__) center/cover}
+/* A 葛西薰 */
+.a{background:#F2F2EF;padding:44px 34px 0;display:flex;flex-direction:column;align-items:center}
+.a .pol{background:#fff;padding:9px 9px 32px;box-shadow:0 1px 0 #ddd,0 10px 24px rgba(0,0,0,.08);width:62%}
+.a .pol .photo{aspect-ratio:46/62}
+.a .row{margin-top:26px;font:500 13px "Shippori Mincho",serif;display:flex;gap:16px;color:#888}
+.a .row span:first-child{color:#111;border-bottom:1px solid #111}
+.a .save{margin-top:auto;margin-bottom:34px;font:700 16px "Shippori Mincho",serif}
+/* B 服部一成 */
+.b{background:#2747D6;padding:34px 26px}
+.b .pol{background:#fff;padding:10px 10px 40px;width:70%;margin:6px auto 0;transform:rotate(-4deg);position:relative}
+.b .pol .photo{aspect-ratio:46/62}
+.b .pol i{position:absolute;bottom:6px;left:14px;font:400 22px "Long Cang",cursive;color:#2747D6;font-style:normal}
+.b .tape{position:absolute;top:-12px;left:36%;width:70px;height:22px;background:#F7D84A;transform:rotate(6deg);opacity:.92}
+.b .chips{display:flex;gap:8px;margin-top:26px;flex-wrap:wrap}
+.b .chips span{background:#fff;border-radius:99px;padding:7px 14px;font:900 13px "Zen Maru Gothic";transform:rotate(-2deg)}
+.b .chips span:nth-child(2){transform:rotate(3deg);background:#F7D84A}
+/* C Halide */
+.c{background:#000;color:#EDEDED;font-family:"JetBrains Mono",monospace;padding:30px 0 0}
+.c .photo{margin:0 22px;aspect-ratio:46/62;height:56%;width:auto;border:8px solid #fff;border-bottom-width:26px;margin:0 auto}
+.c .params{display:flex;justify-content:space-around;font-size:11px;margin-top:18px;color:#8a8a8a}
+.c .params b{display:block;color:#EDEDED;font-size:15px}
+.c .params .on b{color:#FFCC00}
+.c .ruler{height:34px;margin:14px 0;background:repeating-linear-gradient(90deg,#666 0 1px,transparent 1px 9px);position:relative;mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent)}
+.c .ruler:after{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:#FFCC00}
+.c .shut{width:56px;height:56px;border-radius:50%;border:3px solid #fff;margin:0 auto}
+/* D Darkroom */
+.d{background:#1C1C1E;padding:30px 20px;color:#eee}
+.d .pol{background:#fff;padding:8px 8px 28px;width:66%;margin:0 auto}
+.d .pol .photo{aspect-ratio:46/62}
+.d .strip{display:flex;gap:6px;margin-top:22px}
+.d .strip div{flex:1;aspect-ratio:3/4;border-radius:6px}
+.d .strip div:nth-child(1){outline:2px solid #fff}
+.d .strip div:nth-child(2){filter:sepia(.5)}.d .strip div:nth-child(3){filter:grayscale(1)}.d .strip div:nth-child(4){filter:saturate(1.6) hue-rotate(-10deg)}
+.d .tabs{display:flex;justify-content:space-around;margin-top:20px;font-size:12px;color:#888}
+/* E Raycast */
+.e{background:#07080A;color:#ddd;padding:26px 18px;font:13px Inter,"Noto Sans SC",sans-serif}
+.e .photo{height:44%;border:6px solid #fff;border-bottom-width:20px;aspect-ratio:46/62;margin:0 auto}
+.e ul{list-style:none;padding:0;margin-top:16px;border:1px solid #242728;border-radius:10px;background:#121315}
+.e li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #1d1f21}
+.e li:first-child{background:#202225}
+.e li i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.e li kbd{margin-left:auto;font:11px "JetBrains Mono";background:#2a2c2f;border-radius:4px;padding:1px 6px}
+/* F Sugiura */
+.f{background:#17120E;color:#EDE3CF;padding:28px 0 0;font-family:"Noto Serif SC",serif}
+.f .photo{height:46%;border:6px solid #EDE3CF;border-bottom-width:20px;aspect-ratio:46/62;margin:0 auto}
+.f .dial{width:120%;aspect-ratio:1;border-radius:50%;border:1px solid #B8964A;margin:22px -10% 0;position:relative;background:repeating-conic-gradient(from 0deg,#B8964A 0 .6deg,transparent .6deg 6deg)}
+.f .dial:before{content:"";position:absolute;inset:16%;border-radius:50%;background:#17120E;border:1px solid #B8964A}
+.f .dial:after{content:"";position:absolute;left:50%;top:9%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#C8381E}
+.f .lbl{position:absolute;left:0;right:0;bottom:22%;text-align:center;font-size:13px;letter-spacing:.3em}
+.pick{outline:3px solid #111;outline-offset:6px}
+</style></head><body>
+<h1>六个候选（灰框为挑出做完整版的三张）</h1>
+<div class="grid">
+ <div class="cell"><div class="ph c pick"><div class="photo"></div><div class="params"><span class="on">滤镜<b>海盐</b></span><span>亮度<b>+0.3</b></span><span>色温<b>5600K</b></span><span>颗粒<b>12</b></span></div><div class="ruler"></div><div class="shut"></div></div>
+ <p class="cap"><b>C · Halide 拨盘</b>　现实参照｜→ dir-1</p></div>
+ <div class="cell"><div class="ph a pick"><div class="pol"><div class="photo"></div></div><div class="row"><span>原片</span><span>海盐</span><span>旧夏</span><span>雾</span><span>墨</span></div><div class="save">存入相册</div></div>
+ <p class="cap"><b>A · 葛西薰 相册页</b>　最佳设计师｜→ dir-2</p></div>
+ <div class="cell"><div class="ph b pick"><div class="pol"><div class="tape"></div><div class="photo"></div><i>2026.10.26 海边</i></div><div class="chips"><span>原片</span><span>旧夏</span><span>海盐</span><span>雾</span></div></div>
+ <p class="cap"><b>B · 服部一成 贴纸本</b>　最佳设计师｜→ dir-3</p></div>
+ <div class="cell"><div class="ph d"><div class="pol"><div class="photo"></div></div><div class="strip"><div class="photo"></div><div class="photo"></div><div class="photo"></div><div class="photo"></div></div><div class="tabs"><span>滤镜</span><span>调整</span><span>白框</span></div></div>
+ <p class="cap"><b>D · Darkroom 缩略图带</b>　现实参照｜备选（和 C 同属暗色专业）</p></div>
+ <div class="cell"><div class="ph e"><div class="photo"></div><ul><li><i style="background:#FF6363"></i>滤镜：海盐<kbd>F</kbd></li><li><i style="background:#FFC531"></i>亮度<kbd>B</kbd></li><li><i style="background:#52A9FF"></i>色温<kbd>T</kbd></li><li><i style="background:#59D499"></i>存入相册<kbd>↵</kbd></li></ul></div>
+ <p class="cap"><b>E · 命令面板</b>　秒数轮盘 App #8｜备选（form 弱）</p></div>
+ <div class="cell"><div class="ph f"><div class="photo"></div><div class="dial"><div class="lbl">海 盐 · 旧 夏 · 雾</div></div></div>
+ <p class="cap"><b>F · 杉浦康平 曼荼罗拨盘</b>　秒数轮盘 东亚 #8｜备选（偏用力）</p></div>
+</div>
+</body></html>

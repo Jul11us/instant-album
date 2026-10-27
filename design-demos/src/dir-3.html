@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>方向 3 · 贴纸本</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Long+Cang&display=swap">
+<style>
+/* 骨架：照片斜贴在一块纯色上，下面是贴纸式滤镜小样、两列粗滑块、白框颜色和题字，底部一颗大白药丸。 */
+:root{--blue:#2747D6;--deep:#1B33A6;--paper:#FFFFFF;--tape:#F7D84A;--pink:#FF8FB1;--ink:#10153A;--round:"Zen Maru Gothic","Noto Sans SC",sans-serif;--hand:"Long Cang",cursive}
+*{box-sizing:border-box;margin:0}
+body{background:var(--deep);color:#fff;font-family:var(--round);padding:36px 48px}
+.board{display:grid;grid-template-columns:250px auto auto;gap:36px;justify-content:center;align-items:start}
+.title{font:900 56px/1.05 var(--round);letter-spacing:-.02em}
+.title span{display:inline-block}
+.title span:nth-child(2){transform:translate(20px,6px) rotate(-3deg);color:var(--tape)}
+.note{font:500 13px/1.8 var(--round);color:#d6dcff;margin-top:22px}
+.note p+p{margin-top:12px}
+.label{font:700 13px var(--round);color:#d6dcff;margin-bottom:10px}
+.phone{width:390px;height:800px;border-radius:52px;border:10px solid #0b0f2a;background:var(--blue);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.top{display:flex;justify-content:space-between;align-items:center;padding:50px 20px 0;font:700 13px var(--round)}
+.top .grp{display:flex;gap:6px}
+.top .grp span{background:rgba(255,255,255,.16);border-radius:99px;padding:4px 10px;cursor:pointer}
+.stage{display:flex;justify-content:center;padding:18px 0 0;position:relative}
+.pol{background:var(--paper);padding:9px 9px 42px;width:232px;transform:rotate(-4deg);position:relative;box-shadow:6px 8px 0 rgba(0,0,0,.18);transition:padding .2s,background .2s}
+.pol.noframe{padding:0}.pol.noframe .cap{display:none}
+.tape{position:absolute;top:-13px;left:36%;width:76px;height:24px;background:var(--tape);transform:rotate(7deg);opacity:.93;z-index:2}
+.img{aspect-ratio:462/620;background:url(__IMG__) center/cover;position:relative;overflow:hidden}
+.grain,.vig{position:absolute;inset:0;pointer-events:none}
+.grain{opacity:0;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.cap{position:absolute;left:12px;right:12px;bottom:6px;font:400 22px var(--hand);color:var(--blue);outline:none;white-space:nowrap;overflow:hidden}
+.sticker{position:absolute;right:36px;top:170px;background:var(--pink);color:var(--ink);font:900 12px var(--round);border-radius:50%;width:54px;height:54px;display:grid;place-items:center;transform:rotate(12deg);text-align:center;line-height:1.1}
+.fl{display:flex;gap:9px;overflow-x:auto;padding:22px 16px 6px;scrollbar-width:none}
+.fl::-webkit-scrollbar{display:none}
+.fl .f{flex:0 0 52px;text-align:center;font:900 11px var(--round);cursor:pointer}
+.fl .f div{height:58px;background:url(__IMG__) center/cover;border:3px solid #fff;border-bottom-width:9px;margin-bottom:4px;transition:transform .15s}
+.fl .f:nth-child(odd) div{transform:rotate(-4deg)}.fl .f:nth-child(even) div{transform:rotate(3deg)}
+.fl .f.on div{border-color:var(--tape);transform:rotate(0) translateY(-4px)}
+.fl .f.on{color:var(--tape)}
+.sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:12px 18px 0}
+.sl{display:grid;grid-template-columns:30px 1fr;align-items:center;font:700 11px var(--round)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;background:transparent;height:24px}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--deep)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--paper);margin-top:-6px;box-shadow:2px 2px 0 rgba(0,0,0,.25)}
+.frame{display:flex;gap:8px;align-items:center;font:700 11px var(--round);padding:10px 18px 0}
+.frame b{width:26px;height:26px;border-radius:50%;border:3px solid transparent;cursor:pointer;display:inline-block}
+.frame b.on{border-color:var(--tape)}
+.frame .chip{margin-left:auto;background:rgba(255,255,255,.16);border-radius:99px;padding:5px 10px;cursor:pointer}
+.save{margin:auto 18px 26px;display:flex;gap:10px}
+.save button{background:var(--paper);color:var(--blue);border:0;border-radius:99px;height:56px;font:900 18px var(--round);cursor:pointer;box-shadow:4px 5px 0 var(--deep);flex:1;transform:rotate(-1.5deg)}
+.save .sm{flex:0 0 56px;background:var(--tape);color:var(--ink);font-size:13px;transform:rotate(3deg)}
+/* scan */
+.desk{height:470px;margin:14px 14px 0;border-radius:18px;background:#E9E2D3;position:relative;overflow:hidden}
+.skew{position:absolute;left:74px;top:70px;width:190px;background:#fff;padding:10px 10px 36px;transform:perspective(600px) rotateX(14deg) rotateZ(-11deg);box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.skew .ph{aspect-ratio:462/620;background:url(__IMG__) center/cover}
+.desk svg{position:absolute;inset:0}
+.bubble{position:absolute;right:12px;top:14px;background:var(--tape);color:var(--ink);font:900 12px var(--round);border-radius:14px;padding:6px 10px;transform:rotate(3deg)}
+.bubble2{position:absolute;left:12px;bottom:14px;background:#fff;color:var(--ink);font:700 11px var(--round);border-radius:14px;padding:6px 10px;transform:rotate(-2deg)}
+.chips{display:flex;gap:8px;padding:14px 18px 0;flex-wrap:wrap}
+.chips span{background:rgba(255,255,255,.16);border-radius:99px;padding:6px 12px;font:700 12px var(--round)}
+.chips span.on{background:#fff;color:var(--blue)}
+.tray{display:flex;gap:10px;padding:16px 18px 0;align-items:flex-end}
+.tray div{width:46px;height:58px;background:url(__IMG__) center/cover;border:3px solid #fff;border-bottom-width:9px}
+.tray div:nth-child(1){transform:rotate(-6deg)}.tray div:nth-child(2){transform:rotate(4deg);filter:grayscale(1)}.tray div:nth-child(3){transform:rotate(-2deg);filter:sepia(.4)}
+.tray small{margin-left:auto;font:700 12px var(--round);color:#d6dcff}
+.scanbtn{margin:auto 18px 26px;background:var(--tape);color:var(--ink);border-radius:99px;height:56px;display:grid;place-items:center;font:900 18px var(--round);box-shadow:4px 5px 0 var(--deep)}
+.foot{grid-column:1/-1;font-size:11px;color:#9fb0ff}
+</style></head><body>
+<div class="board">
+  <div>
+    <div class="title"><span>贴</span><span>进</span><br><span>相册</span></div>
+    <div class="note"><p>方向 3｜最佳设计师 服部一成。一块饱和纯色当桌面，照片歪着贴上去，白框底下能手写一行字。</p>
+    <p>这一版把能玩的都摆出来：八张滤镜小样（就是你这张照片）、四根粗滑块同屏、白框换颜色、题字换字体，还能贴一枚圆贴纸。</p>
+    <p>扫描屏用便利贴式的提示告诉你哪里反光，扫过的几张叠在下面。</p>
+    <p>form：拍立得会被人拿在手里、贴进本子里，这个动作就是界面。</p></div>
+  </div>
+  <div>
+    <div class="label">扫描</div>
+    <div class="phone">
+      <div class="top"><span>取消</span><div class="grp"><span>自动</span><span>闪光 关</span></div></div>
+      <div class="desk"><div class="skew"><div class="ph"></div></div>
+        <svg viewBox="0 0 362 400" preserveAspectRatio="none"><polygon points="58,90 262,46 300,370 102,414" fill="rgba(247,216,74,.18)" stroke="#2747D6" stroke-width="3" stroke-linejoin="round"/></svg>
+        <span class="bubble">右上有点反光，往左歪一下</span><span class="bubble2">认出来了：instax mini</span></div>
+      <div class="chips"><span class="on">mini</span><span>square</span><span>wide</span><span>Polaroid</span></div>
+      <div class="tray"><div></div><div></div><div></div><small>已扫 3 张 · 全部调色 ›</small></div>
+      <div class="scanbtn">找到了！拉正它</div>
+    </div>
+  </div>
+  <div>
+    <div class="label">调色（白框上的字可以直接点着改）</div>
+    <div class="phone">
+      <div class="top"><span>‹ 重扫</span><div class="grp"><span id="undo">撤销</span><span>原图</span></div></div>
+      <div class="stage"><div class="pol" id="pol"><div class="tape"></div><div class="img" id="img"><div class="grain" id="grain"></div><div class="vig" id="vig"></div></div><div class="cap" id="cap" contenteditable="true" spellcheck="false">帕兰加，晒到发烫</div></div>
+        <span class="sticker">夏天<br>限定</span></div>
+      <div class="fl" id="fl"></div>
+      <div class="sliders">
+        <label class="sl">亮度<input type="range" data-k="bright" min="-50" max="50" value="0"></label>
+        <label class="sl">对比<input type="range" data-k="contrast" min="-50" max="50" value="0"></label>
+        <label class="sl">色温<input type="range" data-k="warm" min="-50" max="50" value="0"></label>
+        <label class="sl">颗粒<input type="range" data-k="grain" min="0" max="50" value="0"></label>
+      </div>
+      <div class="frame" id="frame">白框
+        <b data-c="#FFFFFF" class="on" style="background:#fff"></b><b data-c="#F7D84A" style="background:#F7D84A"></b><b data-c="#FF8FB1" style="background:#FF8FB1"></b><b data-c="#10153A" style="background:#10153A"></b><b data-c="none" style="background:repeating-linear-gradient(45deg,#fff 0 3px,transparent 3px 6px)"></b>
+        <span class="chip" id="font">换字体</span></div>
+      <div class="save"><button id="save">存进相册</button><button class="sm">分享</button></div>
+    </div>
+  </div>
+  <p class="foot">示例照片：Palanga 09，Wikimedia Commons，CC BY-SA 4.0</p>
+</div>
+<script>
+const F={原片:'',旧夏:'sepia(.35) saturate(1.2) contrast(1.05)',海盐:'saturate(.85) brightness(1.05) hue-rotate(-8deg) contrast(.95)',柯达金:'sepia(.25) saturate(1.4) contrast(1.1) brightness(1.03)',雾:'contrast(.8) brightness(1.1) saturate(.7)',褪色:'contrast(.75) brightness(1.15) saturate(.6) sepia(.15)',夜蓝:'hue-rotate(15deg) saturate(1.1) brightness(.9) contrast(1.1)',墨:'grayscale(1) contrast(1.15)'};
+const s={filter:'旧夏',bright:0,contrast:0,warm:0,grain:0,frame:'#FFFFFF'};
+const $=id=>document.getElementById(id);
+function apply(){const w=s.warm;
+  $('img').style.filter=`${F[s.filter]} brightness(${1+s.bright/100}) contrast(${1+s.contrast/100}) ${w>0?`sepia(${w/120})`:`hue-rotate(${w/4}deg)`}`;
+  $('grain').style.opacity=s.grain/60;
+  const p=$('pol');p.classList.toggle('noframe',s.frame==='none');if(s.frame!=='none')p.style.background=s.frame;
+  $('cap').style.color=s.frame==='#10153A'?'#fff':'';
+  $('fl').innerHTML=Object.keys(F).map(n=>`<div class="f ${n===s.filter?'on':''}" data-f="${n}"><div data-f="${n}" style="filter:${F[n]}"></div>${n}</div>`).join('');
+  document.querySelectorAll('#frame b').forEach(b=>b.classList.toggle('on',b.dataset.c===s.frame))}
+$('fl').onclick=e=>{if(e.target.dataset.f){s.filter=e.target.dataset.f;apply()}};
+document.querySelector('.sliders').oninput=e=>{s[e.target.dataset.k]=+e.target.value;apply()};
+$('frame').onclick=e=>{if(e.target.dataset.c){s.frame=e.target.dataset.c;apply()}};
+let hand=true;$('font').onclick=()=>{hand=!hand;$('cap').style.fontFamily=hand?'':'var(--round)';$('cap').style.fontSize=hand?'':'15px';$('cap').style.fontWeight=hand?'':'900'};
+$('save').onclick=()=>{$('save').textContent='存好啦';setTimeout(()=>$('save').textContent='存进相册',1200)};
+apply();
+</script>
+</body></html>

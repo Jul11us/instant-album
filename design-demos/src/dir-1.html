@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>方向 1 · 拨盘</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap">
+<style>
+/* 骨架：上照片+读数行，中滤镜预览带，下参数行+刻度尺，底部快门式「存」键。黄色只给当前参数。 */
+:root{--bg:#000;--panel:#111;--line:#262626;--fg:#EDEDED;--dim:#8A8A8A;--hi:#FFCC00;--mono:"JetBrains Mono",ui-monospace,monospace;--sans:"Noto Sans SC",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:#0c0c0c;color:var(--fg);font-family:var(--sans);padding:40px 48px}
+.board{display:grid;grid-template-columns:230px auto auto;gap:36px;align-items:start;justify-content:center}
+.head h1{font:700 30px var(--mono);letter-spacing:-.02em}
+.head p{color:var(--dim);font-size:13px;line-height:1.7;margin-top:12px}
+.label{font:12px var(--mono);color:var(--dim);margin-bottom:10px;letter-spacing:.06em}
+.phone{width:390px;height:800px;border-radius:52px;border:10px solid #222;background:var(--bg);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;padding:50px 20px 0;font:12px var(--mono);color:var(--dim)}
+.top .grp{display:flex;gap:14px}
+.top b{color:var(--fg);font-weight:400}
+.top .pill{border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--fg)}
+/* scan */
+.vf{position:relative;margin:12px 12px 0;height:460px;background:#2b2621;border-radius:6px;overflow:hidden}
+.skew{position:absolute;left:66px;top:70px;width:200px;background:#f4f4f0;padding:10px 10px 36px;transform:perspective(600px) rotateX(18deg) rotateZ(-9deg)}
+.skew .ph{aspect-ratio:462/620;background:url(__IMG__) center/cover}
+.skew .glare{position:absolute;left:40%;top:22%;width:60px;height:90px;background:radial-gradient(closest-side,rgba(255,255,255,.75),transparent);transform:rotate(20deg)}
+.vf svg{position:absolute;inset:0}
+.zebra{position:absolute;left:142px;top:118px;width:46px;height:64px;background:repeating-linear-gradient(135deg,rgba(255,204,0,.8) 0 3px,transparent 3px 7px);border-radius:40%;transform:rotate(20deg)}
+.reads{display:grid;grid-template-columns:repeat(4,1fr);padding:12px 14px;gap:4px;font:10px var(--mono);color:var(--dim)}
+.reads b{display:block;font-size:13px;color:var(--fg);margin-top:2px}
+.reads .warn b{color:var(--hi)}
+.tip{margin:0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--fg);line-height:1.6}
+.tip span{color:var(--hi)}
+.tray{display:flex;gap:8px;padding:12px 14px 0;align-items:center}
+.tray .t{width:40px;height:52px;background:#f4f4f0;padding:3px 3px 9px}
+.tray .t div{height:100%;background:url(__IMG__) center/cover}
+.tray .add{width:40px;height:52px;border:1px dashed #444;display:grid;place-items:center;color:var(--dim);font:16px var(--mono)}
+.tray small{margin-left:auto;font:11px var(--mono);color:var(--dim)}
+.scanbar{margin-top:auto;padding:0 26px 30px;display:flex;align-items:center;justify-content:space-between;font:12px var(--mono);color:var(--dim)}
+.scanbar .shutter{width:64px;height:64px}
+/* edit */
+.stage{display:flex;justify-content:center;padding:10px 0 0;position:relative}
+.pol{background:#f4f4f0;padding:8px 8px 30px;width:240px;transition:padding .2s,background .2s;position:relative}
+.pol.noframe{padding:0}
+.img{aspect-ratio:462/620;background:url(__IMG__) center/cover;position:relative;overflow:hidden}
+.grain,.vig{position:absolute;inset:0;pointer-events:none}
+.grain{opacity:0;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hist{position:absolute;right:14px;top:14px;width:64px;height:34px;display:flex;align-items:flex-end;gap:1px;background:rgba(0,0,0,.55);padding:3px;border-radius:4px}
+.hist i{flex:1;background:#bbb;opacity:.8}
+.cmp{position:absolute;left:14px;top:14px;font:10px var(--mono);border:1px solid var(--line);border-radius:4px;padding:3px 6px;color:var(--dim);background:#000}
+.meta{text-align:center;font:10px var(--mono);color:var(--dim);margin-top:8px}
+.fstrip{display:flex;gap:7px;overflow-x:auto;padding:12px 14px 4px;scrollbar-width:none}
+.fstrip::-webkit-scrollbar{display:none}
+.fstrip .f{flex:0 0 46px;cursor:pointer;text-align:center;font-size:10px;color:var(--dim)}
+.fstrip .f div{height:56px;background:url(__IMG__) center/cover;border:2px solid transparent;margin-bottom:4px}
+.fstrip .f.on{color:var(--hi)}.fstrip .f.on div{border-color:var(--hi)}
+.params{display:grid;grid-template-columns:repeat(6,1fr);padding:6px 6px 0}
+.params button{background:none;border:0;color:var(--dim);font:10px var(--sans);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 0}
+.params button b{font:700 13px var(--mono);color:var(--fg)}
+.params button.on b,.params button.on{color:var(--hi)}
+.ruler{position:relative;height:40px;margin-top:2px;overflow:hidden;cursor:ew-resize;touch-action:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent)}
+.ticks{position:absolute;top:8px;height:26px;left:0;width:1400px;background:repeating-linear-gradient(90deg,#777 0 1px,transparent 1px 70px),repeating-linear-gradient(90deg,#444 0 1px,transparent 1px 14px);background-size:auto 100%,auto 55%;background-repeat:repeat-x;background-position:0 0,0 100%}
+.needle{position:absolute;left:50%;top:4px;bottom:4px;width:2px;margin-left:-1px;background:var(--hi)}
+.frames{display:flex;align-items:center;gap:8px;padding:4px 16px 0;font:10px var(--mono);color:var(--dim)}
+.frames button{width:26px;height:26px;border-radius:50%;border:2px solid #333;cursor:pointer}
+.frames button.on{border-color:var(--hi)}
+.frames .tx{margin-left:auto;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--fg);background:none;font:10px var(--mono);width:auto;height:auto}
+.bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:0 26px 26px}
+.bottom .last{width:40px;height:52px;background:#f4f4f0;padding:3px 3px 9px}.bottom .last div{height:100%;background:url(__IMG__) center/cover;filter:sepia(.35) saturate(1.2)}
+.bottom small{font:11px var(--mono);color:var(--dim);text-align:right}
+.shutter{width:66px;height:66px;border-radius:50%;border:3px solid var(--fg);display:grid;place-items:center;font-size:14px;cursor:pointer;background:none;color:var(--fg)}
+.foot{grid-column:1/-1;color:#555;font:11px var(--mono);text-align:center}
+</style></head><body>
+<div class="board">
+  <div class="head">
+    <h1>INSTANT/<br>DIAL</h1>
+    <p>方向 1｜现实参照 Halide。纯黑底，黄色只给当前在调的那个参数。调参用相机拨盘式刻度尺左右拖。</p>
+    <p>扫描屏把相机的读数搬过来：相纸型号、倾角、反光，反光处打斑马纹提示换个角度。</p>
+    <p>调色屏同屏放下八个滤镜真预览、六个参数、四种白框，不用翻页。</p>
+    <p>form：拍立得本来就是相机，修图像在拨相机。</p>
+  </div>
+  <div>
+    <div class="label">① 扫描</div>
+    <div class="phone">
+      <div class="top"><span>✕</span><div class="grp"><span class="pill">自动</span><span>闪光 关</span></div><b>INSTAX MINI</b></div>
+      <div class="vf"><div class="skew"><div class="ph"></div><div class="glare"></div></div><div class="zebra"></div>
+        <svg viewBox="0 0 366 430" preserveAspectRatio="none"><polygon points="62,80 282,44 296,368 88,400" fill="none" stroke="#FFCC00" stroke-width="1.5"/>
+        <g fill="none" stroke="#FFCC00" stroke-width="2"><circle cx="62" cy="80" r="7"/><circle cx="282" cy="44" r="7"/><circle cx="296" cy="368" r="7"/><circle cx="88" cy="400" r="7"/></g></svg>
+      </div>
+      <div class="reads"><span>相纸<b>MINI</b></span><span>尺寸<b>54×86</b></span><span>倾角<b>−9.2°</b></span><span class="warn">反光<b>中</b></span></div>
+      <p class="tip"><span>■</span> 右上有反光，手机往左下倾一点；已锁定四个角，可以拖动微调。</p>
+      <div class="tray"><div class="t"><div></div></div><div class="t"><div style="filter:grayscale(1)"></div></div><div class="add">+</div><small>本次 2 张</small></div>
+      <div class="scanbar"><span>手动框选</span><button class="shutter">扫</button><span style="color:var(--fg)">拉正 ›</span></div>
+    </div>
+  </div>
+  <div>
+    <div class="label">② 调色</div>
+    <div class="phone" id="ed">
+      <div class="top"><span>‹ 重扫</span><div class="grp"><span id="undo">↶ 撤销</span><span>↷</span></div><b id="readout">旧夏</b></div>
+      <div class="stage"><span class="cmp">按住看原图</span><div class="pol" id="pol"><div class="img" id="img"><div class="grain" id="grain"></div><div class="vig" id="vig"></div></div></div>
+        <div class="hist" id="hist"></div></div>
+      <div class="meta">54×86MM · 已拉正 −9.2° · 1086×1458</div>
+      <div class="fstrip" id="fstrip"></div>
+      <div class="params" id="params">
+        <button data-k="bright" class="on">亮度<b id="v-bright">0</b></button>
+        <button data-k="contrast">对比<b id="v-contrast">0</b></button>
+        <button data-k="warm">色温<b id="v-warm">0</b></button>
+        <button data-k="sat">饱和<b id="v-sat">0</b></button>
+        <button data-k="grain">颗粒<b id="v-grain">0</b></button>
+        <button data-k="vig">暗角<b id="v-vig">0</b></button>
+      </div>
+      <div class="ruler" id="ruler"><div class="ticks" id="ticks"></div><div class="needle"></div></div>
+      <div class="frames" id="frames">白框
+        <button data-c="#f4f4f0" class="on" style="background:#f4f4f0"></button><button data-c="#111" style="background:#111"></button><button data-c="#EFE6D2" style="background:#EFE6D2"></button><button data-c="none" style="background:repeating-linear-gradient(45deg,#333 0 3px,#000 3px 6px)"></button>
+        <button class="tx">+ 日期</button></div>
+      <div class="bottom"><div class="last"><div></div></div><button class="shutter" id="save">存</button><small>相册<br>JPG 原尺寸</small></div>
+    </div>
+  </div>
+  <p class="foot">示例照片：Palanga 09，Wikimedia Commons，CC BY-SA 4.0</p>
+</div>
+<script>
+const F={原片:'',海盐:'saturate(.85) brightness(1.05) hue-rotate(-8deg) contrast(.95)',旧夏:'sepia(.35) saturate(1.2) contrast(1.05)',柯达金:'sepia(.25) saturate(1.4) contrast(1.1) brightness(1.03)',雾:'contrast(.8) brightness(1.1) saturate(.7)',褪色:'contrast(.75) brightness(1.15) saturate(.6) sepia(.15)',夜蓝:'hue-rotate(15deg) saturate(1.1) brightness(.9) contrast(1.1)',墨:'grayscale(1) contrast(1.15)'};
+const names=Object.keys(F);
+const s={filter:'旧夏',bright:0,contrast:0,warm:0,sat:0,grain:0,vig:0,frame:'#f4f4f0'};let cur='bright';
+const $=id=>document.getElementById(id);
+const css=()=>{const w=s.warm;return `${F[s.filter]} brightness(${1+s.bright/100}) contrast(${1+s.contrast/100}) saturate(${1+s.sat/100}) ${w>0?`sepia(${w/120})`:`hue-rotate(${w/4}deg)`}`};
+function render(){
+  $('img').style.filter=css();$('grain').style.opacity=s.grain/60;$('vig').style.boxShadow=`inset 0 0 ${s.vig*1.4}px ${s.vig/2}px rgba(0,0,0,.6)`;
+  const p=$('pol');p.classList.toggle('noframe',s.frame==='none');if(s.frame!=='none')p.style.background=s.frame;
+  ['bright','contrast','warm','sat','grain','vig'].forEach(k=>$('v-'+k).textContent=(s[k]>0&&k!=='grain'&&k!=='vig'?'+':'')+s[k]);
+  $('fstrip').innerHTML=names.map(n=>`<div class="f ${n===s.filter?'on':''}" data-f="${n}"><div style="filter:${F[n]}" data-f="${n}"></div>${n}</div>`).join('');
+  document.querySelectorAll('#frames button[data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c===s.frame));
+  $('readout').textContent=s.filter;
+  $('hist').innerHTML=[3,5,8,12,15,18,22,26,24,20,17,14,16,19,13,8,5,3].map((h,i)=>`<i style="height:${Math.max(2,Math.min(28,h+s.bright/4+(i>9?s.contrast/6:-s.contrast/6)))}px"></i>`).join('');
+}
+$('params').onclick=e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.k;off=-s[cur]*7;document.querySelectorAll('.params button').forEach(x=>x.classList.toggle('on',x===b))};
+$('fstrip').onclick=e=>{const f=e.target.dataset.f;if(f){s.filter=f;render()}};
+$('frames').onclick=e=>{const c=e.target.dataset.c;if(c){s.frame=c;render()}};
+let dx=null,start=0,off=0;
+$('ruler').onpointerdown=e=>{dx=e.clientX;start=off;$('ruler').setPointerCapture(e.pointerId)};
+$('ruler').onpointermove=e=>{if(dx===null)return;off=start+(e.clientX-dx);$('ticks').style.transform=`translateX(${(off%70)-70}px)`;
+  const v=Math.round(off/-7);s[cur]=cur==='grain'||cur==='vig'?Math.max(0,Math.min(50,v)):Math.max(-50,Math.min(50,v));render()};
+$('ruler').onpointerup=()=>dx=null;
+$('save').onclick=()=>{$('save').textContent='✓';setTimeout(()=>$('save').textContent='存',1200)};
+render();
+</script>
+</body></html>

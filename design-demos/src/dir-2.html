@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>方向 2 · 相册页</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 骨架：一页相册。照片在上，下面依次是滤镜小样、四根细线参数、白框与题字，主操作一行加粗黑字。没有色块按钮。 */
+:root{--paper:#F1F1EE;--sheet:#FFFFFF;--ink:#161616;--mute:#76766F;--rule:#CFCFCA;--serif:"Shippori Mincho","Noto Serif SC",serif;--sans:"Zen Kaku Gothic New","Noto Sans SC",sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:#E4E4E0;color:var(--ink);font-family:var(--sans);padding:40px 48px}
+.board{display:grid;grid-template-columns:auto auto 220px;gap:36px;justify-content:center;align-items:start}
+.label{font:500 12px var(--sans);color:var(--mute);margin-bottom:10px;letter-spacing:.12em}
+.phone{width:390px;height:800px;border-radius:52px;border:10px solid #1a1a1a;background:var(--paper);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.side h1{font:700 32px/1.25 var(--serif);letter-spacing:.04em}
+.side p{font-size:13px;line-height:1.85;color:#555;margin-top:14px}
+.top{display:flex;justify-content:space-between;align-items:baseline;padding:52px 24px 0;font:500 13px var(--serif);color:var(--mute)}
+.top b{color:var(--ink);font-weight:700}
+.top .mid{display:flex;gap:14px}
+.stage{display:flex;justify-content:center;padding:10px 0 0;gap:12px;align-items:flex-end}
+.pol{background:var(--sheet);padding:8px 8px 34px;width:196px;box-shadow:0 1px 0 #d8d8d4,0 10px 24px rgba(0,0,0,.07);position:relative;transition:padding .25s,background .25s}
+.pol.noframe{padding:0;box-shadow:none}
+.pol .date{position:absolute;bottom:10px;right:10px;font:500 11px var(--serif);color:var(--mute)}
+.pol.noframe .date{display:none}
+.pol.dark .date{color:#bbb}
+.img{aspect-ratio:462/620;background:url(__IMG__) center/cover;position:relative;overflow:hidden}
+.grain,.vig{position:absolute;inset:0;pointer-events:none}
+.grain{opacity:0;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.orig{width:64px;font:500 11px/1.6 var(--serif);color:var(--mute)}
+.orig div{aspect-ratio:462/620;background:url(__IMG__) center/cover;margin-bottom:4px;outline:1px solid var(--rule)}
+.sec{padding:0 24px;margin-top:12px}
+.sec h3{font:700 12px var(--serif);display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:5px;margin-bottom:8px}
+.sec h3 span{font-weight:500;color:var(--mute)}
+.fl{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none}
+.fl::-webkit-scrollbar{display:none}
+.fl .f{flex:0 0 38px;text-align:center;font:500 11px var(--serif);color:var(--mute);cursor:pointer}
+.fl .f div{height:46px;background:url(__IMG__) center/cover;margin-bottom:4px;border:3px solid #fff;border-bottom-width:7px;box-shadow:0 0 0 1px var(--rule)}
+.fl .f.on{color:var(--ink);font-weight:700}.fl .f.on div{box-shadow:0 0 0 1.5px var(--ink)}
+.adj{display:grid;grid-template-columns:34px 1fr 30px;gap:2px 8px;align-items:center;font:500 12px var(--serif)}
+.adj output{text-align:right;color:var(--mute);font-size:11px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;background:transparent;height:22px}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--paper);border:1px solid var(--ink);margin-top:-6px}
+.fr{display:flex;align-items:center;gap:14px;font:500 12px var(--serif);color:var(--mute)}
+.fr span{cursor:pointer;display:flex;align-items:center;gap:5px}
+.fr span i{width:12px;height:12px;border:1px solid var(--ink);display:inline-block}
+.fr span.on{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.fr input{margin-left:auto;width:100px;border:0;border-bottom:1px solid var(--rule);background:none;font:500 12px var(--serif);color:var(--ink);padding:2px 0}
+.acts{margin-top:auto;padding:0 24px 30px;display:flex;justify-content:space-between;align-items:baseline}
+.save{font:700 17px var(--serif);letter-spacing:.2em;background:none;border:0;border-bottom:1.5px solid var(--ink);padding:0 2px 4px;cursor:pointer;color:var(--ink)}
+.acts small{font:500 12px var(--serif);color:var(--mute)}
+/* scan */
+.desk{height:400px;background:#DAD8D2;position:relative;margin:14px 14px 0}
+.skew{position:absolute;left:74px;top:70px;width:190px;background:#fff;padding:10px 10px 36px;transform:perspective(600px) rotateX(16deg) rotateZ(7deg);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.skew .ph{aspect-ratio:462/620;background:url(__IMG__) center/cover}
+.desk svg{position:absolute;inset:0}
+.desk .c{position:absolute;font:500 10px var(--serif);color:var(--ink)}
+.facts{margin:12px 24px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font:500 12px var(--serif)}
+.facts dt{color:var(--mute)}
+.book{padding:0 24px;margin-top:14px}
+.book .g{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.book .g div{aspect-ratio:46/62;background:url(__IMG__) center/cover;border:2px solid #fff;border-bottom-width:6px;box-shadow:0 0 0 1px var(--rule)}
+.foot{grid-column:1/-1;color:var(--mute);font-size:11px}
+</style></head><body>
+<div class="board">
+  <div>
+    <div class="label">调色：一页相册</div>
+    <div class="phone">
+      <div class="top"><span>重扫</span><span class="mid"><span id="undo">撤销</span><span>重做</span></span><b>二〇二六年十月</b></div>
+      <div class="stage"><div class="pol" id="pol"><div class="img" id="img"><div class="grain" id="grain"></div><div class="vig" id="vig"></div></div><span class="date" id="date">10.26 帕兰加</span></div>
+        <div class="orig"><div></div>原片<br>按住比较</div></div>
+      <div class="sec"><h3>滤镜<span id="fname">旧夏</span></h3><div class="fl" id="fl"></div></div>
+      <div class="sec"><h3>调整<span id="reset" style="cursor:pointer">还原</span></h3>
+        <div class="adj" id="adj"></div></div>
+      <div class="sec"><h3>白框与题字</h3>
+        <div class="fr" id="fr"><span data-c="#FFFFFF" class="on"><i style="background:#fff"></i>白</span><span data-c="#1b1b1b"><i style="background:#1b1b1b"></i>黑</span><span data-c="#ECE4D4"><i style="background:#ECE4D4"></i>旧纸</span><span data-c="none">无</span>
+        <input id="cap" value="10.26 帕兰加" aria-label="题字"></div></div>
+      <div class="acts"><small>另存一张无框</small><button class="save" id="save">存入相册</button></div>
+    </div>
+  </div>
+  <div>
+    <div class="label">扫描：对准一张拍立得</div>
+    <div class="phone">
+      <div class="top"><span>取消</span><b>扫描</b></div>
+      <div class="desk"><div class="skew"><div class="ph"></div></div>
+        <svg viewBox="0 0 362 400" preserveAspectRatio="none"><polygon points="94,62 290,92 262,382 60,346" fill="none" stroke="#161616" stroke-width="1" stroke-dasharray="4 4"/></svg>
+        <span class="c" style="left:70px;top:44px">左上</span><span class="c" style="left:278px;top:72px">右上</span></div>
+      <dl class="facts"><dt>相纸</dt><dd>instax mini　54 × 86 毫米</dd><dt>倾角</dt><dd>7.4°，拉正后自动转回</dd><dt>反光</dt><dd>右上一小块，可换个角度再拍一张合成</dd></dl>
+      <div class="book"><div class="sec" style="padding:0"><h3>这一本<span>12 张</span></h3></div>
+        <div class="g"><div></div><div style="filter:grayscale(1)"></div><div style="filter:sepia(.4)"></div><div style="filter:contrast(.8) brightness(1.1)"></div><div style="filter:hue-rotate(15deg)"></div><div style="filter:saturate(1.4)"></div></div></div>
+      <div class="acts"><small>四角可以拖动微调</small><button class="save">拉正</button></div>
+    </div>
+  </div>
+  <div class="side">
+    <h1>相册的<br>一页</h1>
+    <p>方向 2｜最佳设计师 葛西薰。整屏几乎不用颜色，靠位置和字号排层级。</p>
+    <p>这一版把功能全摆上纸面：滤镜是八张小样（每张都是你自己的照片），四个参数同时可见，白框可以换黑、旧纸色，底部还能题一行字。</p>
+    <p>扫描屏下方是「这一本」，扫过的照片排成一页小相册。</p>
+    <p>form：拍立得的白框本来就是留白，界面顺着这块留白往外长。</p>
+  </div>
+  <p class="foot">示例照片：Palanga 09，Wikimedia Commons，CC BY-SA 4.0</p>
+</div>
+<script>
+const F={原片:'',海盐:'saturate(.85) brightness(1.05) hue-rotate(-8deg) contrast(.95)',旧夏:'sepia(.35) saturate(1.2) contrast(1.05)',柯达金:'sepia(.25) saturate(1.4) contrast(1.1) brightness(1.03)',雾:'contrast(.8) brightness(1.1) saturate(.7)',褪色:'contrast(.75) brightness(1.15) saturate(.6) sepia(.15)',夜蓝:'hue-rotate(15deg) saturate(1.1) brightness(.9) contrast(1.1)',墨:'grayscale(1) contrast(1.15)'};
+const P=[['bright','光',-50],['contrast','对比',-50],['warm','温度',-50],['grain','颗粒',0],['vig','暗角',0]];
+const s={filter:'旧夏',bright:0,contrast:0,warm:0,grain:0,vig:0,frame:'#FFFFFF'};
+const $=id=>document.getElementById(id);
+function apply(){const w=s.warm;
+  $('img').style.filter=`${F[s.filter]} brightness(${1+s.bright/100}) contrast(${1+s.contrast/100}) ${w>0?`sepia(${w/120})`:`hue-rotate(${w/4}deg)`}`;
+  $('grain').style.opacity=s.grain/60;$('vig').style.boxShadow=`inset 0 0 ${s.vig*1.4}px ${s.vig/2}px rgba(0,0,0,.6)`;
+  const p=$('pol');p.classList.toggle('noframe',s.frame==='none');p.classList.toggle('dark',s.frame==='#1b1b1b');if(s.frame!=='none')p.style.background=s.frame;
+  $('fname').textContent=s.filter;
+  $('fl').innerHTML=Object.keys(F).map(n=>`<div class="f ${n===s.filter?'on':''}" data-f="${n}"><div data-f="${n}" style="filter:${F[n]}"></div>${n}</div>`).join('');
+  document.querySelectorAll('#fr span').forEach(x=>x.classList.toggle('on',x.dataset.c===s.frame))}
+$('adj').innerHTML=P.map(([k,l,min])=>`<span>${l}</span><input type="range" data-k="${k}" min="${min}" max="50" value="0" aria-label="${l}"><output id="o-${k}">0</output>`).join('');
+$('adj').oninput=e=>{const k=e.target.dataset.k;s[k]=+e.target.value;$('o-'+k).textContent=s[k];apply()};
+$('reset').onclick=()=>{P.forEach(([k])=>{s[k]=0;$('o-'+k).textContent=0});document.querySelectorAll('#adj input').forEach(i=>i.value=0);apply()};
+$('fl').onclick=e=>{if(e.target.dataset.f){s.filter=e.target.dataset.f;apply()}};
+$('fr').onclick=e=>{const sp=e.target.closest('span');if(sp){s.frame=sp.dataset.c;apply()}};
+$('cap').oninput=e=>$('date').textContent=e.target.value;
+$('save').onclick=()=>{$('save').textContent='已存入';setTimeout(()=>$('save').textContent='存入相册',1200)};
+apply();
+</script>
+</body></html>

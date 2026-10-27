@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="640" viewBox="0 0 1400 640" role="img" aria-labelledby="title desc">
+<title id="title">贴进相册 — A little darkroom for instant photos</title>
+<desc id="desc">An editorial illustration of an instant photo on a warm charcoal background.</desc>
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#282622"/><stop offset="1" stop-color="#151413"/></linearGradient>
+ <linearGradient id="sky" x2="0.25" y2="1"><stop stop-color="#d5b99b"/><stop offset="0.52" stop-color="#e6c49a"/><stop offset="1" stop-color="#737f76"/></linearGradient>
+ <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#798e87"/><stop offset="1" stop-color="#465c59"/></linearGradient>
+ <filter id="shadow" x="-40%" y="-30%" width="180%" height="180%"><feGaussianBlur stdDeviation="19"/></filter>
+</defs>
+<rect width="1400" height="640" fill="url(#bg)"/>
+<path d="M80 84H1320M80 556H1320" stroke="#6c655b" stroke-opacity=".55"/>
+<text x="82" y="63" fill="#dbb972" font-family="Arial,sans-serif" font-size="13" letter-spacing="4">AN INSTANT PHOTO WORKSPACE</text>
+<text x="80" y="217" fill="#f2eee6" font-family="Georgia,serif" font-size="73">Keep the moment.</text>
+<text x="80" y="301" fill="#f2eee6" font-family="Georgia,serif" font-size="73" font-style="italic">Make it yours.</text>
+<path d="M83 350H147" stroke="#e8b657" stroke-width="3"/>
+<text x="82" y="403" fill="#bbb2a5" font-family="Arial,sans-serif" font-size="20" letter-spacing="1">SCAN  /  RESTORE  /  CREATE</text>
+<text x="82" y="598" fill="#a49b8e" font-family="Arial,sans-serif" font-size="13" letter-spacing="2">A SMALL SPACE FOR THE PHOTOS YOU HOLD DEAR</text>
+<text x="1275" y="598" fill="#a49b8e" text-anchor="end" font-family="Arial,sans-serif" font-size="13" letter-spacing="2">01 — 03</text>
+<g transform="translate(893 95) rotate(5 190 224)">
+ <rect x="-2" y="14" width="390" height="475" rx="4" fill="#000" opacity=".42" filter="url(#shadow)"/>
+ <rect width="380" height="464" rx="3" fill="#f0eadf"/>
+ <rect x="22" y="22" width="336" height="345" fill="url(#sky)"/>
+ <circle cx="250" cy="108" r="34" fill="#f3dbad" opacity=".8"/>
+ <path d="M22 234C70 224 100 242 149 229S260 210 358 229V367H22Z" fill="url(#sea)"/>
+ <path d="M22 276C95 269 118 288 180 278S287 267 358 277M22 310C85 304 127 319 186 311S295 300 358 312" fill="none" stroke="#c5c2a7" stroke-opacity=".5" stroke-width="2"/>
+ <path d="M22 338C100 320 142 345 197 334S290 327 358 340V367H22Z" fill="#c4ae91"/>
+ <text x="28" y="424" fill="#827567" font-family="Georgia,serif" font-size="23" font-style="italic">a moment to remember</text>
+ <circle cx="336" cy="420" r="5" fill="#ce9c4c"/>
+</g>
+</svg>
