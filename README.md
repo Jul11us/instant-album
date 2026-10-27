@@ -22,9 +22,9 @@
 | **02 / 减少反光** | 换个角度补拍后尝试对齐并合成，或用画笔手动修补小光斑。合成后可按住对比合成前，再决定保留还是撤回。两张照片在同一位置都有反光时无法通过合成恢复细节。 |
 | **03 / 色彩与相纸** | 使用滤镜、亮度、对比、色温和颗粒调整照片；保留原框，选择代码绘制的相纸样式，或绘制、上传自己的边框。 |
 | **04 / 留下字迹** | 为照片添加文字、选择字体，并加上胶片相机风格的日期印章。 |
-| **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天。还可以拍下相纸背面，和正面存在一起，随时翻面查看。 |
+| **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天；记不清时可以记录到年月、季节、年份、「大约某年」或「不记得」，相册与时间线会按所选精度展示和排序。还可以拍下相纸背面，和正面存在一起，随时翻面查看。 |
 | **06 / 导出与拼页** | 导出整张相纸或只要画面，选择 JPEG、PNG 与尺寸；多张可打包为 ZIP 并附「回忆.txt」。有背面的照片可与正面并排导出或另存一张。把几张照片拼成手账贴纸墙、胶片接触印、旅行明信片或回忆时间线；调整照片顺序，换底色、胶带和摆放方式，存成以后还能接着改的相册页。 |
-| **07 / 我的相册** | 建立「旅行」「朋友」等相册并设置封面，按日期、地点、人物或故事查找，在应用里按月份翻看收藏；点有背面的照片可以翻面。 |
+| **07 / 我的相册** | 建立「旅行」「朋友」等相册并设置封面，按日期、地点、人物或故事查找，在应用里按日期精度分组翻看收藏；点有背面的照片可以翻面。 |
 | **08 / 本地草稿** | 在浏览器支持时自动保存照片、背面、四角、编辑设置、相册和相册页，下次打开时尝试恢复；可删除单张或清空草稿。 |
 | **09 / 了解相机** | 根据选择的相机查看拍摄提示和推荐参数；通过程序化 3D 模型探索即时成像相机的通用内部结构。 |
 
@@ -40,6 +40,7 @@
 
 - 自动识别和反光处理是启发式方法，结果取决于照片、光线和背景。反光算法目前使用模拟图像测试，尚未以真实拍立得照片验证。
 - 渐变或多色边框可能无法自动识别为相纸；请手动选择相纸型号，或先选择相机。识别不到边缘时可手动调整四角。
+- 照片日期设为月份时，日期印章只印年月；设为季节、年份或「大约某年」时只印年份，设为「不记得」时不印日期。
 - 桌面端支持拖放、粘贴和多张导入；多张照片未识别时，先调整第一张，其余需重新导入。
 - 高清导出依照片中实际可用的像素决定，最长边最高 3200 像素；补拍合成的照片最高为标准尺寸。
 - 草稿只保存在当前设备的当前浏览器中，清理浏览器数据或存储空间不足时可能丢失，请及时导出。手机浏览器能否经由分享直接存入系统相册，因系统和浏览器而异。
@@ -65,7 +66,7 @@ python build.py .
 
 构建会生成 `贴进相册.html` 和本地预览用的 `preview.html`。Google Fonts 和 Three.js 通过网络加载；Three.js 版本为 0.160.0。
 
-浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的五个 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。
+浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。
 
 ## English
 
@@ -75,12 +76,12 @@ python build.py .
 
 - **Scan:** Detect edges and correct perspective, or adjust the corners with a magnifier and choose a film format. Ordinary photographs can retain their original proportions.
 - **Restore:** Try a second, differently angled shot to reduce glare, compare the result, or brush over small spots. Results depend on the images; glare removal has been tested on simulated images, not yet on real instant photographs.
-- **Create:** Adjust colour and frames, add captions and date stamps, and record a place, people and a short story. The date of the original moment can be edited separately from the digitisation date. Scan the back of a print too and flip between both sides.
+- **Create:** Adjust colour and frames, add captions and date stamps, and record a place, people and a short story. The date of the original moment can be edited separately from the digitisation date, or kept as vague as you remember it: a year and month, a season, a year, “around” a year, or unknown. Scan the back of a print too and flip between both sides.
 - **Keep & share:** Export a single image as JPEG or PNG, save several as a ZIP, or arrange them into a scrapbook wall, contact sheet, postcard or timeline, then reorder photos, change the paper and tape, and keep the page to edit later. Drafts are stored locally when browser storage is available.
 - **Browse:** Group photos into albums with covers, and search by date, place or people.
 - **Explore:** Browse camera-specific shooting tips and illustrative 3D models of generic instant-camera internals.
 
-Open [贴进相册.html](贴进相册.html) in a browser to start. No backend installation is required. Fonts and the 3D library require an internet connection. Regular browsers offer a download link and image preview; file sharing depends on browser support. Drafts can be lost when browser data is cleared or storage is unavailable, so export finished work. Claude-specific saving and the optional “Ask Claude” feature depend on the host runtime; the latter may send a photo or analysis data and use your own Claude quota.
+Open [贴进相册.html](贴进相册.html) in a browser to start. No backend installation is required. Fonts and the 3D library require an internet connection. Regular browsers offer a download link and image preview; file sharing depends on browser support. The date stamp uses the chosen precision: month and year, year only for seasons, years or approximate years, and no date when unknown. Drafts can be lost when browser data is cleared or storage is unavailable, so export finished work. Claude-specific saving and the optional “Ask Claude” feature depend on the host runtime; the latter may send a photo or analysis data and use your own Claude quota.
 
 ## 图片署名 / Image credits
 

@@ -205,6 +205,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .memo .bk canvas{width:54px;height:auto;border-radius:3px;box-shadow:0 0 0 1px var(--line);flex:none;cursor:pointer}
 .memo .bk>div{display:grid;gap:6px}.memo .bk b{color:var(--text)}
 .memo .newcol{width:8em;padding:5px 8px;font-size:12px}
+.memo select{width:100%;background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:8px 6px;font:500 13px var(--ui);color-scheme:dark}
+.memo .dsel{display:flex;gap:6px}.memo .dsel>*{min-width:0;flex:1}
 /* 我的相册：分类、搜索、翻面 */
 .lib .q{width:100%;margin-top:12px;background:var(--surface2);color:var(--text);border:0;border-radius:10px;padding:10px 12px;font:500 14px var(--ui)}
 .lib .tags{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px}
@@ -1004,7 +1006,20 @@ function buildDate(){
   const dt=ed.st.date,c=(k,v,l,on)=>`<button class="chip${on?' on':''}" data-${k}="${v}">${l}</button>`;
   $('daterow').innerHTML=`<b>日期印章</b>${c('on',dt.on?0:1,dt.on?'开':'关',dt.on)}`+(dt.on?
     // 格式、颜色、位置各一个按钮，点一下换下一种，手机上一两行放得下
-    `<input type="date" id="dateIn" value="${dt.d}" aria-label="印哪一天">`+(dt.guess?'<span class="mh">默认是翻拍那天</span>':'')+c('cyc','fmt',dt.fmt,0)+c('cyc','look',DATE_LOOKS[dt.look],0)+c('cyc','pos',DATE_POS[dt.pos],0):'')}
+    (dPrec(dt)!=='day'?`<span class="mh">${dPrec(dt)==='none'?'日期不记得，不印':`印「${dateText(dt)}」`}。在「回忆」里改</span>`:`<input type="date" id="dateIn" value="${dt.d}" aria-label="印哪一天">`)+(dt.guess?'<span class="mh">默认是翻拍那天</span>':dt.adjusted&&dPrec(dt)==='day'?'<span class="mh">日期已自动调整，请核对</span>':'')+c('cyc','fmt',dt.fmt,0)+c('cyc','look',DATE_LOOKS[dt.look],0)+c('cyc','pos',DATE_POS[dt.pos],0):'')}
+/* 不确定的日期：p 是记得多清楚，d 还是一个完整日期，只当年、月的落点用；s 是季节 */
+const DPREC={day:'哪一天',month:'哪个月',season:'哪个季节',year:'哪一年',about:'大约哪年',none:'不记得'};
+const SEASONS={spring:['春天','04'],summer:['夏天','07'],autumn:['秋天','10'],winter:['冬天','12']};
+const dPrec=dt=>dt&&DPREC[dt.p]?dt.p:'day',seasonOf=m=>m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';
+// 排序键：同一年里，整年的排最前，月份接着那个月的日子，季节排在季节月份的日子后面；不记得的是空串
+function dKey(dt){const p=dPrec(dt),d=dt&&dt.d||'';if(p==='none'||!d)return'';const y=d.slice(0,4);
+  return p==='day'?d:p==='month'?d.slice(0,7):p==='season'?`${y}-${SEASONS[dt.s||'summer'][1]}-s`:y}
+const cmpD=(a,b)=>{a=dKey(a.st.date);b=dKey(b.st.date);return a<b?-1:a>b?1:0};
+function dLabel(dt){const p=dPrec(dt),d=dt&&dt.d||'',[y,m]=d.split('-');if(p==='none'||!d)return'';
+  return p==='day'?dShort(d):p==='month'?`${y}.${m}`:p==='season'?`${y} ${SEASONS[dt.s||'summer'][0]}`:p==='about'?`约 ${y}`:y}
+// 相册里按这个分组
+function dGroup(dt){const p=dPrec(dt),d=dt&&dt.d||'',[y,m]=d.split('-');if(p==='none'||!d)return'日期未知';
+  return p==='day'||p==='month'?`${y} 年 ${+m} 月`:p==='season'?`${y} 年${SEASONS[dt.s||'summer'][0]}`:p==='about'?`大约 ${y} 年`:`${y} 年`}
 const DATE_LOOKS={led:'橙色数码',white:'白字',ink:'跟字同色'},DATE_POS={photo:'印在画面上',frame:'写在白边上'};
 const nextKey=(o,k)=>{const ks=Object.keys(o);return ks[(ks.indexOf(k)+1)%ks.length]};
 $('daterow').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!ed)return;const dt=ed.st.date;commit();
@@ -1012,15 +1027,21 @@ $('daterow').addEventListener('click',e=>{const b=e.target.closest('button');if(
   else if(b.dataset.cyc==='fmt')dt.fmt=DATE_FMTS[(DATE_FMTS.indexOf(dt.fmt)+1)%DATE_FMTS.length];
   else if(b.dataset.cyc==='look')dt.look=nextKey(DATE_LOOKS,dt.look);else if(b.dataset.cyc==='pos')dt.pos=nextKey(DATE_POS,dt.pos);
   buildDate();renderCard()});
-$('daterow').addEventListener('change',e=>{if(e.target.id!=='dateIn'||!ed||!e.target.value)return;commit();ed.st.date.d=e.target.value;ed.st.date.guess=false;buildMemo();renderCard()});
+$('daterow').addEventListener('change',e=>{if(e.target.id!=='dateIn'||!ed||!e.target.value)return;commit();ed.st.date.d=e.target.value;ed.st.date.guess=false;ed.st.date.adjusted=false;buildDate();buildMemo();renderCard()});
 /* ---------- 回忆：地点、人物、一句故事，可以选哪些印在白边上 ----------
    「照片里的日期」默认按翻拍那天猜（EXIF 或文件时间），拍立得当天往往更早，所以和「翻拍日期」分开写 */
 const MEMO_KEYS={place:'地点',people:'人物'},DSRC={exif:'翻拍照片里记的拍摄时间',file:'文件的修改时间',today:'导入那天'};
 const memoLine=st=>{const m=st.memo;return m&&m.print?m.print.map(k=>(m[k]||'').trim()).filter(Boolean).join(' · '):''};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>`&#${c.charCodeAt(0)};`);
-function buildMemo(){const st=ed.st,m=st.memo,dt=st.date;
-  $('memo').innerHTML=`<div class="two"><label>照片里的日期<input type="date" id="mDate" value="${dt.d}"></label><label>翻拍日期<input type="date" value="${ed.scanDate||''}" disabled></label></div>`+
-    `<p class="mh">${dt.guess?`照片里的日期现在是按翻拍那天猜的（来自${DSRC[ed.scanSrc]||'导入那天'}），拍立得当天可能更早，可以改。`:''}日期印章印的是「照片里的日期」。</p>`+
+function dateField(dt){const p=dPrec(dt),[y,mo]=(dt.d||'').split('-'),yr=`<input type="number" id="mYear" min="1900" max="2100" inputmode="numeric" value="${y||''}" aria-label="年份">`,
+    opt=(v,l,on)=>`<option value="${v}"${on?' selected':''}>${l}</option>`;
+  return p==='day'?`<input type="date" id="mDate" value="${dt.d}">`:p==='none'?'<input value="日期未知" disabled>':
+    p==='month'?`<span class="dsel">${yr}<select id="mMon" aria-label="月份">${Array.from({length:12},(_,i)=>opt(i+1,`${i+1} 月`,+mo===i+1)).join('')}</select></span>`:
+    p==='season'?`<span class="dsel">${yr}<select id="mSea" aria-label="季节">${Object.entries(SEASONS).map(([k,v])=>opt(k,v[0],(dt.s||'summer')===k)).join('')}</select></span>`:yr}
+function buildMemo(){const st=ed.st,m=st.memo,dt=st.date,p=dPrec(dt);
+  $('memo').innerHTML=`<div class="two"><label>照片里的日期${dateField(dt)}</label><label>翻拍日期<input type="date" value="${ed.scanDate||''}" disabled></label></div>`+
+    `<div class="row">记得到${Object.entries(DPREC).map(([k,l])=>`<button class="chip${p===k?' on':''}" data-dp="${k}">${l}</button>`).join('')}</div>`+
+    `<p class="mh">${dt.guess?`照片里的日期现在是按翻拍那天猜的（来自${DSRC[ed.scanSrc]||'导入那天'}），拍立得当天可能更早，可以改。`:''}${p==='day'&&dt.adjusted?'日期因换月或换年自动调整过，请核对具体哪一天。':p==='day'?'':'记不清就别硬编一天，时间线和相册会照这样排。'}日期印章印的是「照片里的日期」。</p>`+
     (ed.back?`<div class="bk"><canvas id="bkThumb" title="翻面"></canvas><div><b>背面</b><span class="mh">背面写的字也是回忆。翻过来看，照着抄进下面的故事里</span><div class="row"><button class="chip" data-bk="flip">${showingBack?'看正面':'翻过来看'}</button><button class="chip" data-bk="redo">重拍背面</button><button class="chip" data-bk="drop">删掉背面</button></div></div></div>`:
       `<div class="bk"><div><b>背面</b><span class="mh">很多人会在相纸背面写日期或一句话。拍下背面和正面存在一起，随时翻面看</span><div class="row"><button class="chip" data-bk="add">加背面照片</button></div></div></div>`)+
     `<label>地点<input id="mPlace" maxlength="30" placeholder="比如：帕兰加的海边" value="${esc(m.place)}"></label>`+
@@ -1037,7 +1058,15 @@ $('memo').addEventListener('click',e=>{if(!ed)return;const b=e.target.closest('[
 $('memo').addEventListener('keydown',e=>{if(e.target.id!=='mNewCol'||e.key!=='Enter'||e.isComposing)return;e.preventDefault();const c=newCol(e.target.value,ed.id);if(c){buildMemo();toast(`放进了「${c.name}」。点上面的「相册」能按相册翻看`)}});
 $('memo').addEventListener('input',e=>{if(!ed)return;const m=ed.st.memo,k={mPlace:'place',mPeople:'people',mStory:'story'}[e.target.id];if(!k)return;m[k]=e.target.value;
   if(k!=='story'&&m.print.includes(k)){layoutCard();renderCard()}else draftSoon()});
-$('memo').addEventListener('change',e=>{if(e.target.id!=='mDate'||!ed||!e.target.value)return;ed.st.date.d=e.target.value;ed.st.date.guess=false;buildMemo();buildDate();renderCard()});
+$('memo').addEventListener('change',e=>{const id=e.target.id,v=e.target.value;if(!ed||!v||!['mDate','mYear','mMon','mSea'].includes(id))return;const dt=ed.st.date;
+  let [y,mo,dd]=(dt.d||new Date().toISOString().slice(0,10)).split('-');
+  if(id==='mDate'){dt.d=v;dt.adjusted=false}else{if(id==='mYear'){if(!/^\d{4}$/.test(v)||v<1900||v>2100){toast('年份写四位数，比如 2023');buildMemo();return}y=v}
+    else if(id==='mMon'){commit(true);mo=String(v).padStart(2,'0')}else{commit(true);dt.s=v;mo=SEASONS[v][1]}
+    // 用有效的日期作为内部落点；切回「哪一天」时不会出现空白日期控件。
+    const last=new Date(+y,+mo,0).getDate();if(+dd>last)dt.adjusted=true;dd=String(Math.min(+dd,last)).padStart(2,'0');dt.d=`${y}-${mo}-${dd}`}
+  dt.guess=false;buildMemo();buildDate();renderCard()});
+$('memo').addEventListener('click',e=>{const b=e.target.closest('[data-dp]');if(!b||!ed)return;commit(true);const dt=ed.st.date;dt.p=b.dataset.dp;dt.guess=false;
+  if(dt.p==='season'&&!dt.s)dt.s=seasonOf(+(dt.d||'').slice(5,7));buildMemo();buildDate();renderCard()});
 $('memo').addEventListener('click',e=>{const b=e.target.closest('[data-pr]');if(!b||!ed)return;commit();const p=ed.st.memo.print,k=b.dataset.pr,ks=Object.keys(MEMO_KEYS);
   if(p.includes(k))p.splice(p.indexOf(k),1);else{p.push(k);p.sort((a,c)=>ks.indexOf(a)-ks.indexOf(c));if(!(ed.st.memo[k]||'').trim())toast(`先在上面填${MEMO_KEYS[k]}`)}
   buildMemo();layoutCard();renderCard()});
@@ -1097,7 +1126,8 @@ function paintCard(){
    官方做法（instax mini Evo / mini LiPlay / mini LiPlay+ 说明书「日期印章 DATE STAMP」）：开 / 关，把日期印在画面上，
    格式跟着相机的日期设置走：YY.MM.DD、DD.MM.YY、MM/DD/YY。字样仿胶片相机的橙色数码管，用代码画，不依赖字体。 */
 const DATE_FMTS=['YY.MM.DD','DD.MM.YY','MM/DD/YY'];
-function dateText(dt){const [y,m,d]=(dt.d||'').split('-');if(!d)return'';const yy=y.slice(2);
+function dateText(dt){const [y,m,d]=(dt.d||'').split('-'),p=dPrec(dt);if(!d||p==='none')return'';const yy=y.slice(2);
+  if(p==='month')return dt.fmt==='DD.MM.YY'?`${m}.${yy}`:dt.fmt==='MM/DD/YY'?`${m}/${yy}`:`${yy}.${m}`;if(p!=='day')return y;   // 只记得季节、年份的印整年
   return dt.fmt==='DD.MM.YY'?`${d}.${m}.${yy}`:dt.fmt==='MM/DD/YY'?`${m}/${d}/${yy}`:`${yy}.${m}.${d}`}
 // 七段数码管：a 上 b 右上 c 右下 d 下 e 左下 f 左上 g 中
 const SEG={0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
@@ -1273,7 +1303,7 @@ function zipStore(files){const enc=new TextEncoder(),parts=[],cen=[],d=new Date(
   const cs=cen.reduce((a,v)=>a+v.byteLength,0);
   return new Blob([...parts,...cen,put(22,[[0,0x06054b50,4],[4,0],[6,0],[8,files.length],[10,files.length],[12,cs,4],[16,off,4],[20,0]])],{type:'application/zip'})}
 function memoTxt(list,names){if(!list.some(s=>{const m=s.st.memo||{};return m.place||m.people||m.story}))return null;
-  return '\uFEFF'+list.map((s,i)=>{const m=s.st.memo||{},dt=s.st.date||{};return [names[i],`照片里的日期：${dt.d||'—'}${dt.guess?'（按翻拍日期猜的）':''}`,`翻拍日期：${s.scanDate||'—'}`,
+  return '\uFEFF'+list.map((s,i)=>{const m=s.st.memo||{},dt=s.st.date||{};return [names[i],`照片里的日期：${dPrec(dt)==='none'?'不记得':dLabel(dt)||'—'}${dt.guess?'（按翻拍日期猜的）':''}`,`翻拍日期：${s.scanDate||'—'}`,
     m.place&&`地点：${m.place}`,m.people&&`人物：${m.people}`,m.story&&`故事：${m.story}`].filter(Boolean).join('\r\n')}).join('\r\n\r\n')+'\r\n'}
 const stamp=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`};
 let downloads=null;
@@ -1418,7 +1448,7 @@ const ALBUM_DRAW={
         if(o.tape!=='none'){x.save();x.translate(cx+Math.sin(rot)*hs[i]/2,cy-Math.cos(rot)*hs[i]/2);x.rotate(ta);   // 纸胶带
           x.fillStyle=o.tape==='kraft'?'rgba(196,160,112,.9)':o.tape==='clear'?'rgba(255,255,255,.45)':TAPES[i%TAPES.length];x.fillRect(-cw*.2,-22,cw*.4,44);
           x.fillStyle=o.tape==='clear'?'rgba(255,255,255,.25)':o.tape==='kraft'?'rgba(120,88,50,.18)':'rgba(255,255,255,.22)';for(let t=-cw*.2+8;t<cw*.2;t+=18)x.fillRect(t,-22,6,44);x.restore()}
-        const m=items[i].st.memo||{},lab=[dShort(items[i].st.date.d),m.place].filter(Boolean).join('  ');
+        const m=items[i].st.memo||{},lab=[dLabel(items[i].st.date),m.place].filter(Boolean).join('  ');
         if(lab){x.save();x.translate(cx,cy+hs[i]/2+56);x.rotate(rot*.5);x.fillStyle=o.dark?'#D8D0C2':'#4A3F30';x.font=`400 40px ${HANDF}`;x.textAlign='center';x.textBaseline='middle';x.fillText(lab,0,0);x.restore()}}
       y+=rowH[r]}
     return c},
@@ -1428,7 +1458,7 @@ const ALBUM_DRAW={
     for(let r=0;r<rows;r++){const y0=top+r*(band+20);x.fillStyle='#1D1C1B';x.fillRect(pad-30,y0,W-pad*2+60,band);x.fillStyle=o.bg;
       for(let hx=pad-14;hx<W-pad+20;hx+=40){fillRR(x,hx,y0+10,20,14,3);fillRR(x,hx,y0+band-24,20,14,3)}   // 齿孔
       for(let k=0;k<cols;k++){const i=r*cols+k;if(i>=n)break;const px=pad+k*(cw+gap),py=y0+34;cover(x,cards[i],px,py,cw,ch);
-        x.fillStyle='#F08A24';x.font=`700 20px ${MONO}`;x.fillText(`▸ ${i+1}A`,px,py+ch+22);x.textAlign='right';x.fillText(dShort(items[i].st.date.d),px+cw,py+ch+22);x.textAlign='left'}}
+        x.fillStyle='#F08A24';x.font=`700 20px ${MONO}`;x.fillText(`▸ ${i+1}A`,px,py+ch+22);x.textAlign='right';x.fillText(dLabel(items[i].st.date),px+cw,py+ch+22);x.textAlign='left'}}
     return c},
   postcard(items,cards,title,o){const W=1600,H=1040,c=mkCv(W,H),x=c.getContext('2d'),it=items[0],m=it.st.memo||{},ink=o.dark?'rgba(230,222,206,.6)':'rgba(44,44,78,.6)',t=o.tilt;
     x.fillStyle=o.bg;x.fillRect(0,0,W,H);x.strokeStyle=o.dark?'#3A3732':'#D8CDB8';x.lineWidth=2;x.strokeRect(24,24,W-48,H-48);
@@ -1441,30 +1471,30 @@ const ALBUM_DRAW={
     cover(x,it.photoCv,1374,94,122,124);x.fillStyle='#C8553D';x.fillRect(1374,218,122,28);x.fillStyle='#FFFDF8';x.font=`700 16px ${MONO}`;x.textBaseline='middle';x.fillText('INSTANT',1382,232);x.textAlign='right';x.fillText('80',1490,232);x.textAlign='left';
     // 邮戳
     x.strokeStyle=ink;x.lineWidth=4;x.beginPath();x.arc(1250,190,78,0,7);x.stroke();x.lineWidth=2;x.beginPath();x.arc(1250,190,64,0,7);x.stroke();
-    x.fillStyle=ink;x.textAlign='center';x.font=`600 20px ${SANS}`;x.fillText((m.place||'POST').slice(0,6),1250,160);x.font=`700 22px ${MONO}`;x.fillText(dShort(it.st.date.d)||'',1250,194);x.font=`600 16px ${MONO}`;x.fillText('INSTANT',1250,226);x.textAlign='left';
+    x.fillStyle=ink;x.textAlign='center';x.font=`600 20px ${SANS}`;x.fillText((m.place||'POST').slice(0,6),1250,160);x.font=`700 22px ${MONO}`;x.fillText(dLabel(it.st.date),1250,194);x.font=`600 16px ${MONO}`;x.fillText('INSTANT',1250,226);x.textAlign='left';
     x.lineWidth=3;for(const wy of [160,190,220]){x.beginPath();for(let wx=1330;wx<=1560;wx+=6)x.lineTo(wx,wy+Math.sin(wx/14)*6);x.stroke()}
     // 右边：写的字
     x.strokeStyle=o.dark?'#3A3732':'#D9CFBD';x.lineWidth=2;for(let i=0;i<6;i++){const y=470+i*72;x.beginPath();x.moveTo(1010,y);x.lineTo(1520,y);x.stroke()}
     x.textBaseline='alphabetic';x.fillStyle=o.dark?'#F2D08A':'#2747D6';if(title){x.font=`400 60px ${HANDF}`;x.fillText(title,1010,390)}
     x.font=`400 44px ${HANDF}`;wrapLines(x,m.story||it.st.caption||'',500).slice(0,6).forEach((l,i)=>x.fillText(l,1014,460+i*72));
-    x.fillStyle=o.dark?'#A8A094':'#7A6F5E';x.font=`500 26px ${SANS}`;x.fillText([m.place,m.people,dShort(it.st.date.d)].filter(Boolean).join(' · '),1010,H-100);
+    x.fillStyle=o.dark?'#A8A094':'#7A6F5E';x.font=`500 26px ${SANS}`;x.fillText([m.place,m.people,dLabel(it.st.date)].filter(Boolean).join(' · '),1010,H-100);
     return c},
   timeline(items,cards,title,o){const ink=o.dark?'#EFE9DE':'#2B2620';const W=1600,cw=560,tx=900,tw=600,mx=mkCv(1,1).getContext('2d');mx.font=`400 38px ${HANDF}`;
     const blocks=items.map((it,i)=>{const m=it.st.memo||{},ch=cw*cards[i].height/cards[i].width,lines=wrapLines(mx,m.story||it.st.caption||'',tw).slice(0,9);return {h:Math.max(ch,170+lines.length*56)+90,ch,lines,m}});
     const top=title?250:150,H=Math.round(top+blocks.reduce((a,b)=>a+b.h,0)+40),c=mkCv(W,H),x=c.getContext('2d');
     x.fillStyle=o.bg;x.fillRect(0,0,W,H);x.textBaseline='alphabetic';
     if(title){x.fillStyle=ink;x.font=`400 92px ${HANDF}`;x.fillText(title,120,150)}
-    const ds=items.map(i=>i.st.date.d).filter(Boolean);if(ds.length){x.fillStyle='#8A8072';x.font=`500 26px ${SANS}`;x.fillText(ds[0]!==ds[ds.length-1]?`${dShort(ds[0])} — ${dShort(ds[ds.length-1])}`:dShort(ds[0]),124,title?205:90)}
+    const ds=items.map(i=>dLabel(i.st.date)).filter(Boolean);if(ds.length){x.fillStyle='#8A8072';x.font=`500 26px ${SANS}`;x.fillText(ds[0]!==ds[ds.length-1]?`${ds[0]} — ${ds[ds.length-1]}`:ds[0],124,title?205:90)}
     x.strokeStyle='#CBBFA8';x.lineWidth=3;x.beginPath();x.moveTo(200,top-20);x.lineTo(200,H-50);x.stroke();
     let y=top;items.forEach((it,i)=>{const b=blocks[i];
       x.fillStyle='#E0A030';x.beginPath();x.arc(200,y+34,13,0,7);x.fill();x.strokeStyle=o.bg;x.lineWidth=5;x.stroke();
       dropCard(x,cards[i],260+cw/2,y+b.ch/2,cw,(i%2?1:-1)*.02*o.tilt);
-      x.fillStyle=ink;x.font=`700 44px ${SANS}`;x.fillText(dShort(it.st.date.d)||'某一天',tx,y+50);
+      x.fillStyle=ink;x.font=`700 44px ${SANS}`;x.fillText(dLabel(it.st.date)||'某一天',tx,y+50);
       const sub=[b.m.place,b.m.people].filter(Boolean).join(' · ');let ty=y+110;if(sub){x.fillStyle='#8A6D3B';x.font=`500 28px ${SANS}`;x.fillText(sub,tx,ty-8);ty+=56}
       x.fillStyle=o.dark?'#DDD5C8':'#3A3226';x.font=`400 38px ${HANDF}`;b.lines.forEach((l,k)=>x.fillText(l,tx,ty+k*56));y+=b.h});
     return c}};
 async function albumCanvas(){try{await Promise.all([`400 60px ${HANDF}`,`700 30px ${SANS}`].map(f=>document.fonts.load(f)))}catch(e){}
-  const items=alb.pick.map(id=>scans.find(s=>s.id===id)).filter(Boolean);if(alb.tpl==='timeline')items.sort((a,b)=>(a.st.date.d||'').localeCompare(b.st.date.d||''));
+  const items=alb.pick.map(id=>scans.find(s=>s.id===id)).filter(Boolean);if(alb.tpl==='timeline')items.sort(cmpD);
   const cards=[];for(const it of items)cards.push(await cardOf(it,alb.tpl==='contact'));
   const o={bg:alb.bg||TPL_BG[alb.tpl],tape:alb.tape,tilt:alb.tilt,seed:alb.seed};o.dark=isDark(o.bg);
   return ALBUM_DRAW[alb.tpl](items,cards,alb.title.trim(),o)}
@@ -1476,7 +1506,7 @@ function openAlbum(pick,title){if(!scans.length)return;if(pick){const m=ALBUMS[a
 function renderAlbumUI(){const tl=alb.tpl==='timeline',bg=alb.bg||TPL_BG[alb.tpl],ch=(k,v,l)=>`<button class="chip${alb[k]===v?' on':''}" data-ak="${k}" data-av="${v}">${l}</button>`;
   $('albPages').hidden=!pages.length;$('albPages').innerHTML='<span>我的相册页</span>'+pages.map(p=>`<button class="chip${p.id===alb.id?' on':''}" data-page="${p.id}">${esc(p.title||ALBUMS[p.tpl][0])}</button>`).join('')+'<button class="chip" data-page="new">＋ 新的一页</button>';
   const kb=$('albKeep');kb.textContent=alb.id?'删掉这一页':'存成相册页';delete kb.dataset.sure;kb.classList.remove('warn');
-  const ord=$('albOrder'),items=alb.pick.map(id=>scans.find(s=>s.id===id)).filter(Boolean);if(tl)items.sort((a,b)=>(a.st.date.d||'').localeCompare(b.st.date.d||''));
+  const ord=$('albOrder'),items=alb.pick.map(id=>scans.find(s=>s.id===id)).filter(Boolean);if(tl)items.sort(cmpD);
   ord.className='ord'+(tl?' fixed':'');ord.innerHTML=items.length?`<span>${tl?'时间线按「照片里的日期」排，改日期就能换顺序':items.length>1?'顺序 · 按住小图拖动换位置':'顺序'}</span>`:'';
   items.forEach((s,i)=>{const b=document.createElement('button');b.className='it';b.dataset.id=s.id;b.setAttribute('aria-label',`第 ${i+1} 个位置，左右方向键移动`);b.appendChild(thumbOf(s));b.insertAdjacentHTML('beforeend',`<b>${i+1}</b>`);ord.appendChild(b)});
   $('albLook').innerHTML=`<div>底色${[...new Set([TPL_BG[alb.tpl],...BGS])].map(c=>`<button class="bgsw${c===bg?' on':''}" data-bg="${c}" style="background:${c}" aria-label="底色 ${c}"></button>`).join('')}</div>`+
@@ -1532,12 +1562,12 @@ function newCol(name,first){name=(name||'').trim().slice(0,12);if(!name)return n
   if(!c){c={id:newId(),name,cover:null,ids:[]};cols.push(c)}if(first&&!c.ids.includes(first))c.ids.push(first);draftSoon();return c}
 const coverOf=c=>{const l=c.ids.map(id=>scans.find(s=>s.id===id)).filter(Boolean);return l.find(s=>s.id===c.cover)||l[0]||null};
 // 搜的范围：照片里的日期（几种写法）、翻拍日期、地点、人物、故事、白边上的字、所在相册
-function hay(s){const st=s.st,m=st.memo||{},d=st.date.d||'',[y,mo,dd]=d.split('-');
-  return [d,dShort(d),dd&&`${y}年${+mo}月${+dd}日 ${y}年${mo}月 ${+mo}月${+dd}日`,s.scanDate,m.place,m.people,m.story,st.caption,...cols.filter(c=>c.ids.includes(s.id)).map(c=>c.name)].filter(Boolean).join(' ').toLowerCase()}
+function hay(s){const st=s.st,m=st.memo||{},dt=st.date,p=dPrec(dt),d=dt.d||'',[y,mo,dd]=d.split('-'),ym=`${y}.${mo} ${y}-${mo} ${y}年${+mo}月 ${y}年${mo}月`;
+  return [!d||p==='none'?'日期未知 不记得':p==='day'?`${d} ${dShort(d)} ${ym} ${y}年${+mo}月${+dd}日 ${+mo}月${+dd}日`:p==='month'?ym:p==='season'?`${y} ${y}年${SEASONS[dt.s||'summer'][0]} ${SEASONS[dt.s||'summer'][0]}`:`${y} ${y}年 ${p==='about'?'大约 约':''}`,s.scanDate,m.place,m.people,m.story,st.caption,...cols.filter(c=>c.ids.includes(s.id)).map(c=>c.name)].filter(Boolean).join(' ').toLowerCase()}
 // 有自己的照片时不放示例
 const libAll=()=>{const l=scans.filter(s=>!s.demo);return l.length?l:scans.slice()};
 function libList(){const ts=lib.q.trim().toLowerCase().replace(/\//g,'.').split(/\s+/).filter(Boolean),c=colOf(lib.col);
-  return libAll().filter(s=>(lib.pick||!c||c.ids.includes(s.id))&&ts.every(t=>hay(s).includes(t))).sort((a,b)=>(b.st.date.d||'').localeCompare(a.st.date.d||''))}
+  return libAll().filter(s=>(lib.pick||!c||c.ids.includes(s.id))&&ts.every(t=>hay(s).includes(t))).sort((a,b)=>cmpD(b,a))}
 function openLib(){if(!scans.length)return;lib.pick=false;$('libQ').value=lib.q;$('libPanel').hidden=false;renderLib()}
 function coverCv(s,size){const c=mkCv(size,size);if(s){const x=c.getContext('2d');cover(x,s.photoCv,0,0,size,size)}return c}
 function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.pick=false}const c=colOf(lib.col),live=id=>scans.some(s=>s.id===id);
@@ -1552,11 +1582,11 @@ function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.
   $('libAlbum').textContent=lib.pick?'挑好了':'用这些拼一页'}
 function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=libList(),cov=c&&coverOf(c);g.innerHTML='';
   if(!list.length){g.innerHTML=`<p class="empty">${lib.q?'没找到。换个词试试，比如年份「2025」、月份「2025.07」或者地点':c?'这个相册还是空的。点「挑照片」，或者在调色页的「回忆」里放进来':'还没有照片'}</p>`;return}
-  let last=null;for(const s of list){const d=s.st.date.d||'',mk=d.slice(0,7),m=s.st.memo||{};
-    if(mk!==last){last=mk;g.insertAdjacentHTML('beforeend',`<h4>${mk?`${mk.slice(0,4)} 年 ${+mk.slice(5)} 月`:'没写日期'}</h4>`)}
+  let last=null;for(const s of list){const mk=dGroup(s.st.date),m=s.st.memo||{};
+    if(mk!==last){last=mk;g.insertAdjacentHTML('beforeend',`<h4>${mk}</h4>`)}
     const f=document.createElement('figure');f.className='lc'+(lib.pick&&c?(c.ids.includes(s.id)?' sel':' unsel'):'');f.dataset.id=s.id;
     f.innerHTML=`<div class="flip" role="button" tabindex="0" aria-label="${s.back?'翻面':'打开'}"><canvas class="fc"></canvas>${s.back?'<canvas class="bk"></canvas>':''}</div>`+
-      `<figcaption><span>${esc([dShort(d),m.place].filter(Boolean).join(' · ')||'没写日期')}</span>${s.back?'<i>有背面</i>':''}${s.demo?'<i>示例</i>':''}</figcaption>`+
+      `<figcaption><span>${esc([dLabel(s.st.date),m.place].filter(Boolean).join(' · ')||'日期未知')}</span>${s.back?'<i>有背面</i>':''}${s.demo?'<i>示例</i>':''}</figcaption>`+
       (lib.pick?'':`<div class="ops"><button data-op="open">打开</button>${s.back?'<button data-op="flip">翻面</button>':''}${c?`<button data-op="cover"${cov===s?' class="on"':''}>${cov===s?'是封面':'设为封面'}</button>`:''}</div>`);
     g.appendChild(f);const fr=f.querySelector('.fc'),[w,h]=s.st.frame==='none'?[s.rect[2],s.rect[3]]:[s.W,s.H];fr.width=280;fr.height=Math.round(280*h/w);
     if(s.back){const b=f.querySelector('.bk');b.width=280;b.height=Math.round(280*s.back.height/s.back.width);b.getContext('2d').drawImage(s.back,0,0,b.width,b.height)}
