@@ -3,7 +3,7 @@
   <br><br>
   <h1>贴进相册</h1>
   <p><strong>把手里的拍立得，留进手机相册。</strong></p>
-  <p>扫描、修饰、写下故事，让每一个瞬间有地方安放。</p>
+  <p>扫描正反面，写下故事，做一本属于自己的数字相册。</p>
   <p><sub>SCAN &nbsp; / &nbsp; CREATE &nbsp; / &nbsp; REMEMBER</sub></p>
   <p><a href="#开始使用">开始使用</a> &nbsp;·&nbsp; <a href="#功能一览">功能一览</a> &nbsp;·&nbsp; <a href="#使用须知">使用须知</a> &nbsp;·&nbsp; <a href="#english">English</a></p>
 </div>
@@ -12,7 +12,7 @@
 
 ### 一张照片，一间小小暗房
 
-「贴进相册」是一款单文件网页工具，帮你把实体即时成像照片整理成数字相册。拍一张或上传图片，拉正相纸、调整色彩、写下照片背后的故事；也可以把几张回忆拼成一页，慢慢收藏。
+「贴进相册」是一款单文件网页工具，帮你把实体即时成像照片整理成数字相册。拍一张或上传图片，拉正相纸、记录正反面和照片背后的故事；把照片收进主题相册，也可以将几张回忆拼成一页，慢慢收藏。
 
 ## 功能一览
 
@@ -22,10 +22,11 @@
 | **02 / 减少反光** | 换个角度补拍后尝试对齐并合成，或用画笔手动修补小光斑。合成后可按住对比合成前，再决定保留还是撤回。两张照片在同一位置都有反光时无法通过合成恢复细节。 |
 | **03 / 色彩与相纸** | 使用滤镜、亮度、对比、色温和颗粒调整照片；保留原框，选择代码绘制的相纸样式，或绘制、上传自己的边框。 |
 | **04 / 留下字迹** | 为照片添加文字、选择字体，并加上胶片相机风格的日期印章。 |
-| **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天。 |
-| **06 / 导出与拼页** | 导出整张相纸或只要画面，选择 JPEG、PNG 与尺寸；多张可打包为 ZIP 并附「回忆.txt」。把几张照片拼成手账贴纸墙、胶片接触印、旅行明信片或回忆时间线。 |
-| **07 / 本地草稿** | 在浏览器支持时自动保存照片、四角和编辑设置，下次打开时尝试恢复；可删除单张或清空草稿。 |
-| **08 / 了解相机** | 根据选择的相机查看拍摄提示和推荐参数；通过程序化 3D 模型探索即时成像相机的通用内部结构。 |
+| **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天。还可以拍下相纸背面，和正面存在一起，随时翻面查看。 |
+| **06 / 导出与拼页** | 导出整张相纸或只要画面，选择 JPEG、PNG 与尺寸；多张可打包为 ZIP 并附「回忆.txt」。有背面的照片可与正面并排导出或另存一张。把几张照片拼成手账贴纸墙、胶片接触印、旅行明信片或回忆时间线；调整照片顺序，换底色、胶带和摆放方式，存成以后还能接着改的相册页。 |
+| **07 / 我的相册** | 建立「旅行」「朋友」等相册并设置封面，按日期、地点、人物或故事查找，在应用里按月份翻看收藏；点有背面的照片可以翻面。 |
+| **08 / 本地草稿** | 在浏览器支持时自动保存照片、背面、四角、编辑设置、相册和相册页，下次打开时尝试恢复；可删除单张或清空草稿。 |
+| **09 / 了解相机** | 根据选择的相机查看拍摄提示和推荐参数；通过程序化 3D 模型探索即时成像相机的通用内部结构。 |
 
 ## 开始使用
 
@@ -64,18 +65,19 @@ python build.py .
 
 构建会生成 `贴进相册.html` 和本地预览用的 `preview.html`。Google Fonts 和 Three.js 通过网络加载；Three.js 版本为 0.160.0。
 
-浏览器回归测试需要 Python Playwright 与 Chromium：运行 `python tests/test_render_cache.py` 与 `python tests/test_draft_deletion.py`，也可以通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。
+浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的五个 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。
 
 ## English
 
 **An instant photo workspace for the pictures you can hold.**
 
-贴进相册 is a single-file web app for turning physical instant photographs into digital keepsakes. Straighten a print, make it your own, and give the story behind it a place to live. The interface is currently in Chinese.
+贴进相册 is a single-file web app for turning physical instant photographs into digital keepsakes. Straighten a print, keep its front and back together, and give the story behind it a place to live. The interface is currently in Chinese.
 
 - **Scan:** Detect edges and correct perspective, or adjust the corners with a magnifier and choose a film format. Ordinary photographs can retain their original proportions.
 - **Restore:** Try a second, differently angled shot to reduce glare, compare the result, or brush over small spots. Results depend on the images; glare removal has been tested on simulated images, not yet on real instant photographs.
-- **Create:** Adjust colour and frames, add captions and date stamps, and record a place, people and a short story. The date of the original moment can be edited separately from the digitisation date.
-- **Keep & share:** Export a single image as JPEG or PNG, save several as a ZIP, or arrange them into a scrapbook wall, contact sheet, postcard or timeline. Drafts are stored locally when browser storage is available.
+- **Create:** Adjust colour and frames, add captions and date stamps, and record a place, people and a short story. The date of the original moment can be edited separately from the digitisation date. Scan the back of a print too and flip between both sides.
+- **Keep & share:** Export a single image as JPEG or PNG, save several as a ZIP, or arrange them into a scrapbook wall, contact sheet, postcard or timeline, then reorder photos, change the paper and tape, and keep the page to edit later. Drafts are stored locally when browser storage is available.
+- **Browse:** Group photos into albums with covers, and search by date, place or people.
 - **Explore:** Browse camera-specific shooting tips and illustrative 3D models of generic instant-camera internals.
 
 Open [贴进相册.html](贴进相册.html) in a browser to start. No backend installation is required. Fonts and the 3D library require an internet connection. Regular browsers offer a download link and image preview; file sharing depends on browser support. Drafts can be lost when browser data is cleared or storage is unavailable, so export finished work. Claude-specific saving and the optional “Ask Claude” feature depend on the host runtime; the latter may send a photo or analysis data and use your own Claude quota.
