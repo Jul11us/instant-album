@@ -59,6 +59,7 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
 
 /* 调色：卡片 */
 .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:14px 0 4px;background:radial-gradient(ellipse at 50% 45%,#2A2826 0%,var(--bg) 70%)}
+.amb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1.8s ease}.amb.on{opacity:.9}
 .card{position:relative;line-height:0;box-shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -12px rgba(0,0,0,.65)}
 .card canvas{display:block;width:100%;height:100%}
 /* 翻面：卡片绕竖轴转到侧面，换成另一面再转回来 */
@@ -370,7 +371,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
     <div class="top"><div class="grp"><button class="chip" id="back">‹ 重扫</button><button class="chip" id="libBtn">相册</button></div>
       <div class="grp"><button class="chip" id="flip" hidden>翻面</button><button class="chip" id="undo" disabled>撤销</button><button class="chip" id="peek">按住看原图</button></div></div>
     <div class="pad tray" id="tray2"></div>
-    <div class="stage" id="stage">
+    <div class="stage" id="stage"><canvas class="amb" id="amb" aria-hidden="true"></canvas>
       <div class="card" id="card"><div class="tape"></div><canvas id="cardCv"></canvas>
         <div class="cap" id="cap" contenteditable="true" spellcheck="false" aria-label="白框上的字"></div>
         <div class="sticker" id="sticker" hidden></div></div>
@@ -2333,6 +2334,22 @@ function demo(){
     toast(DESK?'这是示例照片。把你的拍立得照片拖进窗口就能换，可以一次拖好几张。':'这是示例照片。点「‹ 重扫」再点「拍一张」，换成你自己的拍立得。',4200);
   };im.src=SAMPLE;
 }
+/* 暗房背景：照片后面一层很暗的安全灯红、一道漏光和颗粒。用 shaders.com 的 MIT 组件，只在支持 WebGPU 时加载；
+   不支持、加载失败或者没网就一直透明，露出原来的背景。关掉它的使用统计；减少动态效果时画面不动 */
+const AMB_URL='https://cdn.jsdelivr.net/npm/shaders@4.0.4/dist/js/index.js/+esm';
+async function startAmb(){const cv=$('amb');if(!navigator.gpu||!cv)return;
+  // The shader library otherwise writes fixed pixel dimensions to the inline style.
+  // Keep the canvas tied to the stage as the viewport and editor panels resize.
+  cv.style.width='100%';cv.style.height='100%';
+  try{const {createShader}=await import(AMB_URL),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    await createShader(cv,{components:[
+      {type:'FlowingGradient',props:{colorA:'#121110',colorB:'#221210',colorC:'#26180F',colorD:'#161413',speed:still?0:.18,distortion:.35,seed:7}},
+      {type:'LightLeak',props:{position:{x:.97,y:.08},spread:.42,intensity:.05,streaks:.3,colorHot:'#FFE7B8',colorMid:'#E8742A',colorFringe:'#7A2E4A',flicker:.25,speed:still?0:.35,seed:3}},
+      {type:'Vignette',props:{color:'#0C0B0A',radius:.35,falloff:.75,intensity:.85}},
+      {type:'FilmGrain',props:{strength:.07,bias:2,animated:false}}]},
+      {disableTelemetry:true,onReady:()=>cv.classList.add('on'),onError:()=>cv.classList.remove('on')})}catch(e){cv.classList.remove('on')}}
+// 等首屏和照片都画好再加载，不跟它们抢网速
+addEventListener('load',()=>setTimeout(()=>(window.requestIdleCallback||setTimeout)(startAmb),1200));
 // 打开时先看有没有草稿：有就接着上次的，没有才放示例
 (async()=>{let r=null;try{r=await restoreDrafts()}catch(e){}restoring=false;
   if(r){openEdit(r.cur);toast(`接着上次的 ${r.n} 张。草稿只存在这个浏览器里，调好的记得导出`,4600)}else demo()})();

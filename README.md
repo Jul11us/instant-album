@@ -12,7 +12,7 @@
 
 ### 一张照片，一间小小暗房
 
-「贴进相册」是一款单文件网页工具，帮你把实体即时成像照片整理成数字相册。拍一张或上传图片，拉正相纸、记录正反面和照片背后的故事；把照片收进主题相册，也可以将几张回忆拼成一页，慢慢收藏。
+「贴进相册」是一款单文件网页工具，帮你把实体即时成像照片整理成数字相册。拍一张或上传图片，拉正相纸、记录正反面和照片背后的故事；把照片收进主题相册，也可以将几张回忆拼成一页，慢慢收藏。编辑时，照片背后还会呈现低调的暗房光影。
 
 ## 功能一览
 
@@ -34,7 +34,7 @@
 2. 上传或拍摄照片；如果自动识别不准确，拖动四角并选择合适的相纸。
 3. 拉正后调整照片、边框和文字，写下回忆；选择单张导出、打包保存或拼成相册页。
 
-无需安装后端。普通浏览器中，保存会显示图片和下载链接，可直接下载，或右键 / 长按另存；支持系统分享的浏览器可以直接分享；支持相应能力的 Claude Artifact 环境可以调用原生保存。字体和 3D 功能需要网络连接。
+无需安装后端。普通浏览器中，保存会显示图片和下载链接，可直接下载，或右键 / 长按另存；支持系统分享的浏览器可以直接分享；支持相应能力的 Claude Artifact 环境可以调用原生保存。字体、3D 功能和暗房背景需要网络连接。
 
 ## 使用须知
 
@@ -64,7 +64,7 @@
 python build.py .
 ```
 
-构建会生成 `贴进相册.html` 和本地预览用的 `preview.html`。Google Fonts 和 Three.js 通过网络加载；Three.js 版本为 0.160.0。
+构建会生成 `贴进相册.html` 和本地预览用的 `preview.html`。Google Fonts、Three.js 和 [Shaders](https://shaders.com/) 通过网络加载；Three.js 版本为 0.160.0，Shaders 版本为 4.0.4（MIT 许可）。暗房光影需要可用的 WebGPU 和网络；不支持、加载失败或离线时保留原有的深色背景。启用系统「减少动态效果」时，光影会保持静止；代码已为 Shaders 禁用使用统计。
 
 浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。
 
@@ -72,7 +72,7 @@ python build.py .
 
 **An instant photo workspace for the pictures you can hold.**
 
-贴进相册 is a single-file web app for turning physical instant photographs into digital keepsakes. Straighten a print, keep its front and back together, and give the story behind it a place to live. The interface is currently in Chinese.
+贴进相册 is a single-file web app for turning physical instant photographs into digital keepsakes. Straighten a print, keep its front and back together, and give the story behind it a place to live. A subtle darkroom glow sits behind the photo while you edit. The interface is currently in Chinese.
 
 - **Scan:** Detect edges and correct perspective, or adjust the corners with a magnifier and choose a film format. Ordinary photographs can retain their original proportions.
 - **Restore:** Try a second, differently angled shot to reduce glare, compare the result, or brush over small spots. Results depend on the images; glare removal has been tested on simulated images, not yet on real instant photographs.
@@ -81,7 +81,7 @@ python build.py .
 - **Browse:** Group photos into albums with covers, and search by date, place or people.
 - **Explore:** Browse camera-specific shooting tips and illustrative 3D models of generic instant-camera internals.
 
-Open [贴进相册.html](贴进相册.html) in a browser to start. No backend installation is required. Fonts and the 3D library require an internet connection. Regular browsers offer a download link and image preview; file sharing depends on browser support. The date stamp uses the chosen precision: month and year, year only for seasons, years or approximate years, and no date when unknown. Drafts can be lost when browser data is cleared or storage is unavailable, so export finished work. Claude-specific saving and the optional “Ask Claude” feature depend on the host runtime; the latter may send a photo or analysis data and use your own Claude quota.
+Open [贴进相册.html](贴进相册.html) in a browser to start. No backend installation is required. Fonts, the 3D library and the WebGPU darkroom background require an internet connection; if WebGPU is unavailable or the effect fails to load, the original dark background is retained. The effect remains still when reduced motion is requested. Regular browsers offer a download link and image preview; file sharing depends on browser support. The date stamp uses the chosen precision: month and year, year only for seasons, years or approximate years, and no date when unknown. Drafts can be lost when browser data is cleared or storage is unavailable, so export finished work. Claude-specific saving and the optional “Ask Claude” feature depend on the host runtime; the latter may send a photo or analysis data and use your own Claude quota.
 
 ## 图片署名 / Image credits
 
