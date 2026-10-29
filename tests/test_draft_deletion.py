@@ -15,6 +15,8 @@ with sync_playwright() as playwright:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto((ROOT / "贴进相册.html").as_uri())
+        page.wait_for_function("() => !restoring")
+        page.locator("#homeDemo").click()
         page.wait_for_selector("#save", state="visible", timeout=30000)
         outcome = page.evaluate("""async mode => {
           await KV.run('readwrite', s => s.clear());
@@ -39,17 +41,22 @@ with sync_playwright() as playwright:
             assert "film:" + outcome["first"] not in outcome["keys"], outcome
             page.reload()
             page.wait_for_function("() => !restoring && ed && !ed.demo", timeout=30000)
+            page.locator("#homeContinue").click()
             restored = page.evaluate("""() => ({id: ed.id, frame: ed.st.frame, color: Array.from(uploadFrame.getContext('2d').getImageData(4,4,1,1).data)})""")
             assert restored["id"] == outcome["second"] and restored["frame"] == "upload", restored
             assert restored["color"][:3] == [18, 86, 171], restored
         else:
             assert outcome["ids"] == [] and outcome["keys"] == [], outcome
+            assert page.locator("#homeView").is_visible()
+            assert page.evaluate("scans.length") == 0
         assert not errors, errors
         print(mode, "draft regression passed")
         context.close()
     context = browser.new_context()
     page = context.new_page()
     page.goto((ROOT / "贴进相册.html").as_uri())
+    page.wait_for_function("() => !restoring")
+    page.locator("#homeDemo").click()
     page.wait_for_selector("#save", state="visible", timeout=30000)
     failure = page.evaluate("""async () => {
       ed.demo = false; clearTimeout(draftT); await saveDraft();
@@ -67,5 +74,35 @@ with sync_playwright() as playwright:
     }""")
     assert "草稿删除失败" in failure["message"] and failure["remaining"] == 1, failure
     print("delete failure notification passed")
+    context.close()
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto((ROOT / "贴进相册.html").as_uri())
+    page.wait_for_function("() => !restoring")
+    page.locator("#homeDemo").click()
+    page.wait_for_selector("#save", state="visible")
+    failure = page.evaluate("""async () => {
+      ed.demo=false;clearTimeout(draftT);await saveDraft();
+      const id=ed.id;window.clearOriginalRun=KV.run;
+      KV.run=async function(mode,fn){
+        if(mode==='readwrite')throw new Error('simulated clear failure');
+        return clearOriginalRun.call(this,mode,fn);
+      };
+      await clearAll();
+      return {id,memory:scans.filter(s=>!s.demo).map(s=>s.id),
+        saved:(await KV.get('meta')).list.map(s=>s.id)};
+    }""")
+    assert failure["memory"] == [failure["id"]] == failure["saved"], failure
+    assert page.locator("#editView").is_visible()
+    assert page.locator("#draftStatus").get_attribute("data-state") == "error"
+    page.evaluate("() => {KV.run=window.clearOriginalRun}")
+    page.locator("#draftRetry").click()
+    page.wait_for_function("() => $('draftStatus').dataset.state === 'saved'")
+    assert page.evaluate("scans.length") == 1
+    page.evaluate("clearAll()")
+    assert page.locator("#homeView").is_visible()
+    assert page.evaluate("scans.length") == 0
+    assert page.evaluate("KV.keys()") == []
+    print("clear failure preserves photos and can retry successfully")
     context.close()
     browser.close()

@@ -42,6 +42,9 @@ with TemporaryDirectory() as temp, sync_playwright() as playwright:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(path.as_uri())
+        page.wait_for_function("() => !restoring")
+        page.locator("#homeDemo").click()
+        page.wait_for_selector("#save", state="visible")
         page.wait_for_function("() => !!window.__shaderOptions", timeout=30000)
         assert page.evaluate("() => window.__shaderOptions.telemetry") is True
         speeds = page.evaluate("() => window.__shaderOptions.speeds")

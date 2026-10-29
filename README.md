@@ -18,32 +18,36 @@
 
 | | |
 |:--|:--|
-| **01 / 扫描与拉正** | 尝试识别照片边缘并校正透视；支持 instax mini、SQUARE、WIDE 与 Polaroid i-Type/600、Go。也可以手动调整四角或选择相纸，拖角时手指旁会出现放大镜。普通照片可按原比例处理。 |
+| **开始 / 首页** | 直接拍摄或导入照片，从「继续上次整理」回到上次使用的照片，或独立打开「我的相册」。示例只在选择「先用示例体验一下」后载入，不会保存到个人收藏。 |
+| **01 / 扫描与拉正** | 尝试识别照片边缘并校正透视；支持 instax mini、SQUARE、WIDE 与 Polaroid i-Type/600、Go。也可以手动调整四角或选择相纸，拖角时手指旁会出现放大镜。框选界面会提示可能的反光位置、裁边、可用像素不足或细节偏少，给出补拍建议；可展开查看、忽略本张提醒，或直接拉正。普通照片可按原比例处理。 |
 | **02 / 减少反光** | 换个角度补拍后尝试对齐并合成，或用画笔手动修补小光斑。合成后可按住对比合成前，再决定保留还是撤回。两张照片在同一位置都有反光时无法通过合成恢复细节。 |
 | **03 / 色彩与相纸** | 使用滤镜、亮度、对比、色温和颗粒调整照片；保留原框，选择代码绘制的相纸样式，或绘制、上传自己的边框。 |
 | **04 / 留下字迹** | 为照片添加文字、选择字体，并加上胶片相机风格的日期印章。 |
 | **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天；记不清时可以记录到年月、季节、年份、「大约某年」或「不记得」，相册与时间线会按所选精度展示和排序。还可以拍下相纸背面，和正面存在一起，随时翻面查看。 |
 | **06 / 导出与拼页** | 导出整张相纸或只要画面，选择 JPEG、PNG 与尺寸；多张可打包为 ZIP 并附「回忆.txt」。有背面的照片可与正面并排导出或另存一张。把几张照片拼成手账贴纸墙、胶片接触印、旅行明信片或回忆时间线；调整照片顺序，换底色、胶带和摆放方式，存成以后还能接着改的相册页。 |
 | **07 / 我的相册** | 建立「旅行」「朋友」等相册并设置封面，按日期、地点、人物或故事查找，在应用里按日期精度分组翻看收藏；点有背面的照片可以翻面。 |
-| **08 / 本地草稿** | 在浏览器支持时自动保存照片、背面、四角、编辑设置、相册和相册页，下次打开时尝试恢复；可删除单张或清空草稿。 |
+| **08 / 本地草稿** | 在浏览器支持时自动保存照片、背面、四角、编辑设置、相册和相册页，下次打开时尝试恢复。编辑区显示等待保存、正在保存、已保存或保存失败；失败后可重试。只有浏览器实际完成写入后才显示已保存；「导出图片」用于另存到设备。可删除单张或清空草稿。 |
 | **09 / 了解相机** | 根据选择的相机查看拍摄提示和推荐参数；通过程序化 3D 模型探索即时成像相机的通用内部结构。 |
 
 ## 开始使用
 
 1. 下载仓库，在浏览器中打开 **[贴进相册.html](贴进相册.html)**。
-2. 上传或拍摄照片；如果自动识别不准确，拖动四角并选择合适的相纸。
-3. 拉正后调整照片、边框和文字，写下回忆；选择单张导出、打包保存或拼成相册页。
+2. 在首页选择「拍一张」或「导入照片」。检查选框并选择合适的相纸，再确认拉正；普通照片可以点「使用整张原图」，保留原始方向和比例。没有足够相纸特征时会先展示完整原图，批量导入中的不确定结果会留在待确认队列。
+3. 拉正后调整照片、边框和文字，写下回忆。编辑区的保存状态表示当前浏览器中的草稿写入情况；点「导出图片」另存成品，也可打包保存或拼成相册页。
+4. 下次打开从首页选择「继续上次整理」或「我的相册」。想先了解工具时，可以主动打开示例体验。
 
 无需安装后端。普通浏览器中，保存会显示图片和下载链接，可直接下载，或右键 / 长按另存；支持系统分享的浏览器可以直接分享；支持相应能力的 Claude Artifact 环境可以调用原生保存。字体、3D 功能和暗房背景需要网络连接。
 
 ## 使用须知
 
 - 自动识别和反光处理是启发式方法，结果取决于照片、光线和背景。反光算法目前使用模拟图像测试，尚未以真实拍立得照片验证。
+- 扫描提醒在本机分析当前选框，不上传照片；拖角、旋转或更换相纸后会重新检查。亮斑和细节偏少也可能来自原片内容，提示不能确认反光或失焦，尚未用真实照片数据集评估准确率。背面不检查反光与清晰度；批量自动拉正的照片可点「重扫」查看提醒。
 - 渐变或多色边框可能无法自动识别为相纸；请手动选择相纸型号，或先选择相机。识别不到边缘时可手动调整四角。
 - 照片日期设为月份时，日期印章只印年月；设为季节、年份或「大约某年」时只印年份，设为「不记得」时不印日期。
-- 桌面端支持拖放、粘贴和多张导入；多张照片未识别时，先调整第一张，其余需重新导入。
+- 桌面端支持拖放、粘贴和多张导入；未识别的照片会进入待框选队列，拉正一张后自动继续下一张，也可以通过「继续框选」返回队列。待框选文件仅保留在当前页面，刷新前请完成拉正；完成后才会保存为草稿。
 - 高清导出依照片中实际可用的像素决定，最长边最高 3200 像素；补拍合成的照片最高为标准尺寸。
 - 草稿只保存在当前设备的当前浏览器中，清理浏览器数据或存储空间不足时可能丢失，请及时导出。手机浏览器能否经由分享直接存入系统相册，因系统和浏览器而异。
+- 启动时若无法完整读取旧收藏，会暂停导入和保存，并在首页提供「重试读取本机收藏」，避免把未读出的照片当作已删除数据覆盖。
 - 3D 相机外形参考公开尺寸；内部零件是通用结构示意，并非官方拆解图。
 - 「问问 Claude」仅在提供相关运行时能力的环境中出现；该功能可能发送照片或照片分析数据，并使用用户自己的 Claude 额度。
 - 相机资料与出处详见 [product-facts.md](product-facts.md)。
@@ -75,9 +79,13 @@ python build.py .
 贴进相册 is a single-file web app for turning physical instant photographs into digital keepsakes. Straighten a print, keep its front and back together, and give the story behind it a place to live. A subtle darkroom glow sits behind the photo while you edit. The interface is currently in Chinese.
 
 - **Scan:** Detect edges and correct perspective, or adjust the corners with a magnifier and choose a film format. Ordinary photographs can retain their original proportions.
+- **Start & return:** The home screen offers capture, import, the last edited photo and the library. The sample editor is opt-in. Uncertain detections require confirmation; “Use the full original” preserves an ordinary photo’s orientation and aspect ratio.
+- **Check before straightening:** Local, non-blocking hints flag possible glare locations, edges close to the image boundary, low usable resolution and limited detail. Adjusting corners, orientation or film format refreshes the check. Hints may reflect the original scene and have only been tested with synthetic fixtures; they do not establish real-photo detection accuracy. Back-side scans skip glare and sharpness checks; automatically straightened batches can be reviewed through the rescan screen.
 - **Restore:** Try a second, differently angled shot to reduce glare, compare the result, or brush over small spots. Results depend on the images; glare removal has been tested on simulated images, not yet on real instant photographs.
 - **Create:** Adjust colour and frames, add captions and date stamps, and record a place, people and a short story. The date of the original moment can be edited separately from the digitisation date, or kept as vague as you remember it: a year and month, a season, a year, “around” a year, or unknown. Scan the back of a print too and flip between both sides.
 - **Keep & share:** Export a single image as JPEG or PNG, save several as a ZIP, or arrange them into a scrapbook wall, contact sheet, postcard or timeline, then reorder photos, change the paper and tape, and keep the page to edit later. Drafts are stored locally when browser storage is available.
+- **Know what is saved:** A persistent editor status distinguishes pending changes, a write in progress, completed local storage and a failed write with retry. Exporting an image is a separate action; completing a browser-storage transaction does not save a file to the device’s photo library.
+- **Recover before writing:** If startup cannot fully read an existing collection, importing and saving pause until “Retry reading local collection” succeeds, preserving unread photos instead of overwriting them.
 - **Browse:** Group photos into albums with covers, and search by date, place or people.
 - **Explore:** Browse camera-specific shooting tips and illustrative 3D models of generic instant-camera internals.
 

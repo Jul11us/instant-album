@@ -17,6 +17,8 @@ with sync_playwright() as playwright:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto((ROOT / "贴进相册.html").as_uri())
+        page.wait_for_function("() => !restoring")
+        page.locator("#homeDemo").click()
         page.wait_for_selector("#save", state="visible", timeout=30000)
         page.click("#back")
         page.locator("#fileIn").set_input_files(str(ROOT / "design-demos/assets/sample.jpg"))
@@ -39,6 +41,7 @@ with sync_playwright() as playwright:
         page.evaluate("() => { clearTimeout(draftT); return saveDraft() }")
         page.reload()
         page.wait_for_function("() => !restoring && ed && !ed.demo", timeout=30000)
+        page.locator("#homeContinue").click()
         restored = page.evaluate("() => ({cols, memo: ed.st.memo, id: ed.id})")
         assert restored["memo"]["place"] == "\u4e1c\u4eac", restored
         assert len(restored["cols"]) == 1, restored

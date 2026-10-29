@@ -19,6 +19,8 @@ with sync_playwright() as playwright:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(PAGE.as_uri())
+        page.wait_for_function("() => !restoring")
+        page.locator("#homeDemo").click()
         page.wait_for_selector("#save", state="visible", timeout=30000)
         page.evaluate("ed.demo = false")
         page.locator('#tabs [data-t="memo"]').click()
@@ -36,6 +38,7 @@ with sync_playwright() as playwright:
         assert page.evaluate("saveDraft()")
         page.reload()
         page.wait_for_function("() => !restoring && ed && !ed.demo", timeout=30000)
+        page.locator("#homeContinue").click()
         assert page.evaluate("!!ed.back")
         page.locator("#save").click()
         page.locator('#expBox [data-k="back"][data-v="sep"]').click()

@@ -14,6 +14,8 @@ with sync_playwright() as playwright:
     page.on("pageerror", lambda error: errors.append(str(error)))
     source = Path(os.environ.get("ALBUM_TEST_HTML", ROOT / "贴进相册.html"))
     page.goto(source.resolve().as_uri())
+    page.wait_for_function("() => !restoring")
+    page.locator("#homeDemo").click()
     page.wait_for_selector("#save", state="visible", timeout=30000)
     page.locator("#album").click()
     page.locator("#albKeep").click()
@@ -55,6 +57,7 @@ with sync_playwright() as playwright:
     page.evaluate("async () => { clearTimeout(draftT); await saveDraft(); }")
     page.reload()
     page.wait_for_function("() => !restoring && ed && !ed.demo", timeout=30000)
+    page.locator("#homeContinue").click()
     restored = page.evaluate("""id => {
       const p = pages.find(p => p.id === id);
       loadPage(p);

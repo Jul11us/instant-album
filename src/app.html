@@ -31,6 +31,34 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
 .chip:hover{background:#38352F}
 .chip.on{background:var(--accent);color:var(--accent-ink)}
 .chip:disabled{background:transparent;color:var(--faint);box-shadow:inset 0 0 0 1px var(--line);cursor:default}
+.home{overflow:auto;padding:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 28px;min-height:0}
+.home-wrap{width:100%;max-width:1060px;margin:auto}
+.home-brand{display:flex;justify-content:space-between;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.home-brand b{font-size:18px;letter-spacing:.08em}.home-brand span{font-size:11px;color:var(--muted)}
+.home-hero{display:grid;gap:28px;padding:36px 0 28px;align-items:center}
+.home-kicker{font-size:10px;letter-spacing:.18em;color:var(--accent);font-weight:600}
+.home h1{font-size:clamp(36px,4.5vw,64px);font-weight:600;line-height:1.28;letter-spacing:-.04em;white-space:pre-line;margin:14px 0}
+.home-copy>p{font-size:13px;color:var(--muted);line-height:1.9;margin:0;max-width:32em}
+.home-print{display:none;background:#F1EDE6;padding:16px 16px 32px;width:240px;justify-self:center;transform:rotate(4deg);box-shadow:0 20px 70px #08080766}
+.home-print img{display:block;width:100%;height:255px;object-fit:cover}.home-print figcaption{font-family:var(--hand);font-size:20px;color:#365493;text-align:center;margin-top:14px}
+.home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.home-actions .chip{padding:13px 18px;font-size:14px}
+.home-text{display:inline-block;margin-top:18px;font-size:12px;color:var(--muted);padding:4px 0;text-decoration:underline;text-underline-offset:4px}
+.home-shelf{border-top:1px solid var(--line);padding-top:20px;display:grid;gap:12px}
+.home-shelf-head{display:flex;justify-content:space-between;align-items:center}.home-shelf-head h2{font-size:14px;margin:0}.home-shelf-head span{font-size:12px;color:var(--muted)}
+.home-resume{display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface);border-radius:12px;width:100%;text-align:left}
+.home-resume canvas{width:50px;height:66px;object-fit:cover;border:4px solid var(--paper);border-bottom-width:10px;flex:none}
+.home-resume div{flex:1;min-width:0}.home-resume b{display:block;font-size:14px}.home-resume small{display:block;color:var(--muted);font-size:12px;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-resume>span{font-size:20px;color:var(--accent)}
+.home-empty{margin:0;color:var(--muted);font-size:13px;line-height:1.8;padding:12px 0}
+.home-foot{display:flex;gap:8px;align-items:center;margin-top:24px;font-size:11px;color:var(--muted);line-height:1.6}
+.home-foot:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+.scan-top{flex-wrap:wrap}.scan-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.scan-choice{padding-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.draft-status{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center;min-height:24px;padding-top:5px}
+.draft-status[data-state="error"]{color:var(--danger)}
+.draft-status button{font-size:11px;text-decoration:underline;text-underline-offset:3px;padding:2px}
+@media(min-width:700px){.home{padding:40px}.home-hero{grid-template-columns:1.2fr 1fr;min-height:430px;padding:54px 0}.home-print{display:block}.home-shelf{max-width:620px}}
 .big{margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));height:50px;border-radius:12px;font-weight:700;font-size:16px;letter-spacing:.02em}
 .big.yellow{background:var(--accent);color:var(--accent-ink)}
 .big.yellow:hover{filter:brightness(1.06)}
@@ -46,6 +74,24 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
 .formats .chip{font-size:12px;padding:6px 10px}
 .glaretip{font-size:12px;color:var(--muted);line-height:1.7;padding-top:10px;margin:0}
 .glaretip b{color:var(--accent);margin-right:6px;font-weight:700}
+#scanView{overflow-y:auto}
+#scanView>*{flex-shrink:0}
+#scanView>.desk{min-height:220px}
+.scancheck{padding-top:10px;font-size:12px;line-height:1.6}
+.scancheck details{border-top:1px solid var(--line);padding-top:8px}
+.scancheck summary{cursor:pointer;color:var(--accent);font-weight:600}
+.scancheck p{margin:4px 0 0;color:var(--muted)}
+.scancheck details[open]+p{display:none}
+#scanCheckBody{max-height:150px;overflow-y:auto;margin-top:8px;padding-right:4px}
+#scanCheckBody ol{margin:0;padding-left:24px}
+#scanCheckBody li{margin-bottom:8px}
+#scanCheckBody b{font-weight:600;color:var(--text)}
+#scanCheckBody span{display:block;color:var(--muted)}
+#scanIgnore{margin-top:8px;font-size:12px}
+#scanMarks{pointer-events:none}
+#scanMarks circle{fill:#1A1918;stroke:var(--accent);stroke-width:2}
+#scanMarks text{fill:var(--accent);font:bold 12px system-ui;text-anchor:middle;dominant-baseline:central}
+@media(max-width:899px){#scanView>.big{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px var(--bg),0 -10px 20px var(--bg)}}
 .tray{display:flex;gap:8px;padding-top:12px;align-items:center;min-height:72px;overflow-x:auto;scrollbar-width:none}
 .tray::-webkit-scrollbar{display:none}
 .tray .t{flex:0 0 auto;border-radius:6px;overflow:hidden;cursor:pointer;line-height:0;box-shadow:0 0 0 1px var(--line);transition:box-shadow .15s}
@@ -87,7 +133,7 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
   #editView>.stage{min-height:100px;overflow:hidden}
   #editView>.side{display:flex;flex-direction:column;flex:0 1 auto;min-height:0;max-height:55%;overflow-y:auto}
   #editView>.side>.pad:first-child{position:sticky;top:0;z-index:2;background:var(--bg);flex:0 0 auto}
-  #editView>.side>.savebar{position:sticky;bottom:0;z-index:2;flex:0 0 auto;background:var(--bg)}
+  #editView>.side>.savebar{position:sticky;bottom:0;z-index:2;flex:0 0 auto;background:var(--bg);padding-top:10px;border-top:1px solid var(--line);box-shadow:0 -6px 0 var(--bg)}
 }
 .tabs{display:flex;gap:2px;margin-top:10px;border-bottom:1px solid var(--line)}
 .tabs button{flex:1;padding:10px 0 9px;font-weight:600;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
@@ -134,7 +180,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .daterow .chip{padding:6px 10px;font-size:12px}
 .daterow input[type=date]{background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:6px 10px;font:500 12px var(--ui);color-scheme:dark}
 .daterow .sep{width:1px;height:16px;background:var(--line)}
-.savebar{display:flex;gap:8px;align-items:center;margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.savebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.savebar .draft-status{flex-basis:100%;padding:0;min-height:18px}
 .savebar .big{margin:0;flex:1;background:var(--accent);color:var(--accent-ink)}
 .savebar .big:hover{filter:brightness(1.06)}
 .savebar .sm{flex:0 0 auto;height:50px;padding:0 16px;border-radius:12px;background:var(--surface2);color:var(--text);font-weight:600;font-size:13px}
@@ -330,6 +377,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   #scanView>.desk{grid-column:1;grid-row:1/-1;margin:16px;border-radius:14px}
   #editView>.stage{grid-column:1;grid-row:1/-1;padding:28px 0}
   #scanView>.big{align-self:end;margin:16px}
+  #scanView:not([hidden]){grid-template-rows:repeat(7,auto) minmax(66px,1fr)}
   #editView:not([hidden]){grid-template-rows:auto auto minmax(0,1fr)}
   #editView>.side{display:flex;flex-direction:column;overflow-y:auto;min-height:0;scrollbar-width:thin}
   #editView .side>.savebar{position:sticky;bottom:0;margin:auto 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) 16px 16px;background:var(--surface);border-top:1px solid var(--line);z-index:2}
@@ -351,24 +399,39 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 </style>
 
 <div class="app" id="app">
+  <section class="view home" id="homeView" aria-label="首页">
+    <div class="home-wrap">
+      <header class="home-brand"><b>贴进相册</b><span>一张照片，一段回忆</span></header>
+      <div class="home-hero"><div class="home-copy"><span class="home-kicker">SCAN · KEEP · REMEMBER</span><h1 id="homeTitle">把手里的照片，
+慢慢收好。</h1><p id="homeIntro">拉正相纸，留下背面的字迹和照片里的故事，放进属于你的数字相册。</p>
+        <div class="home-actions"><button class="chip on" id="homeShoot" disabled>拍一张</button><button class="chip" id="homeImport" disabled>导入照片</button></div>
+        <button class="home-text" id="homeDemo" disabled>先用示例体验一下</button>
+      </div><figure class="home-print"><img id="homeSample" alt="海边的拍立得示例照片"><figcaption>把那天的海风也留下</figcaption></figure></div>
+      <div class="home-shelf"><div class="home-shelf-head"><h2>我的收藏</h2><button class="chip" id="homeLibrary" disabled>我的相册 ›</button></div>
+        <button class="home-resume" id="homeContinue" hidden><div><b>继续上次整理</b><small id="homeResumeInfo"></small></div><span aria-hidden="true">›</span></button>
+        <p class="home-empty" id="homeEmpty">正在读取本机收藏…</p><button class="chip on" id="homeRestoreRetry" hidden>重试读取本机收藏</button><button class="chip" id="homePending" hidden>继续框选</button>
+      </div><p class="home-foot">收藏保存在当前浏览器中，整理好后记得导出图片。</p>
+    </div>
+  </section>
   <!-- 扫描 -->
-  <section class="view" id="scanView">
-    <div class="top"><button class="chip" id="shoot">拍一张</button>
-      <div class="grp"><button class="chip" id="pick">相册选</button><button class="chip" id="rot">转 90°</button></div></div>
+  <section class="view" id="scanView" hidden>
+    <div class="top scan-top"><button class="chip" id="scanHome">‹ 首页</button>
+      <div class="scan-tools"><button class="chip" id="shoot">拍一张</button><button class="chip" id="pick">相册选</button><button class="chip" id="rot">转 90°</button></div></div>
     <div class="desk" id="desk"><canvas id="srcCv"></canvas>
-      <svg id="quadSvg"><polygon id="quadPoly" fill="rgba(242,181,68,.14)" stroke="#F2B544" stroke-width="2.5" stroke-linejoin="round"/></svg><canvas class="loupe" id="loupe" hidden></canvas>
+      <svg id="quadSvg"><polygon id="quadPoly" fill="rgba(242,181,68,.14)" stroke="#F2B544" stroke-width="2.5" stroke-linejoin="round"/><g id="scanMarks" aria-hidden="true"></g></svg><canvas class="loupe" id="loupe" hidden></canvas>
       <span class="bubble" id="tip"></span><span class="bubble2" id="found"></span></div>
     <div class="pad formats" id="formats"></div>
-    <p class="pad glaretip"><b>防反光</b>关掉手机闪光灯 · 别站在顶灯正下方，靠窗用侧面的光 · 手机稍微斜一点拍，斜了会自动拉正</p>
+    <div class="pad scan-choice"><button class="chip" id="fullPhoto">使用整张原图</button><span id="scanConfirmNote">先确认选框，再拉正</span></div>
+    <div class="pad scancheck"><details id="scanCheck"><summary id="scanCheckTitle">扫描检查</summary><div id="scanCheckBody"></div><button class="chip" id="scanIgnore">忽略本张提醒</button></details><p id="scanCheckLead" role="status" aria-live="polite"></p></div>
     <div class="pad camrow"><span>我的相机</span><button class="chip" id="camBtn">选一下，教你怎么拍</button><button class="chip" id="td3d" style="background:rgba(255,255,255,.16);color:#fff">3D 拆开看</button></div>
     <div class="pad tray" id="tray"></div>
     <p class="pad dhint">把照片拖进这个窗口、按 Ctrl+V 粘贴，或者点「上传照片」。可以一次放好几张，能认出边框的会自动拉正。</p>
-    <button class="big yellow" id="straighten">找到了！拉正它</button>
+    <button class="big yellow" id="straighten">确认选框并拉正</button>
   </section>
 
   <!-- 调色 -->
   <section class="view" id="editView" hidden>
-    <div class="top"><div class="grp"><button class="chip" id="back">‹ 重扫</button><button class="chip" id="libBtn">相册</button></div>
+    <div class="top"><div class="grp"><button class="chip" id="editHome">首页</button><button class="chip" id="back">重扫</button><button class="chip" id="libBtn">相册</button></div>
       <div class="grp"><button class="chip" id="flip" hidden>翻面</button><button class="chip" id="undo" disabled>撤销</button><button class="chip" id="peek">按住看原图</button></div></div>
     <div class="pad tray" id="tray2"></div>
     <div class="stage" id="stage"><canvas class="amb" id="amb" aria-hidden="true"></canvas>
@@ -389,7 +452,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
     <div class="pad fontrow tp" id="fontrow"></div>
     <div class="pad daterow tp" id="daterow"></div>
     <div class="pad memo tp" id="memo"></div>
-    <div class="savebar"><button class="big" id="save">存进相册</button><button class="sm" id="album">拼一页</button><button class="sm" id="bigview">大图</button></div>
+    <div class="savebar"><div class="draft-status" id="draftStatus" data-state="empty" role="status" aria-live="polite"><span id="draftText">还没有需要保存的照片</span><button id="draftRetry" hidden>重试保存</button></div><button class="big" id="save">导出图片</button><button class="sm" id="album">拼一页</button><button class="sm" id="bigview">大图</button></div>
     </div>
   </section>
 
@@ -430,7 +493,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
       <p class="sub" id="albNote"></p><div class="picks" id="albPicks"></div><div class="ord" id="albOrder"></div><div class="look" id="albLook"></div><canvas class="pv" id="albCv"></canvas></div>
   </section>
   <section class="panel lib" id="libPanel" hidden aria-label="我的相册">
-    <div class="top"><button class="chip" id="libClose">‹ 回去调色</button><button class="chip on" id="libAlbum">用这些拼一页</button></div>
+    <div class="top"><button class="chip" id="libClose">‹ 首页</button><div class="grp"><button class="chip" id="libImport">＋ 导入</button><button class="chip on" id="libAlbum">用这些拼一页</button></div></div>
     <div class="pad"><input class="q" id="libQ" type="search" placeholder="找日期、地点、人物：2025.07、海边、小雨" aria-label="查找照片"><div class="tags" id="libTags"></div>
       <div class="cols" id="libCols"></div><div class="bar" id="libBar"></div></div>
     <div class="body"><div class="grid" id="libGrid"></div></div>
@@ -444,7 +507,7 @@ const $ = id => document.getElementById(id);
 // 有鼠标、能悬停的当电脑：改文案、开拖放和快捷键；宽屏布局另由 CSS 宽度决定
 const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
 document.documentElement.dataset.device=DESK?'desktop':'touch';
-const SAVE_T=DESK?'保存图片':'存进相册';
+const SAVE_T='保存图片';
 
 /* ---------- 相纸规格（毫米）：整张尺寸 + 画面位置 ---------- */
 const FORMATS = {
@@ -684,16 +747,36 @@ function processImage(src, st){
 }
 
 /* ---------- 状态 ---------- */
-const scans=[]; let curScan=-1;
+const scans=[]; let curScan=-1,lastRealId=null;
+const realFocus=()=>scans.find(s=>!s.demo&&s.id===lastRealId)?.id||(!ed?.demo?ed?.id:null)||null;
 const blank=()=>({filter:'原片',bright:0,contrast:0,warm:0,grain:0,frame:'orig',caption:'',font:'longcang',capOff:false,sticker:0,sx:.78,sy:.22,
   date:{on:false,d:'',fmt:'YY.MM.DD',look:'led',pos:'photo',guess:true},   // guess：还是按翻拍日期猜的，用户没改过
   memo:{place:'',people:'',story:'',print:[]}});
 const newId=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
-let src=null,srcData=null,quad=null,format='mini',autoFound=false;
+let src=null,srcData=null,quad=null,format='mini',autoFound=false,scanNeedsConfirm=true;
 let ed=null; // 当前调色对象
 let history=[];
 
 function toast(msg,ms=2600){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,ms)}
+
+/* 首页：首次导入、继续编辑和相册各有入口，示例只在用户选择后载入。 */
+function renderHome(){
+  const own=restoreFailed?[]:scans.filter(s=>!s.demo),last=own.find(s=>s.id===realFocus())||own[own.length-1],resume=$('homeContinue');
+  $('homeSample').src=SAMPLE;$('homeTitle').textContent=own.length?'回到你的\n小小相册。':'把手里的照片，\n慢慢收好。';
+  $('homeIntro').textContent=own.length?`这里收好了 ${own.length} 张照片。继续写下故事，或者带一张新照片回来。`:'拉正相纸，留下背面的字迹和照片里的故事，放进属于你的数字相册。';
+  for(const id of ['homeShoot','homeImport','homeDemo','homeLibrary'])$(id).disabled=restoring||restoreFailed;
+  resume.hidden=!last||restoring||restoreFailed;resume.querySelector('canvas')?.remove();
+  if(last){resume.prepend(thumbOf(last));$('homeResumeInfo').textContent=[dLabel(last.st.date),last.st.memo?.place,last.st.caption].filter(Boolean).join(' · ');resume.onclick=()=>openEdit(scans.indexOf(last))}
+  $('homeEmpty').hidden=!!last&&!restoreFailed&&!restoring;$('homeEmpty').textContent=restoring?'正在读取本机收藏…':restoreFailed?'本机收藏暂时无法完整读取。旧数据仍保留，重试读取成功后可以继续整理。':'还没有自己的照片。从第一张开始，也可以先体验示例。';
+  $('homeRestoreRetry').hidden=!restoreFailed;$('homeRestoreRetry').disabled=restoring;
+  $('homePending').hidden=!pendingFiles.length;$('homePending').textContent=`继续框选 · ${pendingFiles.length} 张`;
+}
+function showHome(){closePanels();backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
+function chooseHomePhoto(cameraInput){backFor=mergeFor=-1;$(cameraInput?'camIn':'fileIn').click()}
+$('homeShoot').onclick=()=>chooseHomePhoto(true);$('homeImport').onclick=()=>chooseHomePhoto(false);
+$('homeLibrary').onclick=()=>openLib();$('editHome').onclick=$('scanHome').onclick=showHome;
+$('homePending').onclick=async()=>{if(importBusy)return;importBusy=true;try{await openPending()}finally{importBusy=false}};
+$('homeDemo').onclick=()=>{const i=scans.findIndex(s=>s.demo);if(i>=0)openEdit(i);else demo()};
 
 /* ---------- 载入图片 ---------- */
 async function decodeFile(file){
@@ -701,8 +784,8 @@ async function decodeFile(file){
     return await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=URL.createObjectURL(file)})}
 }
 async function loadFile(file){const im=await decodeFile(file);im._date=await fileDate(file);im._file=file;
-  if(backFor>=0){setSource(im,null,true);if(autoFound){straighten(true);return}showScan();$('found').textContent='背面没认出边框，拖四个角框住，再点下面';return}
-  if(mergeFor>=0){setSource(im,null,true);if(autoFound){straighten(true);return}showScan();$('found').textContent='第二张没认出边框，拖四个角框住，再点下面合成';return}
+  if(backFor>=0){setSource(im,null,true);if(autoFound&&!scanNeedsConfirm){straighten(true);return}showScan();$('found').textContent='请确认背面的四角，再点下面';return}
+  if(mergeFor>=0){setSource(im,null,true);if(autoFound&&!scanNeedsConfirm){straighten(true);return}showScan();$('found').textContent='请确认补拍照片的四角，再点下面合成';return}
   setSource(im)}
 /* 读 JPEG 的 EXIF 拍摄时间（DateTimeOriginal）。这是「翻拍」的时间，不一定是拍立得当天，所以界面上分开写 */
 async function fileDate(file){
@@ -716,10 +799,26 @@ async function fileDate(file){
         if(/^\d{4}:\d\d:\d\d/.test(s))return {d:s.slice(0,10).replace(/:/g,'-'),src:'exif'};break}
       if((m&0xFF00)!==0xFF00)break;o+=2+len}}catch(e){}
   return file.lastModified?{d:ymd(new Date(file.lastModified)),src:'file'}:{d:ymd(new Date()),src:'today'}}
-/* 电脑上常一次拖进好几张：能认出边框的直接拉正，认不出的留到最后手动框 */
+/* 待框选只保留文件，避免让整批解码图片一直占用内存。 */
+let pendingFiles=[],pendingSource=null,importBusy=false;
+async function openPending(){
+  if(!pendingFiles.length)return;
+  backFor=mergeFor=-1;
+  const f=pendingFiles[0],im=await decodeFile(f);im._date=await fileDate(f);im._file=f;
+  setSource(im);im.close?.();pendingSource=src;
+  $('found').textContent=`待确认 ${pendingFiles.length} 张 · 检查选框或使用整张原图，再继续下一张`;
+}
+/* 电脑上常一次拖进好几张：能认出边框的直接拉正，认不出的排队手动框 */
 async function loadFiles(list){
+  if(restoring||restoreFailed){toast(restoreFailed?'请先在首页重试读取本机收藏，避免覆盖旧数据':'正在读取本机收藏，请稍等');return}
+  if(importBusy){toast('正在载入照片，请稍等再添加');return}
+  importBusy=true;
+  try{await importFiles(list)}finally{importBusy=false}
+}
+async function importFiles(list){
   const files=[...list].filter(f=>f&&f.type&&f.type.startsWith('image/'));
   if(!files.length){toast('只能放图片文件');return}
+  closePanels();
   if(files.length>1)backFor=mergeFor=-1;   // 背面、补拍都只要一张
   if(files.length===1){await loadFile(files[0]).catch(()=>toast('这张图打不开，换一张试试'));return}
   toast(`正在处理 ${files.length} 张…`,60000);
@@ -727,11 +826,12 @@ async function loadFiles(list){
   for(const f of files){
     let bmp;try{bmp=await decodeFile(f);bmp._date=await fileDate(f);bmp._file=f}catch(e){bad++;continue}
     setSource(bmp,null,true);
-    if(autoFound){curScan=-1;straighten(false);ok++}else manual.push(bmp);
+    if(autoFound&&!scanNeedsConfirm){curScan=-1;straighten(false);ok++}else manual.push(f);
+    bmp.close?.();
     await new Promise(r=>setTimeout(r,0));
   }
   const tail=bad?`，${bad} 张打不开`:'';
-  if(manual.length){setSource(manual[0]);toast(`${ok} 张已自动拉正${tail}。这张没认出边框，拖四个角框一下${manual.length>1?`（还有 ${manual.length-1} 张也要手动，处理完再拖进来）`:''}`,6000)}
+  if(manual.length){pendingFiles.push(...manual);await openPending();toast(`${ok} 张已自动拉正${tail}，${pendingFiles.length} 张需要确认选框。确认后会自动继续下一张。`,6000)}
   else if(ok){openEdit(scans.length-1);toast(`${ok} 张都拉正了${tail}，${innerWidth>=900?'点右边的小图切换着调':'点「‹ 重扫」能看到全部，点小图切换'}`,4200)}
   else toast('这些图都打不开');
 }
@@ -742,14 +842,77 @@ function setSource(img, presetQuad, quiet){
   src=document.createElement('canvas');src.width=W;src.height=H;const x=src.getContext('2d',{willReadFrequently:true});
   x.drawImage(img,0,0,W,H);srcData=x.getImageData(0,0,W,H);
   src._file=img._file||null;src._ow=img.width;   // 原文件留着不解码：认边框只用 2400 的缩小图，高清导出时再从原文件解一次
-  let q=presetQuad||detect(src);autoFound=!!q;
+  let q=presetQuad||detect(src);autoFound=!!q;scanNeedsConfirm=true;
   if(q){const o=orientFilm(srcData,q);
-    if(o){q=o.q;format=o.fmt;if(!camera?.film&&SQ_FAMILY.includes(format))format=squareFamily(srcData,q)||format}
-    // 不像拍立得（普通照片、截图）：不转方向、不套相纸比例，按原比例拉正
-    else{const s=q.map(p=>p[0]+p[1]);q=rotQuad(q,s.indexOf(Math.min(...s)));setFree(q);format='free'}}
-  else{q=[[W*.18,H*.15],[W*.82,H*.15],[W*.82,H*.85],[W*.18,H*.85]];}
+    if(o){q=o.q;format=o.fmt;scanNeedsConfirm=area(q)/(W*H)<.12;if(!camera?.film&&SQ_FAMILY.includes(format))format=squareFamily(srcData,q)||format}
+    // 没有足够相纸特征时，不采用画面内部的可疑轮廓，先展示完整原图。
+    else{q=[[0,0],[W,0],[W,H],[0,H]];setFree(q);format='free'}}
+  else{q=[[0,0],[W,0],[W,H],[0,H]];setFree(q);format='free'}
   quad=q;if(!quiet)showScan();
 }
+
+/* 扫描提示是保守的像素启发式，不判断原片好坏，也不阻止拉正。 */
+function scanQuality(sd,q,F,{trusted=true,nativeScale=1,back=false}={}){
+  const issue=(code,title,detail,point)=>({code,title,detail,...(point?{point}:{})});
+  if(!trusted)return [issue('framing','先把四角贴到相纸边缘','还没认出边框。拖动四个角框住整张相纸，松手后再检查。')];
+  const valid=Array.isArray(q)&&q.length===4&&q.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite));
+  const turns=valid?q.map((p,i)=>{const b=q[(i+1)%4],c=q[(i+2)%4];return (b[0]-p[0])*(c[1]-b[1])-(b[1]-p[1])*(c[0]-b[0])}):[];
+  if(!valid||(!turns.every(v=>v>1)&&!turns.every(v=>v< -1))||area(q)<64)
+    return [issue('quad','四角交叉或靠得太近','把四个角依次放回相纸四角，再检查一次。')];
+  const hints=[],W=sd.width,H=sd.height,center=q.reduce((s,p)=>[s[0]+p[0]/4,s[1]+p[1]/4],[0,0]);
+  const edges=[['左',0,0,W],['右',0,W,W],['上',1,0,H],['下',1,H,H]];
+  if(!F.free){const near=edges.filter(([,ax,v,len])=>q.some(p=>Math.abs(p[ax]-v)<len*.012));
+    if(near.length){const [,ax,v]=near[0],p=q.reduce((a,b)=>Math.abs(a[ax]-v)<Math.abs(b[ax]-v)?a:b);
+      hints.push(issue('edge',`${near.map(e=>e[0]).join('、')}边缘贴近画面边界`,'相纸可能没拍全。稍退后一点，让四边都留出空隙；也可以先确认选框是否贴准。',p))}}
+  // 只取照片画面，避开相纸白边；普通照片的四角本来就包住画面。
+  const box=F.free?[.025,.025,.95,.95]:[F.img[0]/F.W+.025,F.img[1]/F.H+.025,F.img[2]/F.W-.05,F.img[3]/F.H-.05];
+  const h=solveH([[0,0],[1,0],[1,1],[0,1]],q),project=(u,v)=>{const d=h[6]*u+h[7]*v+1;return [(h[0]*u+h[1]*v+h[2])/d,(h[3]*u+h[4]*v+h[5])/d]};
+  const [u,v,bw,bh]=box,crop=[[u,v],[u+bw,v],[u+bw,v+bh],[u,v+bh]].map(p=>project(...p));
+  if(!crop.flat().every(Number.isFinite))return [issue('quad','这个选框暂时无法检查','把四角贴齐相纸边缘后再试。')];
+  const cw=(dist(crop[0],crop[1])+dist(crop[2],crop[3]))/2,ch=(dist(crop[0],crop[3])+dist(crop[1],crop[2]))/2;
+  const pixels=Math.min(cw,ch)*Math.max(1,nativeScale),occupancy=area(q)/(W*H);
+  if(pixels<900&&occupancy<.18)hints.push(issue('small','照片占画面偏小','靠近一点，让相纸占据更多画面，同时保留完整四边。',center));
+  else if(pixels<420)hints.push(issue('resolution','图片的可用像素较少','优先导入原图；如果是在翻拍，可以靠近并重新对焦，单纯放大不会增加细节。',center));
+  if(back)return hints; // 背面的白纸和稀疏字迹不适用正面检测。
+  const scale=Math.min(1,220/Math.max(cw,ch)),sw=Math.max(8,Math.round(cw*scale)),sh=Math.max(8,Math.round(ch*scale));
+  const im=warp(sd,crop,sw,sh),g=glareMap(im,0),seen=new Uint8Array(g.length),stack=new Int32Array(g.length);
+  let best=null,bright=0;for(const val of g)if(val>.8)bright++;
+  // 连续亮斑才提示；纯白、雪景等大片高亮不直接判成反光。
+  for(let i=0;i<g.length;i++){if(seen[i]||g[i]<=.8)continue;let head=0,tail=1,n=0,sx=0,sy=0;stack[0]=i;seen[i]=1;
+    while(head<tail){const j=stack[head++],x=j%sw,y=(j-x)/sw;n++;sx+=x;sy+=y;
+      for(const k of [x?j-1:-1,x<sw-1?j+1:-1,y?j-sw:-1,y<sh-1?j+sw:-1])if(k>=0&&!seen[k]&&g[k]>.8){seen[k]=1;stack[tail++]=k}}
+    if(!best||n>best.n)best={n,x:sx/n,y:sy/n}}
+  if(best&&best.n>=Math.max(12,g.length*.008)&&bright/g.length<.45){
+    const p=project(u+(best.x+.5)/sw*bw,v+(best.y+.5)/sh*bh),x=p[0]/W,y=p[1]/H;
+    const place=(y<.36?'上':y>.64?'下':'')+(x<.36?'左':x>.64?'右':'');
+    const label=place==='上左'?'左上':place==='上右'?'右上':place==='下左'?'左下':place==='下右'?'右下':place||'中间';
+    hints.push(issue('glare',`${label}有一块亮斑，可能反光`,'关掉闪光灯，稍换角度或避开顶灯再拍；如果这里本来就是白色，可以忽略。',p));
+  }
+  const m=analyze(im);
+  if(m.std>18&&m.sharp<2.2&&m.mean>35&&m.mean<220&&bright/g.length<.12)
+    hints.push(issue('soft','画面细节偏少，检查是否对焦','擦净镜头，点一下相纸画面对焦并拿稳再拍；原片本身柔和时可以忽略。'));
+  return hints;
+}
+let scanHints=[],scanCheckTimer=0;
+const ignoredScans=new WeakSet();
+function drawScanMarks(){const g=$('scanMarks');g.replaceChildren();if(!src||ignoredScans.has(src)||drag!==null)return;
+  scanHints.forEach((hint,i)=>{if(!hint.point)return;const [x,y]=hint.point.map((v,j)=>v*view.k+(j?view.oy:view.ox));
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle'),text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',11);text.setAttribute('x',x);text.setAttribute('y',y);text.textContent=i+1;g.append(circle,text)})}
+function refreshScanCheck(){clearTimeout(scanCheckTimer);if(!src||$('scanView').hidden)return;
+  const ignored=ignoredScans.has(src),body=$('scanCheckBody');body.replaceChildren();
+  try{scanHints=ignored?[]:scanQuality(srcData,quad,FORMATS[format],{trusted:autoFound,nativeScale:(src._ow||src.width)/src.width,back:backFor>=0})}
+  catch(e){scanHints=[{code:'unavailable',title:'暂时无法检查这张照片',detail:'可以手动确认四角、反光和清晰度，再继续拉正。'}]}
+  $('scanCheckTitle').textContent=ignored?'已忽略本张提醒':scanHints.length?`扫描提醒 · ${scanHints[0].title}${scanHints.length>1?`（共 ${scanHints.length} 条）`:''}`:'未发现明显扫描问题';
+  $('scanCheckLead').textContent=ignored?'按当前选框继续拉正，或展开重新检查。':scanHints[0]?.detail||'确认四角贴齐相纸边缘，就可以拉正。';
+  const list=document.createElement('ol');for(const hint of scanHints){const li=document.createElement('li'),b=document.createElement('b'),s=document.createElement('span');b.textContent=hint.title;s.textContent=hint.detail;li.append(b,s);list.append(li)}body.append(list);
+  const note=document.createElement('p');note.textContent='提示仅供参考，不影响继续拉正。防反光：关闪光灯、避开顶灯，试试侧面的自然光。';body.append(note);
+  $('scanIgnore').textContent=ignored?'重新检查本张':'忽略本张提醒';$('scanIgnore').hidden=!ignored&&!scanHints.length;
+  requestAnimationFrame(layoutDesk);
+}
+function scheduleScanCheck(){clearTimeout(scanCheckTimer);scanHints=[];$('scanMarks').replaceChildren();$('scanCheckTitle').textContent='正在检查选框…';$('scanCheckLead').textContent='';$('scanCheckBody').replaceChildren();$('scanIgnore').hidden=true;scanCheckTimer=setTimeout(refreshScanCheck,120)}
+$('scanIgnore').onclick=()=>{if(!src)return;if(ignoredScans.has(src))ignoredScans.delete(src);else ignoredScans.add(src);refreshScanCheck()};
+$('scanCheck').addEventListener('toggle',()=>{if(!$('scanView').hidden)requestAnimationFrame(layoutDesk)});
 
 /* ---------- 扫描界面 ---------- */
 let view={k:1,ox:0,oy:0};
@@ -770,27 +933,30 @@ function drawQuad(){
   b.setAttribute('stroke','#FFFFFF');b.setAttribute('stroke-width','5');b.setAttribute('stroke-linecap','round');svg.appendChild(b);
   P.forEach((p,i)=>{const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
     c.setAttribute('cx',p[0]);c.setAttribute('cy',p[1]);c.setAttribute('r',13);c.setAttribute('class','handle');c.dataset.i=i;svg.appendChild(c)});
+  drawScanMarks();
 }
 function showScan(){
-  $('scanView').hidden=false;$('editView').hidden=true;$('straighten').textContent=backFor>=0?'拉正，存成背面':mergeFor>=0?'拉正并合成，去掉反光':'找到了！拉正它';
-  $('found').textContent=autoFound&&format==='free'?'没看到拍立得的厚白边，按原比例拉正，不会变形':autoFound?`认出来了：${FORMATS[format].label}`+(SQ_FAMILY.includes(format)&&!camera?.film?'。三种方形相纸长得像，不对就点下面换':''):'没认出来，拖四个角框住它';
-  $('tip').textContent=autoFound&&format==='free'?'如果这其实是拍立得，在下面选相纸型号':autoFound?'白线是底边（白框最宽那边），不对就点「转 90°」':'拍的时候放在深色桌面上，更好认';
-  renderFormats();renderTray();renderCamBtn();requestAnimationFrame(layoutDesk);
+  $('homeView').hidden=true;$('scanView').hidden=false;$('editView').hidden=true;$('straighten').textContent=backFor>=0?'确认选框，存成背面':mergeFor>=0?'确认选框并合成':'确认选框并拉正';
+  $('found').textContent=scanNeedsConfirm?'未确定相纸边框。请确认整张原图，或选择相纸并拖动四角':`建议相纸：${FORMATS[format].label} · 请确认四角贴齐`;
+  $('tip').textContent=format==='free'?'普通照片可以直接使用整张原图；相纸照片请框住四边':'白线是相纸底边，方向不对可点「转 90°」';
+  $('fullPhoto').hidden=backFor>=0||mergeFor>=0;$('scanConfirmNote').textContent=scanNeedsConfirm?'识别不确定，请确认后继续':'自动结果也可以手动调整';
+  renderFormats();renderTray();renderCamBtn();scheduleScanCheck();requestAnimationFrame(layoutDesk);
 }
 function renderFormats(){
   $('formats').innerHTML=Object.keys(FORMATS).map(k=>`<button class="chip ${k===format?'on':''}" data-f="${k}">${FORMATS[k].label}</button>`).join('');
 }
-$('formats').onclick=e=>{const f=e.target.dataset.f;if(f){if(f==='free')setFree(quad);format=f;renderFormats();$('found').textContent=`相纸：${FORMATS[f].label}`}};
-$('rot').onclick=()=>{quad=rotQuad(quad,1);drawQuad()};
+$('formats').onclick=e=>{const f=e.target.dataset.f;if(f){if(f==='free')setFree(quad);format=f;renderFormats();$('found').textContent=`相纸：${FORMATS[f].label}`;scheduleScanCheck()}};
+$('rot').onclick=()=>{quad=rotQuad(quad,1);drawQuad();scheduleScanCheck()};
+$('fullPhoto').onclick=()=>{if(!src)return;quad=[[0,0],[src.width,0],[src.width,src.height],[0,src.height]];setFree(quad);format='free';autoFound=true;scanNeedsConfirm=false;showScan();$('found').textContent='使用整张原图，保留原始方向和比例';$('scanConfirmNote').textContent='整张原图已选好，可以继续';};
 let drag=null;
 $('quadSvg').addEventListener('pointerdown',e=>{
   const r=$('desk').getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
   let bi=-1,bd=44;quad.forEach((p,i)=>{const d=Math.hypot(p[0]*view.k+view.ox-mx,p[1]*view.k+view.oy-my);if(d<bd){bd=d;bi=i}});
-  if(bi<0)return;drag=bi;$('quadSvg').setPointerCapture(e.pointerId);e.preventDefault();showLoupe(e)});
+  if(bi<0)return;drag=bi;clearTimeout(scanCheckTimer);scanHints=[];$('scanMarks').replaceChildren();$('scanCheckTitle').textContent='松开四角后重新检查';$('scanCheckLead').textContent='';$('scanCheckBody').replaceChildren();$('scanIgnore').hidden=true;$('quadSvg').setPointerCapture(e.pointerId);e.preventDefault();showLoupe(e)});
 $('quadSvg').addEventListener('pointermove',e=>{if(drag===null)return;const r=$('desk').getBoundingClientRect();
   quad[drag]=[Math.max(0,Math.min(src.width,(e.clientX-r.left-view.ox)/view.k)),Math.max(0,Math.min(src.height,(e.clientY-r.top-view.oy)/view.k))];drawQuad();showLoupe(e)});
-$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;if(drag!==null){drag=null;autoFound=true;$('found').textContent='好，按这个框拉正'}});
-$('quadSvg').addEventListener('pointercancel',()=>{$('loupe').hidden=true;drag=null});
+$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;if(drag!==null){drag=null;autoFound=true;$('found').textContent='好，按这个框拉正';scheduleScanCheck()}});
+$('quadSvg').addEventListener('pointercancel',()=>{$('loupe').hidden=true;drag=null;scheduleScanCheck()});
 // 拖角时在手指旁边放大 3 倍：手指会挡住角，看着放大镜把黄线贴到相纸边上
 function showLoupe(e){const L=$('loupe'),r=$('desk').getBoundingClientRect(),S=128,dpr=Math.min(2,devicePixelRatio||1),p=quad[drag];
   if(L.width!==S*dpr){L.width=L.height=S*dpr;L.style.width=L.style.height=S+'px'}
@@ -809,16 +975,22 @@ function renderTrayInto(t){
   scans.forEach((s,i)=>{const b=document.createElement('button');b.className='t'+(i===curScan?' cur':'');b.setAttribute('aria-label',`第 ${i+1} 张`);
     b.appendChild(thumbOf(s));b.onclick=()=>openEdit(i);t.appendChild(b)});
   const add=document.createElement('button');add.className='add';add.textContent='+';add.setAttribute('aria-label','再扫一张');add.onclick=()=>{backFor=mergeFor=-1;$(DESK?'fileIn':'camIn').click()};t.appendChild(add);
+  if(pendingFiles.length){const b=document.createElement('button');b.className='chip pending';b.textContent=`继续框选（${pendingFiles.length} 张）`;b.onclick=async()=>{if(importBusy)return;importBusy=true;try{await openPending()}catch(e){toast('这张图打不开，请重新导入')}finally{importBusy=false}};t.appendChild(b)}
   const sm=document.createElement('small');sm.textContent=scans.length?`已扫 ${scans.length} 张，点小图接着调${scans.some(s=>!s.demo)?' · 自动存为草稿':''}`:(DESK?'可以一次拖进好几张':'扫过的会叠在这里');t.appendChild(sm);
 }
 
 /* ---------- 拉正 ---------- */
-$('straighten').onclick=()=>straighten(true);
+$('straighten').onclick=async()=>{if(importBusy)return;const queued=src===pendingSource&&backFor<0&&mergeFor<0;
+  straighten(true);
+  if(queued&&pendingFiles.length){importBusy=true;try{await openPending()}catch(e){toast('下一张打不开，请重新导入')}finally{importBusy=false}}};
 function straighten(open){
   if(backFor>=0){const i=backFor;backFor=-1;setBack(i);return}
   if(mergeFor>=0){const i=mergeFor;mergeFor=-1;mergeInto(i);return}
+  const invalid=scanQuality(srcData,quad,FORMATS[format],{back:true}).some(h=>h.code==='quad');if(invalid){toast('先把四角依次放回照片四角，再拉正');return}
+  scanNeedsConfirm=false;
   const F=FORMATS[format], long=1600, sc=long/Math.max(F.W,F.H), W=Math.round(F.W*sc), H=Math.round(F.H*sc);
   buildScan(warpFilm(srcData,quad,F,W,H),{src,srcData,quad:quad.map(p=>[...p]),fmt:format,...(F.free?{F:{...F}}:{})},open);
+  if(src===pendingSource){pendingFiles.shift();pendingSource=null;renderTray()}
 }
 // 把四个角框住的相纸拉成 W×H 的整张；原比例时只拉正照片，再放进补出来的白边里
 function warpFilm(sd,q,F,W,H){if(!F.free)return warp(sd,q,W,H);
@@ -843,7 +1015,7 @@ function buildScan(film,meta,open,idx){
   const prev=idx>=0?scans[idx]:scans[curScan], same=idx>=0||(prev&&prev.src===meta.src);
   const st=same?prev.st:blank();if(!same){st.caption=`${now.getMonth()+1}.${now.getDate()} `;st.date.d=srcDate||new Date(now-now.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
   const item={...meta,F,W,H,rect,film,scanCv,photoFull,photoCv,photoS,glare,glareS,glareAmt,st,hist:same?prev.hist:[],
-    id:meta.id||(same?prev.id:newId()),back:same?prev.back||null:null,scanDate:same?prev.scanDate:st.date.d,scanSrc:same?prev.scanSrc:(srcDate?srcDsrc:'today'),demo:same?prev.demo:false};
+    id:meta.id||(same?prev.id:newId()),back:same?prev.back||null:null,scanDate:same?prev.scanDate:st.date.d,scanSrc:same?prev.scanSrc:(srcDate?srcDsrc:'today'),demo:meta.demo??(same?prev.demo:false)};
   const at=idx>=0?idx:curScan;
   if(same)scans[at]=item;else scans.push(item);
   draftSoon();
@@ -952,10 +1124,12 @@ function syncGlare(){const on=ed&&ed.glare,mb=ed&&ed.before;$('gbar').hidden=!on
 /* ---------- 调色界面 ---------- */
 function openEdit(i){
   backFor=mergeFor=-1;curScan=i;ed=scans[i];history=ed.hist;brushing=false;$('card').classList.remove('brush');showingBack=false;$('card').classList.remove('backside');syncFlip();
-  $('scanView').hidden=true;$('editView').hidden=false;
+  if(!ed.demo)lastRealId=ed.id;
+  $('homeView').hidden=true;$('scanView').hidden=true;$('editView').hidden=false;syncDraftStatus();
   buildFilterStrip();buildSliders();buildFrames();syncControls();
   $('cap').textContent=ed.st.caption;updateNote();renderTray();
   requestAnimationFrame(()=>{layoutCard();renderCard()});
+  (window.requestIdleCallback||setTimeout)(startAmb);
 }
 function buildFilterStrip(){
   const fl=$('fl');fl.innerHTML='';
@@ -1087,7 +1261,7 @@ function setFrame(c){commit();ed.st.frame=c;syncControls();layoutCard();renderCa
 function commit(stay){if(showingBack&&!stay)setSide(false);history.push(JSON.stringify(ed.st));if(history.length>60)history.shift();$('undo').disabled=false}
 $('undo').onclick=()=>{if(!history.length)return;ed.st=JSON.parse(history.pop());syncGlare();$('cap').textContent=ed.st.caption;syncControls();layoutCard();renderCard()};
 $('back').onclick=()=>{setSourceFromScan()};
-function setSourceFromScan(){src=ed.src;srcData=ed.srcData;quad=ed.quad.map(p=>[...p]);format=ed.fmt;if(ed.F.free)FORMATS.free={...ed.F};autoFound=true;showScan()}
+function setSourceFromScan(){src=ed.src;srcData=ed.srcData;quad=ed.quad.map(p=>[...p]);format=ed.fmt;if(ed.F.free)FORMATS.free={...ed.F};autoFound=true;scanNeedsConfirm=false;showScan()}
 
 /* 卡片尺寸：按舞台可用空间算，画布只画画面和框，字和贴纸是可编辑的浮层 */
 function cardDims(){
@@ -1369,52 +1543,71 @@ async function doExport(share){const btn=$('expGo'),label=btn.textContent,list=e
   catch(e){toast('导出没成功，再试一次')}
   finally{btn.disabled=false;btn.textContent=label}}
 async function dropCurrent(){const i=curScan;$('expPanel').hidden=true;scans.splice(i,1);
-  if(scans.length)openEdit(Math.min(i,scans.length-1));else{ed=null;curScan=-1;showScan()}
+  if(scans.length)openEdit(Math.min(i,scans.length-1));else{ed=null;curScan=-1;showHome()}
   const saved=await mutateDraft(()=>saveDraft(true));toast(saved?'这一张删掉了':'已从当前页面移除，但草稿删除失败；请刷新后重新删除，或清理浏览器数据',5200)}
-async function clearAll(){$('expPanel').hidden=true;scans.length=0;ed=null;curScan=-1;customFrame=uploadFrame=null;cols=[];pages=[];alb=newAlb();clearTimeout(draftT);
-  await mutateDraft(async()=>{try{await KV.run('readwrite',s=>s.clear())}catch(e){toast('清空草稿失败，请重试');return}demo();toast('草稿清空了')})}
+async function clearAll(){$('expPanel').hidden=true;clearTimeout(draftT);
+  await mutateDraft(async()=>{try{await KV.run('readwrite',s=>s.clear())}catch(e){draftState='error';syncDraftStatus();toast('清空草稿失败，照片仍保留，可以稍后重试');return}
+    pendingFiles=[];pendingSource=null;scans.length=0;ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;cols=[];pages=[];alb=newAlb();draftPending=false;clearTimeout(draftT);draftSavedKey=draftKey();draftState='empty';syncDraftStatus();showHome();toast('草稿清空了')})}
 
 /* ---------- 本地草稿 ----------
    照片、四个角、所有调整自动存进这个浏览器的 IndexedDB，刷新或下次打开接着来。
    图片只存一次（翻拍原图 + 拉正后的整张），调整每次改都重写。示例照片不存 */
-const KV={p:null,db(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open('tiejin-drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
+const KV={p:null,db(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open('tiejin-drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}).catch(e=>{this.p=null;throw e}))},
   async run(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction('kv',mode),q=fn(t.objectStore('kv'));t.oncomplete=()=>res(q&&q.result);t.onerror=t.onabort=()=>rej(t.error)})},
   get(k){return this.run('readonly',s=>s.get(k))},keys(){return this.run('readonly',s=>s.getAllKeys())}};
-let draftT=0,draftBusy=false,draftWarned=false,restoring=true,persistAsked=false,draftRunning=null,draftEpoch=0,draftLocks=0,draftPending=false;
-function draftSoon(){clearTimeout(draftT);if(draftLocks){draftPending=true;return}draftT=setTimeout(()=>saveDraft(),1200)}
+let draftT=0,draftBusy=false,draftWarned=false,restoring=true,restoreFailed=false,persistAsked=false,draftRunning=null,draftEpoch=0,draftLocks=0,draftPending=false;
+let draftState='empty',draftSavedKey='',draftTargetKey='';
+const draftRefs=new WeakMap();let draftRefN=0;
+const draftRef=o=>{if(!o)return 0;if(!draftRefs.has(o))draftRefs.set(o,++draftRefN);return draftRefs.get(o)};
+// 不把查看原图、切标签和缩放当成编辑；图片与元数据变动才需要另存。
+function draftKey(){return JSON.stringify([realFocus(),scans.filter(s=>!s.demo).map(s=>[s.id,s.st,s.quad,s.F,s.merged,s.scanDate,s.scanSrc,draftRef(s.src),draftRef(s.scanCv),draftRef(s.back)]),cols,pages,draftRef(customFrame),draftRef(uploadFrame)])}
+function syncDraftStatus(){const el=$('draftStatus'),demo=ed?.demo,state=demo?'demo':draftState;
+  el.dataset.state=state;$('draftText').textContent=({demo:'示例体验 · 不会保存到你的收藏',empty:'还没有需要保存的照片',pending:'有修改，等待保存到本机…',saving:'正在保存到本机…',saved:'已保存到本机 · 导出图片可另存到设备',error:'保存失败 · 修改尚未存好，请重试或导出图片'})[state];$('draftRetry').hidden=state!=='error';
+}
+function draftSoon(){if(restoring||restoreFailed)return;clearTimeout(draftT);const key=draftKey();
+  if(!draftBusy&&key===draftSavedKey){syncDraftStatus();return}
+  if(draftState!=='error')draftState=draftBusy&&key===draftTargetKey?'saving':'pending';syncDraftStatus();
+  if(draftLocks){draftPending=true;return}draftT=setTimeout(()=>saveDraft(),1200)}
+$('draftRetry').onclick=()=>{clearTimeout(draftT);saveDraft()};
 // 删除时先让旧快照失效，等已开始的事务结束，再写入删除后的状态。
 async function mutateDraft(fn){draftEpoch++;draftLocks++;clearTimeout(draftT);
   try{if(draftRunning)await draftRunning;return await fn()}
   finally{draftLocks--;if(!draftLocks&&draftPending){draftPending=false;draftSoon()}}}
-async function saveDraft(force=false){if(restoring)return;if(draftLocks&&!force){draftPending=true;return}if(draftBusy){draftSoon();return draftRunning}draftBusy=true;const epoch=draftEpoch;
+async function saveDraft(force=false){if(restoring||restoreFailed)return false;if(draftLocks&&!force){draftPending=true;return}if(draftBusy){draftSoon();return draftRunning}draftBusy=true;const epoch=draftEpoch,key=draftKey();draftTargetKey=key;
+  if(draftState!=='error')draftState='saving';syncDraftStatus();
   draftRunning=(async()=>{
   try{const list=scans.filter(s=>!s.demo),put=[];
+    list.forEach(s=>{if(!s.src._id)s.src._id=newId()});
+    const meta={v:1,cur:Math.max(0,list.findIndex(s=>s.id===realFocus())),list:list.map(s=>({id:s.id,srcId:s.src._id,ow:s.src._ow,fmt:s.fmt,F:{...s.F,img:[...s.F.img]},quad:s.quad.map(p=>[...p]),st:JSON.parse(JSON.stringify(s.st)),merged:!!s.merged,scanDate:s.scanDate,scanSrc:s.scanSrc,back:!!s.back}))},ids=new Set(meta.list.map(r=>r.id));
+    meta.cols=cols.map(c=>({...c,ids:c.ids.filter(id=>ids.has(id))}));meta.pages=pages.map(p=>({...p,pick:p.pick.filter(id=>ids.has(id))}));
     for(const s of list){if(!s.src._id)s.src._id=newId();
       if(!s.src._saved){put.push(['src:'+s.src._id,await toBlob(s.src,'image/jpeg',.9),s.src]);if(s.src._file)put.push(['orig:'+s.src._id,s.src._file,{}])}
       if(!s._saved)put.push(['film:'+s.id,await toBlob(s.scanCv,'image/jpeg',.93),s]);
       if(s.back&&!s.back._saved)put.push(['back:'+s.id,await toBlob(s.back,'image/jpeg',.9),s.back])}
     for(const [k,f] of [['frame:draw',customFrame],['frame:upload',uploadFrame]])if(f&&!f._saved)put.push([k,await toBlob(f,'image/png'),f]);
-    const meta={v:1,cur:Math.max(0,list.indexOf(ed)),list:list.map(s=>({id:s.id,srcId:s.src._id,ow:s.src._ow,fmt:s.fmt,F:s.F,quad:s.quad,st:s.st,merged:!!s.merged,scanDate:s.scanDate,scanSrc:s.scanSrc,back:!!s.back}))},ids=new Set(meta.list.map(r=>r.id));
-    meta.cols=cols.map(c=>({...c,ids:c.ids.filter(id=>ids.has(id))}));meta.pages=pages.map(p=>({...p,pick:p.pick.filter(id=>ids.has(id))}));
     const keep=new Set(['meta',...(customFrame?['frame:draw']:[]),...(uploadFrame?['frame:upload']:[]),...meta.list.flatMap(r=>['film:'+r.id,'src:'+r.srcId,'orig:'+r.srcId,...(r.back?['back:'+r.id]:[])])]),old=await KV.keys();
     if(epoch!==draftEpoch)return false;
     await KV.run('readwrite',st=>{put.forEach(([k,b])=>st.put(b,k));st.put(meta,'meta');old.forEach(k=>{if(!keep.has(k))st.delete(k)})});
     put.forEach(q=>q[2]._saved=true);
+    if(epoch!==draftEpoch)return false;
+    draftSavedKey=key;draftWarned=false;
+    if(draftKey()===key){clearTimeout(draftT);draftState=list.length||cols.length||pages.length?'saved':'empty'}else{draftState='pending';clearTimeout(draftT);draftT=setTimeout(()=>saveDraft(),1200)}syncDraftStatus();
     if(list.length&&!persistAsked){persistAsked=true;navigator.storage?.persist?.().catch(()=>{})}return true}   // 请浏览器别在空间紧张时自动清掉
-  catch(e){if(!draftWarned){draftWarned=true;toast(e&&e.name==='QuotaExceededError'?'浏览器存储满了，草稿没存上。调好的先导出吧':'这个浏览器存不了草稿，刷新就没了，调好的记得导出',5200)}return false}
+  catch(e){draftState='error';syncDraftStatus();if(!draftWarned){draftWarned=true;toast(e&&e.name==='QuotaExceededError'?'浏览器存储满了，草稿没存上。调好的先导出吧':'这个浏览器存不了草稿，刷新就没了，调好的记得导出',5200)}return false}
   finally{draftBusy=false}})();return draftRunning}
 addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(draftT);saveDraft()}});
-async function restoreDrafts(){const meta=await KV.get('meta');if(!meta||!meta.list||!meta.list.length)return null;
+async function restoreDrafts(){const meta=await KV.get('meta');if(!meta)return null;if(!Array.isArray(meta.list))throw new Error('Draft metadata is unreadable');
   cols=meta.cols||[];pages=meta.pages||[];
   const cvOf=async k=>{const b=await KV.get(k);if(!b)return null;const im=await createImageBitmap(b),c=document.createElement('canvas');c.width=im.width;c.height=im.height;c.getContext('2d',{willReadFrequently:true}).drawImage(im,0,0);return c};
   for(const k of ['draw','upload']){const c=await cvOf('frame:'+k);if(c){c._saved=true;if(k==='draw')customFrame=c;else uploadFrame=c}}
+  if(meta.list.some(r=>r.st?.frame==='draw')&&!customFrame||meta.list.some(r=>r.st?.frame==='upload')&&!uploadFrame)throw new Error('Draft frame is missing');
   const srcs={};let n=0;
   for(const r of meta.list){try{
-    if(!srcs[r.srcId]){const c=await cvOf('src:'+r.srcId);if(!c)continue;c._id=r.srcId;c._saved=true;c._file=await KV.get('orig:'+r.srcId)||null;c._ow=r.ow||c.width;srcs[r.srcId]={c,d:c.getContext('2d').getImageData(0,0,c.width,c.height)}}
-    const fc=await cvOf('film:'+r.id);if(!fc)continue;const S=srcs[r.srcId];curScan=-1;
+    if(!srcs[r.srcId]){const c=await cvOf('src:'+r.srcId);if(!c)throw new Error('Draft source is missing');c._id=r.srcId;c._saved=true;c._file=await KV.get('orig:'+r.srcId)||null;c._ow=r.ow||c.width;srcs[r.srcId]={c,d:c.getContext('2d').getImageData(0,0,c.width,c.height)}}
+    const fc=await cvOf('film:'+r.id);if(!fc)throw new Error('Draft photo is missing');const S=srcs[r.srcId];curScan=-1;
     const it=buildScan(fc.getContext('2d').getImageData(0,0,fc.width,fc.height),{src:S.c,srcData:S.d,quad:r.quad,fmt:r.fmt,F:r.F,merged:r.merged,id:r.id},false);
     Object.assign(it,{st:r.st,scanDate:r.scanDate,scanSrc:r.scanSrc,_saved:true});
-    if(r.back){const b=await cvOf('back:'+r.id);if(b){b._saved=true;it.back=b}}n++}catch(e){}}
+    if(r.back){const b=await cvOf('back:'+r.id);if(!b)throw new Error('Draft back is missing');b._saved=true;it.back=b}n++}catch(e){throw e}}
   return n?{n,cur:Math.min(meta.cur||0,n-1)}:null}
 
 /* ---------- 拼一页：选几张调好的照片，拼成一张能分享的图 ---------- */
@@ -1557,7 +1750,7 @@ $('albSave').onclick=async()=>{if(!alb.pick.length){toast('先选几张照片');
 
 /* ---------- 我的相册：分成「旅行」「朋友」这样的相册，设封面，按日期、地点、人物找 ----------
    相册只记照片的 id，一张照片可以在好几个相册里。和草稿一起存在这个浏览器里 */
-let cols=[],lib={col:'all',q:'',pick:false},libTok=0;
+let cols=[],lib={col:'all',q:'',pick:false},libTok=0,libFromHome=false;
 const colOf=id=>cols.find(c=>c.id===id);
 function newCol(name,first){name=(name||'').trim().slice(0,12);if(!name)return null;let c=cols.find(k=>k.name===name);
   if(!c){c={id:newId(),name,cover:null,ids:[]};cols.push(c)}if(first&&!c.ids.includes(first))c.ids.push(first);draftSoon();return c}
@@ -1566,10 +1759,10 @@ const coverOf=c=>{const l=c.ids.map(id=>scans.find(s=>s.id===id)).filter(Boolean
 function hay(s){const st=s.st,m=st.memo||{},dt=st.date,p=dPrec(dt),d=dt.d||'',[y,mo,dd]=d.split('-'),ym=`${y}.${mo} ${y}-${mo} ${y}年${+mo}月 ${y}年${mo}月`;
   return [!d||p==='none'?'日期未知 不记得':p==='day'?`${d} ${dShort(d)} ${ym} ${y}年${+mo}月${+dd}日 ${+mo}月${+dd}日`:p==='month'?ym:p==='season'?`${y} ${y}年${SEASONS[dt.s||'summer'][0]} ${SEASONS[dt.s||'summer'][0]}`:`${y} ${y}年 ${p==='about'?'大约 约':''}`,s.scanDate,m.place,m.people,m.story,st.caption,...cols.filter(c=>c.ids.includes(s.id)).map(c=>c.name)].filter(Boolean).join(' ').toLowerCase()}
 // 有自己的照片时不放示例
-const libAll=()=>{const l=scans.filter(s=>!s.demo);return l.length?l:scans.slice()};
+const libAll=()=>{const l=scans.filter(s=>!s.demo);return l.length||libFromHome?l:scans.slice()};
 function libList(){const ts=lib.q.trim().toLowerCase().replace(/\//g,'.').split(/\s+/).filter(Boolean),c=colOf(lib.col);
   return libAll().filter(s=>(lib.pick||!c||c.ids.includes(s.id))&&ts.every(t=>hay(s).includes(t))).sort((a,b)=>cmpD(b,a))}
-function openLib(){if(!scans.length)return;lib.pick=false;$('libQ').value=lib.q;$('libPanel').hidden=false;renderLib()}
+function openLib(){libFromHome=!$('homeView').hidden;lib.pick=false;$('libQ').value=lib.q;$('libClose').textContent=libFromHome?'‹ 首页':'‹ 编辑';$('libPanel').hidden=false;renderLib()}
 function coverCv(s,size){const c=mkCv(size,size);if(s){const x=c.getContext('2d');cover(x,s.photoCv,0,0,size,size)}return c}
 function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.pick=false}const c=colOf(lib.col),live=id=>scans.some(s=>s.id===id);
   const tags=[...new Set(libAll().flatMap(s=>{const m=s.st.memo||{};return [m.place,m.people]}).map(v=>(v||'').trim()).filter(Boolean))].slice(0,10);
@@ -1580,7 +1773,7 @@ function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.
   cs.insertAdjacentHTML('beforeend','<input class="newcol" id="libNew" maxlength="12" placeholder="＋ 新相册，写名字回车" aria-label="新相册的名字">');
   $('libBar').innerHTML=c?`<input id="colName" value="${esc(c.name)}" maxlength="12" aria-label="相册名字"><button class="chip${lib.pick?' on':''}" id="colPick">${lib.pick?'挑好了':'挑照片'}</button><button class="chip" id="colDel">删掉相册</button>`+
     `<p>${lib.pick?`点照片放进或拿出「${esc(c.name)}」。亮着的在相册里。`:'点「设为封面」换封面。删掉相册不会删照片。'}</p>`:'';
-  $('libAlbum').textContent=lib.pick?'挑好了':'用这些拼一页'}
+  $('libAlbum').textContent=lib.pick?'挑好了':'用这些拼一页';$('libAlbum').hidden=!libAll().length}
 function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=libList(),cov=c&&coverOf(c);g.innerHTML='';
   if(!list.length){g.innerHTML=`<p class="empty">${lib.q?'没找到。换个词试试，比如年份「2025」、月份「2025.07」或者地点':c?'这个相册还是空的。点「挑照片」，或者在调色页的「回忆」里放进来':'还没有照片'}</p>`;return}
   let last=null;for(const s of list){const mk=dGroup(s.st.date),m=s.st.memo||{};
@@ -1593,7 +1786,8 @@ function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=l
     if(s.back){const b=f.querySelector('.bk');b.width=280;b.height=Math.round(280*s.back.height/s.back.width);b.getContext('2d').drawImage(s.back,0,0,b.width,b.height)}
     cardOf(s,false).then(cv=>{if(t!==libTok)return;fr.height=Math.round(280*cv.height/cv.width);const x=fr.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(cv,0,0,fr.width,fr.height)}).catch(()=>{})}}
 function renderLib(){renderLibHead();renderLibGrid()}
-$('libBtn').onclick=openLib;$('libClose').onclick=()=>$('libPanel').hidden=true;
+$('libBtn').onclick=openLib;$('libClose').onclick=()=>{if(libFromHome)showHome();else $('libPanel').hidden=true};
+$('libImport').onclick=()=>{backFor=mergeFor=-1;$('fileIn').click()};
 let libT=0;$('libQ').oninput=()=>{lib.q=$('libQ').value;clearTimeout(libT);libT=setTimeout(renderLib,200)};
 $('libTags').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;lib.q=lib.q===b.dataset.q?'':b.dataset.q;$('libQ').value=lib.q;renderLib()};
 $('libCols').onclick=e=>{const b=e.target.closest('[data-col]');if(!b)return;lib.col=b.dataset.col;lib.pick=false;renderLib()};
@@ -2290,29 +2484,31 @@ $('shoot').onclick=()=>$('camIn').click();
 $('pick').onclick=()=>$('fileIn').click();
 for(const id of ['camIn','fileIn']){$(id).onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
   $(id).addEventListener('cancel',()=>{backFor=mergeFor=-1})}   // 没选就关掉：下一张照常导入，不当成背面或补拍
-if(DESK){$('shoot').hidden=true;$('pick').textContent='上传照片';$('fileIn').setAttribute('aria-label','上传照片');
+if(DESK){$('homeShoot').hidden=true;$('homeImport').classList.add('on');$('shoot').hidden=true;$('pick').textContent='上传照片';$('fileIn').setAttribute('aria-label','上传照片');
   $('tdHint').textContent='拖动旋转 · 滚轮缩放 · 点击部件把它拆出来'}
-$('save').textContent=SAVE_T;
+$('save').textContent='导出图片';
 /* 拖放和粘贴：电脑上最顺手的导入方式 */
 let dragDepth=0;
 addEventListener('dragenter',e=>{if([...e.dataTransfer.types].includes('Files')){dragDepth++;$('drop').hidden=false}});
 addEventListener('dragleave',()=>{if(--dragDepth<=0){dragDepth=0;$('drop').hidden=true}});
 addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('Files'))e.preventDefault()});
 addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('drop').hidden=true;closePanels();if(e.dataTransfer.files.length)loadFiles(e.dataTransfer.files)});
-addEventListener('paste',e=>{if(document.activeElement===$('cap'))return;const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();closePanels();loadFiles(fs)}});
+const textEditing=()=>{const a=document.activeElement;return !!a&&(a.isContentEditable||a.matches('textarea, input:not([type="range"]):not([type="button"]):not([type="checkbox"]):not([type="radio"])'))};
+addEventListener('paste',e=>{if(textEditing())return;const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();closePanels();loadFiles(fs)}});
 function closePanels(){['camPanel','guidePanel','tdPanel','sheet','drawPanel','expPanel','albumPanel','libPanel'].forEach(id=>$(id).hidden=true);dr=null;if(td)td.running=false}
 /* 快捷键：Ctrl/⌘+Z 撤销，Ctrl/⌘+S 保存，Esc 关面板 */
 addEventListener('keydown',e=>{
   const mod=e.ctrlKey||e.metaKey,editing=!$('editView').hidden&&$('camPanel').hidden&&$('guidePanel').hidden&&$('tdPanel').hidden&&$('drawPanel').hidden&&$('expPanel').hidden&&$('albumPanel').hidden&&$('libPanel').hidden;
   if(e.key==='Escape'){if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('expPanel').hidden)$('expPanel').hidden=true;else if(!$('albumPanel').hidden)$('albumPanel').hidden=true;else if(!$('libPanel').hidden)$('libPanel').hidden=true;else if(!$('drawPanel').hidden)$('drawCancel').click();else if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('tdPanel').hidden)$('tdClose').click();else if(!$('guidePanel').hidden)$('guideClose').click();else if(!$('camPanel').hidden)$('camPanel').hidden=true;return}
-  if(!mod||!editing||document.activeElement===$('cap'))return;
+  if(!mod||!editing||textEditing()||e.isComposing)return;
   if(e.key.toLowerCase()==='z'){e.preventDefault();$('undo').click()}
   else if(e.key.toLowerCase()==='s'){e.preventDefault();if(!$('save').disabled)$('save').click()}
 });
-addEventListener('resize',()=>{if(!$('scanView').hidden)layoutDesk();else if(ed){layoutCard();renderCard()}});
+addEventListener('resize',()=>{if(!$('scanView').hidden)layoutDesk();else if(!$('editView').hidden&&ed){layoutCard();renderCard()}});
 
 /* ---------- 示例：把示例照片做成一张斜放在桌上的拍立得，打开就能看到完整流程 ---------- */
 function demo(){
+  if($('homeDemo').disabled)return;$('homeDemo').disabled=true;
   const im=new Image();im.onload=()=>{
     const F=FORMATS.mini,s=10,W=F.W*s,H=F.H*s;
     const film=document.createElement('canvas');film.width=W;film.height=H;const fx=film.getContext('2d');
@@ -2328,16 +2524,18 @@ function demo(){
       if(u<0||v<0||u>=W-1||v>=H-1)continue;const si=((v|0)*W+(u|0))*4,o=(y*TW+x)*4;td.data[o]=fd.data[si];td.data[o+1]=fd.data[si+1];td.data[o+2]=fd.data[si+2]}
     for(let i=0;i<td.data.length;i+=4){const n=(Math.random()-.5)*10;td.data[i]+=n;td.data[i+1]+=n;td.data[i+2]+=n}
     tx.putImageData(td,0,0);
-    setSource(table);
-    $('straighten').click();ed.demo=true;
+    setSource(table,q,true);format='mini';
+    const FF=FORMATS.mini,k2=1600/Math.max(FF.W,FF.H),w2=Math.round(FF.W*k2),h2=Math.round(FF.H*k2);
+    buildScan(warpFilm(srcData,quad,FF,w2,h2),{src,srcData,quad:quad.map(p=>[...p]),fmt:'mini',demo:true},true);$('homeDemo').disabled=false;
     const st=ed.st;st.filter='旧夏';st.caption='帕兰加，晒到发烫';$('cap').textContent=st.caption;syncControls();layoutCard();renderCard();
-    toast(DESK?'这是示例照片。把你的拍立得照片拖进窗口就能换，可以一次拖好几张。':'这是示例照片。点「‹ 重扫」再点「拍一张」，换成你自己的拍立得。',4200);
-  };im.src=SAMPLE;
+    syncDraftStatus();toast('这是示例体验，不会存进你的收藏。点「首页」即可导入自己的照片。',4200);
+  };im.onerror=()=>{$('homeDemo').disabled=false;toast('示例暂时打不开，可以直接导入自己的照片')};im.src=SAMPLE;
 }
 /* 暗房背景：照片后面一层很暗的安全灯红、一道漏光和颗粒。用 shaders.com 的 MIT 组件，只在支持 WebGPU 时加载；
    不支持、加载失败或者没网就一直透明，露出原来的背景。关掉它的使用统计；减少动态效果时画面不动 */
 const AMB_URL='https://cdn.jsdelivr.net/npm/shaders@4.0.4/dist/js/index.js/+esm';
-async function startAmb(){const cv=$('amb');if(!navigator.gpu||!cv)return;
+let ambStarted=false;
+async function startAmb(){const cv=$('amb');if(ambStarted||!navigator.gpu||!cv||$('editView').hidden)return;ambStarted=true;
   // The shader library otherwise writes fixed pixel dimensions to the inline style.
   // Keep the canvas tied to the stage as the viewport and editor panels resize.
   cv.style.width='100%';cv.style.height='100%';
@@ -2350,7 +2548,11 @@ async function startAmb(){const cv=$('amb');if(!navigator.gpu||!cv)return;
       {disableTelemetry:true,onReady:()=>cv.classList.add('on'),onError:()=>cv.classList.remove('on')})}catch(e){cv.classList.remove('on')}}
 // 等首屏和照片都画好再加载，不跟它们抢网速
 addEventListener('load',()=>setTimeout(()=>(window.requestIdleCallback||setTimeout)(startAmb),1200));
-// 打开时先看有没有草稿：有就接着上次的，没有才放示例
-(async()=>{let r=null;try{r=await restoreDrafts()}catch(e){}restoring=false;
-  if(r){openEdit(r.cur);toast(`接着上次的 ${r.n} 张。草稿只存在这个浏览器里，调好的记得导出`,4600)}else demo()})();
+// 打开时恢复数据，再由首页选择继续整理或导入新照片。
+async function loadHomeDrafts(){restoring=true;restoreFailed=false;clearTimeout(draftT);scans.length=0;cols=[];pages=[];ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;renderHome();
+  let r=null;try{r=await restoreDrafts()}catch(e){restoreFailed=true}restoring=false;clearTimeout(draftT);
+  if(r){curScan=r.cur;ed=scans[curScan];lastRealId=ed.id;history=ed.hist}
+  draftSavedKey=restoreFailed?'':draftKey();draftState=restoreFailed?'error':scans.some(s=>!s.demo)||cols.length?'saved':'empty';syncDraftStatus();showHome();
+  if(restoreFailed)toast('本机收藏暂时读取失败，旧数据仍保留，请重试读取',5200)}
+$('homeRestoreRetry').onclick=loadHomeDrafts;loadHomeDrafts();
 </script>
