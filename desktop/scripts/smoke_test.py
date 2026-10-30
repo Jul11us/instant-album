@@ -5,7 +5,8 @@
 加 --packaged 检查 npm run dist 打出来的 dist/win-unpacked/XiangJiao.exe（Mac 上是 npm run dist:mac 打出来的、
 本机芯片对应的 相角.app）；--app <路径> 检查指定的程序，比如从 dmg 里拷出来的 相角.app；--show 让窗口显示出来；
 --shots <文件夹> 存下首页、编辑和 3D 拆解的截图（Mac 上加 --show 时连整个屏幕一起截，看得到菜单栏）。
---software-gl 用于没有硬件图形支持的 CI，显式启用 SwiftShader；依然要求 3D 模型实际加载成功。
+--software-gl 用于 CI，尝试 SwiftShader；默认仍要求模型实际加载。
+--allow-no-webgl 仅在已知不提供图形支持的 CI 上验证不可用提示，并明确报告未验证渲染。
 """
 import os
 import platform
@@ -24,6 +25,7 @@ ARGS = sys.argv[1:]
 APP = Path(ARGS[ARGS.index('--app') + 1]) if '--app' in ARGS else None
 PACKAGED = '--packaged' in ARGS or APP is not None
 SHOW = '--show' in ARGS
+ALLOW_NO_GL = '--allow-no-webgl' in ARGS
 GL_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] if '--software-gl' in ARGS else []
 SHOTS = Path(ARGS[ARGS.index('--shots') + 1]) if '--shots' in ARGS else None
 if sys.platform == 'darwin':
@@ -115,7 +117,9 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(endpoint)
         page = app_page(browser)
         errors = []
+        console_errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
+        page.on('console', lambda message: console_errors.append(message.text) if message.type == 'error' else None)
         page.wait_for_function('() => typeof restoring !== "undefined" && !restoring')
         assert page.evaluate('!!window.desktop && typeof window.desktop.saveFile === "function"')
         assert page.evaluate('typeof require === "undefined" && typeof process === "undefined"'), 'Node 不能暴露给页面'
@@ -161,14 +165,26 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
         page.locator('#back').click()
         page.wait_for_selector('#scanView', state='visible')
         page.locator('#scanMore summary').click()
+        graphics = page.evaluate("""() => {const c=document.createElement('canvas');
+          const options={antialias:true,alpha:false},gl=c.getContext('webgl2',options)||c.getContext('webgl',options);
+          if(!gl)return {available:false,renderer:null};
+          const info=gl.getExtension('WEBGL_debug_renderer_info');
+          const renderer=gl.getParameter(info?info.UNMASKED_RENDERER_WEBGL:gl.RENDERER);
+          gl.getExtension('WEBGL_lose_context')?.loseContext();return {available:true,renderer}}
+        """)
+        print(f'3D 图形能力：{graphics}', flush=True)
+        assert graphics['available'] or ALLOW_NO_GL, '这个检查要求可用的 WebGL；仅受限 CI 可以显式选择验证不可用提示'
         page.locator('#td3d').click()
         page.wait_for_selector('#tdPanel', state='visible')
         try:
             page.wait_for_function("() => (typeof THREE !== 'undefined' && !!THREE && $('tdLoad').hidden) || /没加载出来|没能显示/.test($('tdLoad').textContent)", timeout=20000)
-            assert page.evaluate("typeof td !== 'undefined' && !!td?.model && $('tdLoad').hidden"), page.locator('#tdLoad').inner_text()
+            if graphics['available']:
+                assert page.evaluate("typeof td !== 'undefined' && !!td?.model && $('tdLoad').hidden"), page.locator('#tdLoad').inner_text()
+            else:
+                assert '没能显示' in page.locator('#tdLoad').inner_text()
         except Exception:
             shot(page, '3-teardown-failure')
-            print(f'3D 检查失败：{page.locator("#tdLoad").inner_text()}；页面错误：{errors}', file=sys.stderr)
+            print(f'3D 检查失败：{page.locator("#tdLoad").inner_text()}；页面错误：{errors}；控制台错误：{console_errors[-10:]}', file=sys.stderr)
             raise
         if SHOTS:
             page.wait_for_timeout(1000)
@@ -207,5 +223,6 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
     finally:
         close(proc)
 
+three_status = '3D 模型渲染' if graphics['available'] else '3D 不可用提示（未验证渲染）'
 print(f'电脑版{"安装包" if PACKAGED else ""}检查通过：离线字体 {len(loaded)} 种、导出 {image_kb} KB、'
-      f'备份 {backup_kb} KB、3D 拆解、重启后草稿保留；WebGPU {"可用" if gpu else "不可用"}')
+      f'备份 {backup_kb} KB、{three_status}、重启后草稿保留；WebGPU {"可用" if gpu else "不可用"}')

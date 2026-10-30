@@ -78,7 +78,7 @@ jobs:
           if [ "$arch" = x64 ]; then want=x86_64; else want=arm64; fi
           test "$(lipo -archs "$app/Contents/MacOS/相角")" = "$want"
           extra=()
-          if [ "$arch" = x64 ]; then extra+=(--software-gl); fi
+          if [ "$arch" = x64 ]; then extra+=(--software-gl --allow-no-webgl); fi
           python scripts/smoke_test.py --app "$app" --show --shots "$RUNNER_TEMP/shots/$arch" "${extra[@]}"
       - name: 校验值
         working-directory: desktop/dist
