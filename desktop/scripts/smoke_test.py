@@ -46,16 +46,29 @@ def launch(user_data, save_dir):
     port = free_port()
     env = dict(os.environ, XIANGJIAO_USER_DATA=str(user_data), XIANGJIAO_SAVE_DIR=str(save_dir),
                XIANGJIAO_HIDDEN='0' if SHOW else '1', XIANGJIAO_OFFLINE='1')
-    proc = subprocess.Popen([*COMMAND, f'--remote-debugging-port={port}'], env=env,
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    log = tempfile.TemporaryFile()
+    try:
+        proc = subprocess.Popen([*COMMAND, f'--remote-debugging-port={port}'], env=env,
+                                stdout=log, stderr=subprocess.STDOUT)
+    except Exception:
+        log.close()
+        raise
+    proc._startup_log = log
     for _ in range(100):
         try:
             with socket.create_connection(('127.0.0.1', port), timeout=.2):
                 return proc, f'http://127.0.0.1:{port}'
         except OSError:
+            if proc.poll() is not None:
+                break
             time.sleep(.2)
-    proc.kill()
-    raise RuntimeError('Electron 没有打开调试端口')
+    if proc.poll() is None:
+        proc.kill()
+    proc.wait()
+    log.seek(0)
+    output = log.read().decode('utf-8', errors='replace')[-8000:]
+    log.close()
+    raise RuntimeError(f'Electron 没有打开调试端口（退出码 {proc.returncode}）\n{output}')
 
 
 def app_page(browser):
@@ -78,11 +91,16 @@ def shot(page, name):
 
 
 def close(proc):
-    proc.terminate()
     try:
-        proc.wait(10)
-    except subprocess.TimeoutExpired:
-        proc.kill()
+        if proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(10)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+    finally:
+        proc._startup_log.close()
 
 
 with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:

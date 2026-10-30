@@ -1,5 +1,5 @@
 # Mac 版：在 GitHub 的 Mac 机器上打 Apple 芯片和 Intel 芯片两个 dmg，像用户一样从 dmg 里拷出 相角.app，
-# 检查签名和芯片，再真的打开跑一遍冒烟检查（Intel 版靠 Rosetta）。dmg、校验值和截图放在这次运行的 Artifacts 里。
+# 检查签名和芯片，再在对应架构的 Mac 上打开跑一遍冒烟检查。dmg、校验值和截图放在这次运行的 Artifacts 里。
 # 放在这里打包是因为 Windows 上的 electron-builder 不能打 Mac 包：dmg 和签名要用 macOS 自带的工具。
 name: Mac 版
 
@@ -24,7 +24,16 @@ concurrency:
 
 jobs:
   mac:
-    runs-on: macos-latest
+    name: Mac ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-latest
+          - arch: x64
+            runner: macos-15-intel
     timeout-minutes: 45
     defaults:
       run:
@@ -53,28 +62,28 @@ jobs:
       - name: 原生保存与窗口回归
         run: node --test scripts/native.test.cjs
       - name: 打包
-        run: npm run dist:mac
+        run: |
+          npm run prepare-web
+          npx electron-builder --mac dmg --publish never --${{ matrix.arch }}
       - name: 从 dmg 装出来检查
         run: |
-          sudo softwareupdate --install-rosetta --agree-to-license
           version=$(node -p "require('./package.json').version")
-          for arch in arm64 x64; do
-            mnt="$RUNNER_TEMP/dmg-$arch" app="$RUNNER_TEMP/$arch/相角.app"
-            mkdir -p "$mnt" "$RUNNER_TEMP/$arch"
-            hdiutil attach -nobrowse -readonly -mountpoint "$mnt" "dist/XiangJiao-$version-mac-$arch.dmg"
-            ditto "$mnt/相角.app" "$app"
-            hdiutil detach "$mnt"
-            codesign --verify --deep --strict --verbose=2 "$app"
-            if [ "$arch" = x64 ]; then want=x86_64; else want=arm64; fi
-            test "$(lipo -archs "$app/Contents/MacOS/相角")" = "$want"
-            python scripts/smoke_test.py --app "$app" --show --shots "$RUNNER_TEMP/shots/$arch"
-          done
+          arch="${{ matrix.arch }}"
+          mnt="$RUNNER_TEMP/dmg-$arch" app="$RUNNER_TEMP/$arch/相角.app"
+          mkdir -p "$mnt" "$RUNNER_TEMP/$arch"
+          hdiutil attach -nobrowse -readonly -mountpoint "$mnt" "dist/XiangJiao-$version-mac-$arch.dmg"
+          ditto "$mnt/相角.app" "$app"
+          hdiutil detach "$mnt"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          if [ "$arch" = x64 ]; then want=x86_64; else want=arm64; fi
+          test "$(lipo -archs "$app/Contents/MacOS/相角")" = "$want"
+          python scripts/smoke_test.py --app "$app" --show --shots "$RUNNER_TEMP/shots/$arch"
       - name: 校验值
         working-directory: desktop/dist
         run: shasum -a 256 *.dmg | tee SHA256SUMS-mac.txt
       - uses: actions/upload-artifact@v7
         with:
-          name: XiangJiao-mac
+          name: XiangJiao-mac-${{ matrix.arch }}
           path: |
             desktop/dist/*.dmg
             desktop/dist/SHA256SUMS-mac.txt
@@ -84,7 +93,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: screenshots-mac
+          name: screenshots-mac-${{ matrix.arch }}
           path: ${{ runner.temp }}/shots
           if-no-files-found: ignore
           retention-days: 30
