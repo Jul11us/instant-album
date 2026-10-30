@@ -5,6 +5,7 @@
 加 --packaged 检查 npm run dist 打出来的 dist/win-unpacked/XiangJiao.exe（Mac 上是 npm run dist:mac 打出来的、
 本机芯片对应的 相角.app）；--app <路径> 检查指定的程序，比如从 dmg 里拷出来的 相角.app；--show 让窗口显示出来；
 --shots <文件夹> 存下首页、编辑和 3D 拆解的截图（Mac 上加 --show 时连整个屏幕一起截，看得到菜单栏）。
+--software-gl 用于没有硬件图形支持的 CI，显式启用 SwiftShader；依然要求 3D 模型实际加载成功。
 """
 import os
 import platform
@@ -23,6 +24,7 @@ ARGS = sys.argv[1:]
 APP = Path(ARGS[ARGS.index('--app') + 1]) if '--app' in ARGS else None
 PACKAGED = '--packaged' in ARGS or APP is not None
 SHOW = '--show' in ARGS
+GL_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] if '--software-gl' in ARGS else []
 SHOTS = Path(ARGS[ARGS.index('--shots') + 1]) if '--shots' in ARGS else None
 if sys.platform == 'darwin':
     APP = APP or (DESKTOP / 'dist' / ('mac-arm64' if platform.machine() == 'arm64' else 'mac') / '相角.app' if PACKAGED
@@ -48,7 +50,7 @@ def launch(user_data, save_dir):
                XIANGJIAO_HIDDEN='0' if SHOW else '1', XIANGJIAO_OFFLINE='1')
     log = tempfile.TemporaryFile()
     try:
-        proc = subprocess.Popen([*COMMAND, f'--remote-debugging-port={port}'], env=env,
+        proc = subprocess.Popen([*COMMAND, *GL_ARGS, f'--remote-debugging-port={port}'], env=env,
                                 stdout=log, stderr=subprocess.STDOUT)
     except Exception:
         log.close()
@@ -161,8 +163,13 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
         page.locator('#scanMore summary').click()
         page.locator('#td3d').click()
         page.wait_for_selector('#tdPanel', state='visible')
-        page.wait_for_function("() => typeof THREE !== 'undefined' && !!THREE && $('tdLoad').hidden", timeout=20000)
-        assert '没加载出来' not in page.locator('#tdLoad').inner_text()
+        try:
+            page.wait_for_function("() => (typeof THREE !== 'undefined' && !!THREE && $('tdLoad').hidden) || /没加载出来|没能显示/.test($('tdLoad').textContent)", timeout=20000)
+            assert page.evaluate("typeof td !== 'undefined' && !!td?.model && $('tdLoad').hidden"), page.locator('#tdLoad').inner_text()
+        except Exception:
+            shot(page, '3-teardown-failure')
+            print(f'3D 检查失败：{page.locator("#tdLoad").inner_text()}；页面错误：{errors}', file=sys.stderr)
+            raise
         if SHOTS:
             page.wait_for_timeout(1000)
             shot(page, '3-teardown')

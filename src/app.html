@@ -2423,9 +2423,10 @@ async function openTeardown(id){
   $('tdCams').innerHTML=Object.keys(TD).map(k=>`<button class="chip" data-id="${k}">${(camById(k)||{name:k}).name.replace('instax ','').replace('Polaroid ','')}</button>`).join('');
   if(!THREE){$('tdLoad').hidden=false;$('tdLoad').textContent='正在搭模型…';
     try{THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js')}catch(e){$('tdLoad').textContent='3D 库没加载出来，检查一下网络再打开一次。';return}}
-  if(!td)initTD();
-  $('tdLoad').hidden=true;loadModel(id);
-  td.running=true;requestAnimationFrame(tdLoop);
+  try{if(!td)initTD();
+    $('tdLoad').hidden=true;loadModel(id);
+    td.running=true;requestAnimationFrame(tdLoop)
+  }catch(e){if(td)td.running=false;$('tdLoad').hidden=false;$('tdLoad').textContent='3D 模型没能显示，关闭后重试，或换个设备打开。'}
 }
 $('td3d').onclick=()=>openTeardown(camera?.id);
 $('tdClose').onclick=()=>{$('tdPanel').hidden=true;if(td)td.running=false};

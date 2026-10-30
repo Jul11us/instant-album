@@ -57,4 +57,19 @@ with sync_playwright() as p:
     assert not errors, errors
     browser.close()
 
-print('3D home entry, wide-to-narrow part access and model-specific details passed')
+    # A device without WebGL must show a useful message and keep the album usable.
+    browser = p.chromium.launch(**options, args=['--disable-webgl'])
+    page = browser.new_page(viewport={'width': 390, 'height': 844})
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.goto(PAGE.as_uri(), wait_until='domcontentloaded')
+    page.wait_for_function('() => !restoring')
+    page.locator('#home3d').click()
+    page.wait_for_function("() => $('tdLoad').textContent.includes('没能显示')", timeout=15000)
+    page.locator('#tdClose').click()
+    assert page.locator('#homeImport').is_enabled()
+    assert page.locator('#homeView').is_visible()
+    assert not errors, errors
+    browser.close()
+
+print('3D entry, responsive parts, model-specific details and unsupported-graphics fallback passed')
