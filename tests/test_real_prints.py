@@ -1,19 +1,25 @@
 """Run licensed photographs of real instant prints through import, scan and straighten.
 
 These images exercise the workflow on real scenes: cluttered tables, hands,
-overlapping prints and scans cropped to the card. They are not labelled with
-true corners, so this is a regression check, not an accuracy benchmark.
+overlapping prints and scans cropped to the card. Each print's true corners are
+in fixtures/real-prints/labels.json, so automatic framing is checked for
+accuracy: a proposed frame must match a labelled print (tests/detect_report.py
+prints the full table), and the number of prints found must not drop.
 Sources and licenses: tests/fixtures/real-prints/CREDITS.md
 """
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
+from detect_report import LABELS, classify
+
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = Path(os.environ.get("INSTANT_ALBUM_TEST_PAGE", ROOT / "相角.html"))
 FIXTURES = ROOT / "tests/fixtures/real-prints"
 PRINTS = sorted(FIXTURES.glob("*.jpg"))
 assert len(PRINTS) >= 10, PRINTS
+assert {p.name for p in PRINTS} == {k for k in LABELS if not k.startswith("_")}, "every fixture needs a label"
+MIN_FOUND, MIN_AUTO = 7, 5   # measured 2026-10: 7 of 9 labelled photos framed, 5 without confirmation
 
 with sync_playwright() as playwright:
     options = {"headless": True}
@@ -21,7 +27,7 @@ with sync_playwright() as playwright:
     if executable:
         options["executable_path"] = executable
     browser = playwright.chromium.launch(**options)
-    auto = []
+    found, auto = [], []
     for photo in PRINTS:
         context = browser.new_context(viewport={"width": 1280, "height": 860})
         page = context.new_page()
@@ -34,16 +40,20 @@ with sync_playwright() as playwright:
         chooser.value.set_files(str(photo))
         page.wait_for_selector("#scanView", state="visible", timeout=30000)
         page.wait_for_function("() => !importBusy")
-        scan = page.evaluate("() => ({confirm: scanNeedsConfirm, fmt: format, W: src.width, H: src.height, quad})")
-        if scan["confirm"]:
-            # Uncertain scenes must fall back to the whole image, never to a
-            # suspicious contour from inside the picture.
-            full = [[0, 0], [scan["W"], 0], [scan["W"], scan["H"]], [0, scan["H"]]]
-            assert all(abs(a - b) <= 1.1 for p, q in zip(scan["quad"], full) for a, b in zip(p, q)), (photo.name, scan)
+        scan = page.evaluate("() => ({confirm: scanNeedsConfirm, format, W: src.width, H: src.height, quad, found: autoFound})")
+        kind, err, format_ok = classify(photo.name, scan)
+        # Uncertain scenes fall back to the whole image; any frame shown must be a real print, the right way up.
+        assert kind != "WRONG", (photo.name, scan)
+        status = page.locator("#found").inner_text()
+        if kind == "fallback":
+            assert not scan["found"] and "没认出" in status, (photo.name, status)
         else:
-            # Anything accepted without confirmation has to be a real film format.
-            assert scan["fmt"] != "free", (photo.name, scan)
-            auto.append(photo.name)
+            found.append(photo.name)
+            assert scan["found"] and "没认出" not in status, (photo.name, status)
+            if kind == "auto":
+                # Accepted without confirmation: a real film format, and the right one.
+                assert scan["format"] != "free" and format_ok, (photo.name, scan)
+                auto.append(photo.name)
 
         # Whatever detection did, the full-image path straightens without distortion.
         page.locator("#fullPhoto").click()
@@ -55,4 +65,5 @@ with sync_playwright() as playwright:
         assert not errors, (photo.name, errors)
         context.close()
     browser.close()
-    print(f"real prints passed: {len(PRINTS)} photos, {len(auto)} framed automatically {auto}")
+    assert len(found) >= MIN_FOUND and len(auto) >= MIN_AUTO, (found, auto)
+    print(f"real prints passed: {len(PRINTS)} photos, {len(found)} framed ({len(auto)} automatically) {found}")

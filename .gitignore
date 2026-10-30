@@ -16,3 +16,10 @@ __pycache__/
 *.pyc
 .vscode/
 .idea/
+
+# 电脑版：依赖、构建产物、从网页版生成的 app/ 和下载的字体缓存
+desktop/node_modules/
+desktop/dist/
+desktop/app/
+desktop/.cache/
+desktop/release/

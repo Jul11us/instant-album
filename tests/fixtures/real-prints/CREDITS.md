@@ -1,8 +1,8 @@
 # 真实相纸测试图片 / Real-print test fixtures
 
-这些图片来自 Wikimedia Commons，只用于 `tests/test_real_prints.py`，不会打包进应用。每张都缩小到长边 1200 像素以内，并去掉了 EXIF 信息；除此以外未作修改。各图沿用原许可，CC BY-SA 图片的缩小版本以相同许可提供。
+这些图片来自 Wikimedia Commons，只用于测试（`tests/test_real_prints.py`、`tests/detect_report.py`），不会打包进应用。`labels.json` 是每张完整相纸的真实四角，用 `label_tool.py` 贴到相纸边缘后逐张核对过。每张都缩小到长边 1200 像素以内，并去掉了 EXIF 信息；除此以外未作修改。各图沿用原许可，CC BY-SA 图片的缩小版本以相同许可提供。
 
-These Wikimedia Commons images are used only by `tests/test_real_prints.py` and are not bundled with the app. Each was resized to at most 1200 px on the long side and stripped of EXIF metadata, with no other changes. Each keeps its original license; resized CC BY-SA images are shared under the same license.
+These Wikimedia Commons images are used only by the tests (`tests/test_real_prints.py`, `tests/detect_report.py`) and are not bundled with the app. `labels.json` holds the true corners of each complete print, fitted to the card edges with `label_tool.py` and checked one by one. Each was resized to at most 1200 px on the long side and stripped of EXIF metadata, with no other changes. Each keeps its original license; resized CC BY-SA images are shared under the same license.
 
 | 文件 / File | 原图 / Source | 作者 / Author | 许可 / License |
 |:--|:--|:--|:--|

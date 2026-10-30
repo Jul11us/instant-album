@@ -1,0 +1,53 @@
+{
+  "name": "xiangjiao-desktop",
+  "productName": "相角",
+  "version": "0.1.2",
+  "description": "相角 Windows 电脑版：把拍立得收进电子相册",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare-web": "python ../build.py .. && node scripts/prepare-web.mjs",
+    "start": "npm run prepare-web && electron .",
+    "dist": "npm run prepare-web && electron-builder --win --x64",
+    "check": "node --test scripts/native.test.cjs && python scripts/smoke_test.py",
+    "release": "npm run dist && node scripts/collect-release.mjs"
+  },
+  "build": {
+    "appId": "app.xiangjiao.desktop",
+    "productName": "相角",
+    "executableName": "XiangJiao",
+    "copyright": "相角",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "artifactName": "XiangJiao-${version}-win-x64-portable.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "相角",
+      "artifactName": "XiangJiao-Setup-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "26.18.0",
+    "esbuild": "0.28.2",
+    "shaders": "4.0.4",
+    "three": "0.160.0"
+  }
+}

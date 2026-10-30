@@ -1,0 +1,304 @@
+{
+ "_about": "Card corners of every complete instant print in each fixture, in image pixels, ordered top-left, top-right, bottom-right, bottom-left of the card itself (the thick border is the bottom). Rough corners were placed by hand on a grid and snapped to the strongest nearby edge with label_tool.py; sides marked pinned run into the image edge. A photo with an empty list has no complete print that should be framed automatically.",
+ "handheld-blank-print.jpg": {
+  "note": "Polaroid held in a hand; bottom-left corner under the thumb",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      517.6,
+      112.2
+     ],
+     [
+      803.2,
+      110.7
+     ],
+     [
+      802.6,
+      452.4
+     ],
+     [
+      527.2,
+      459.3
+     ]
+    ]
+   }
+  ]
+ },
+ "instax-ejecting.jpg": {
+  "note": "instax print still half inside the camera",
+  "prints": []
+ },
+ "print-on-beige-paper.jpg": {
+  "note": "Polaroid on beige paper, fully visible",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      172.5,
+      72.1
+     ],
+     [
+      978.7,
+      59.1
+     ],
+     [
+      1026.0,
+      1058.1
+     ],
+     [
+      172.8,
+      1079.2
+     ]
+    ]
+   }
+  ]
+ },
+ "print-on-playing-cards.jpg": {
+  "note": "print runs off the bottom of the photo, so no complete card is visible",
+  "prints": []
+ },
+ "prints-around-camera.jpg": {
+  "note": "many motion-blurred prints around a camera; no single clear print",
+  "prints": []
+ },
+ "scan-cropped-bottom-border.jpg": {
+  "note": "Polaroid Spectra/Image print (not a supported format); card top and left run into the image edge",
+  "prints": [
+   {
+    "format": "free",
+    "quad": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      1171.2,
+      0.0
+     ],
+     [
+      1170.6,
+      1176.3
+     ],
+     [
+      0.0,
+      1177.1
+     ]
+    ],
+    "pinned": [
+     0,
+     3
+    ]
+   }
+  ]
+ },
+ "scan-cropped-top.jpg": {
+  "note": "Polaroid scan whose top border runs into the image edge",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      0.6,
+      0.0
+     ],
+     [
+      958.8,
+      0.0
+     ],
+     [
+      972.7,
+      1170.9
+     ],
+     [
+      16.4,
+      1181.0
+     ]
+    ],
+    "pinned": [
+     0
+    ]
+   }
+  ]
+ },
+ "scan-faded-expired.jpg": {
+  "note": "Polaroid scan with thin background strips",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      55.2,
+      35.5
+     ],
+     [
+      1030.8,
+      24.0
+     ],
+     [
+      1039.8,
+      1177.7
+     ],
+     [
+      61.3,
+      1176.5
+     ]
+    ]
+   }
+  ]
+ },
+ "scan-old-family-print.jpg": {
+  "note": "old peel-apart Polaroid print, landscape, rounded corners (not a supported format)",
+  "prints": [
+   {
+    "format": "free",
+    "quad": [
+     [
+      20.6,
+      19.2
+     ],
+     [
+      1030.4,
+      17.8
+     ],
+     [
+      1037.0,
+      815.0
+     ],
+     [
+      25.9,
+      816.8
+     ]
+    ]
+   }
+  ]
+ },
+ "scan-washington-square.jpg": {
+  "note": "scan cropped exactly to a Polaroid card: the whole image is the card",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      991.0,
+      0.0
+     ],
+     [
+      991.0,
+      1200.0
+     ],
+     [
+      0.0,
+      1200.0
+     ]
+    ],
+    "pinned": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
+  ]
+ },
+ "three-prints-on-wood.jpg": {
+  "note": "three Polaroid prints touching edge to edge; any one is a correct answer",
+  "prints": [
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      84.5,
+      360.4
+     ],
+     [
+      411.4,
+      251.9
+     ],
+     [
+      546.0,
+      643.3
+     ],
+     [
+      210.4,
+      756.6
+     ]
+    ]
+   },
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      411.7,
+      250.7
+     ],
+     [
+      737.3,
+      142.5
+     ],
+     [
+      876.0,
+      530.9
+     ],
+     [
+      544.8,
+      642.7
+     ]
+    ]
+   },
+   {
+    "format": "polaroid",
+    "quad": [
+     [
+      737.2,
+      141.5
+     ],
+     [
+      1060.2,
+      33.5
+     ],
+     [
+      1200,
+      421.0
+     ],
+     [
+      876.2,
+      531.0
+     ]
+    ]
+   }
+  ]
+ },
+ "two-overlapping-prints.jpg": {
+  "note": "left print lies on top: an instax WIDE turned 90°, thick border on the left (the card's bottom). The right print's left edge and one corner are hidden, so only the left one is required",
+  "prints": [
+   {
+    "format": "wide",
+    "quad": [
+     [
+      574.8,
+      80.2
+     ],
+     [
+      734.9,
+      701.8
+     ],
+     [
+      254.6,
+      815.7
+     ],
+     [
+      94.4,
+      205.2
+     ]
+    ]
+   }
+  ]
+ }
+}

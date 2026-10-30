@@ -23,6 +23,9 @@
   color-scheme:light;
 }
 html,body{height:100%}
+/* Windows 上默认的灰色粗滚动条太抢眼：换成细的纸色滚动条（scrollbar-color 会继承到各个滚动区） */
+html{scrollbar-color:var(--edge) transparent}
+.home,.panel .body,.side,#scanView{scrollbar-width:thin}
 [hidden]{display:none!important}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg) var(--grain);color:var(--text);font-family:var(--ui);font-size:14px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
@@ -518,7 +521,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
           <div class="slot-wrap"><i class="slot" style="--w:108;--h:86"></i><small>instax wide</small></div>
           <div class="slot-wrap"><i class="slot" style="--w:88;--h:107"></i><small>Polaroid</small></div>
         </div><figcaption>还没有照片</figcaption></figure><button class="chip on" id="homeRestoreRetry" hidden>重试读取本机收藏</button><button class="chip" id="homePending" hidden>继续框选</button>
-      </div><div class="home-foot"><span>照片仅保存在当前浏览器，记得定期备份。</span><button id="backupOpen" disabled>备份与恢复</button><small class="home-credit">首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）</small></div>
+      </div><div class="home-foot"><span id="homeFootNote">照片仅保存在当前浏览器，记得定期备份。</span><button id="backupOpen" disabled>备份与恢复</button><small class="home-credit">首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）</small></div>
     </div>
   </section>
   <!-- 扫描 -->
@@ -607,8 +610,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   </section>
   <section class="panel" id="backupPanel" hidden aria-label="备份与恢复"><div class="top"><button class="chip ghost" id="backupClose">‹ 返回</button><b>带走你的收藏</b></div><div class="body backup-body">
     <p class="backup-intro">照片的正反面、写下的故事和调好的样子，都收在同一个备份里。</p>
-    <section class="backup-section"><h2>保存完整备份</h2><p>包含原图、编辑参数、相册和拼页。换设备或浏览器后，可以恢复并继续编辑。</p><button class="chip on" id="backupExport">下载完整备份</button></section>
-    <section class="backup-section"><h2>从备份恢复</h2><p>先选择备份查看内容，确认后才会替换当前浏览器内的收藏。</p><button class="chip" id="backupChoose">选择备份文件</button><input class="vh" id="backupIn" type="file" accept=".json,application/json"><div id="backupSummary" hidden></div><button class="chip on" id="backupApply" hidden>替换本机收藏并恢复</button></section>
+    <section class="backup-section"><h2>保存完整备份</h2><p id="backupKeepNote">包含原图、编辑参数、相册和拼页。换设备或浏览器后，可以恢复并继续编辑。</p><button class="chip on" id="backupExport">下载完整备份</button></section>
+    <section class="backup-section"><h2>从备份恢复</h2><p id="backupRestoreNote">先选择备份查看内容，确认后才会替换当前浏览器内的收藏。</p><button class="chip" id="backupChoose">选择备份文件</button><input class="vh" id="backupIn" type="file" accept=".json,application/json"><div id="backupSummary" hidden></div><button class="chip on" id="backupApply" hidden>替换本机收藏并恢复</button></section>
     <p id="backupMessage" role="status" aria-live="polite"></p>
   </div></section>
 </div>
@@ -620,6 +623,7 @@ const CARD_TILT=0;  // 卡片的倾斜角度（度），要和 CSS 里 .card 的
 const $ = id => document.getElementById(id);
 // 有鼠标、能悬停的当电脑：改文案、开拖放和快捷键；宽屏布局另由 CSS 宽度决定
 const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const DESKTOP=window.desktop||null;   // 电脑版（desktop/ 里的 Electron 外壳）：草稿存在这台电脑上，保存时弹系统的「另存为」
 document.documentElement.dataset.device=DESK?'desktop':'touch';
 const SAVE_T='保存图片';
 
@@ -737,99 +741,187 @@ function orderQuad(pts){
   let k=0;q.forEach((p,i)=>{if(p[0]+p[1]<q[k][0]+q[k][1])k=i});
   return q.slice(k).concat(q.slice(0,k));
 }
-function hull(pts){
-  pts.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
-  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
-  const lo=[],up=[];
-  for(const p of pts){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
-  for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
-  return lo.slice(0,-1).concat(up.slice(0,-1));
-}
 const area=q=>Math.abs(q.reduce((s,p,i)=>{const n=q[(i+1)%4];return s+p[0]*n[1]-n[0]*p[1]},0))/2;
 
-/* ---------- 自动找边框：从画面四边向里长出「桌面」，剩下最大的一块就是拍立得 ---------- */
-function detect(img){
-  const S=360/Math.max(img.width,img.height), w=Math.round(img.width*S), h=Math.round(img.height*S);
-  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});
-  x.drawImage(img,0,0,w,h);const d=x.getImageData(0,0,w,h).data, n=w*h;
-  const edge=[];for(let i=0;i<w;i++)edge.push(i,(h-1)*w+i);for(let j=0;j<h;j++)edge.push(j*w,j*w+w-1);
-  const med=k=>{const a=edge.map(p=>d[p*4+k]).sort((p,q)=>p-q);return a[a.length>>1]};
-  const ref=[med(0),med(1),med(2)];
-  const dRef=p=>Math.hypot(d[p*4]-ref[0],d[p*4+1]-ref[1],d[p*4+2]-ref[2]);
-  const dN=(p,q)=>Math.abs(d[p*4]-d[q*4])+Math.abs(d[p*4+1]-d[q*4+1])+Math.abs(d[p*4+2]-d[q*4+2]);
-  const bg=new Uint8Array(n), Q=new Int32Array(n);let qh=0,qt=0;
-  for(const p of edge)if(!bg[p]&&dRef(p)<80){bg[p]=1;Q[qt++]=p}
-  while(qh<qt){const p=Q[qh++],px=p%w;
-    for(const q of [p-w,p+w,px>0?p-1:-1,px<w-1?p+1:-1]){if(q<0||q>=n||bg[q])continue;
-      if(dN(p,q)<30&&dRef(q)<130){bg[q]=1;Q[qt++]=q}}}
-  const lab=new Int32Array(n);let best=0,bestN=0,cur=0;
-  for(let s=0;s<n;s++){if(bg[s]||lab[s])continue;cur++;let cnt=0;qh=qt=0;Q[qt++]=s;lab[s]=cur;
-    while(qh<qt){const p=Q[qh++],px=p%w;cnt++;
-      for(const q of [p-w,p+w,px>0?p-1:-1,px<w-1?p+1:-1]){if(q<0||q>=n||bg[q]||lab[q])continue;lab[q]=cur;Q[qt++]=q}}
-    if(cnt>bestN){bestN=cnt;best=cur}}
-  if(bestN<n*.04||bestN>n*.97)return null;
-  const pts=[];
-  for(let p=0;p<n;p++){if(lab[p]!==best)continue;const px=p%w;
-    if(px===0||px===w-1||p<w||p>=n-w||lab[p-1]!==best||lab[p+1]!==best||lab[p-w]!==best||lab[p+w]!==best)pts.push([px+.5,(p/w|0)+.5])}
-  const H=hull(pts);let bq=null,ba=0;
-  for(let t=0;t<90;t+=2){const a=t*Math.PI/180,co=Math.cos(a),si=Math.sin(a);
-    const ext=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([su,sv])=>{let bp=null,bv=-Infinity;
-      for(const p of H){const u=p[0]*co+p[1]*si,v=-p[0]*si+p[1]*co,val=su*u+sv*v;if(val>bv){bv=val;bp=p}}return bp});
-    const q=orderQuad(ext),ar=area(q);if(ar>ba){ba=ar;bq=q}}
-  if(!bq||ba<bestN*.6)return null;
-  return bq.map(p=>[p[0]/S,p[1]/S]);
-}
-
-/* 白框最厚的那条边是底边：拉正后量四条边的白框有多厚，把最厚的转到下面 */
-function thickSide(img, quad){
-  const a=(dist(quad[0],quad[1])+dist(quad[3],quad[2]))/2, b=(dist(quad[0],quad[3])+dist(quad[1],quad[2]))/2;
-  const k=160/Math.max(a,b), W=Math.max(20,Math.round(a*k)), H=Math.max(20,Math.round(b*k));
-  const im=warp(img,quad,W,H), d=im.data, px=(x,y)=>{const i=(y*W+x)*4;return [d[i],d[i+1],d[i+2]]};
-  const depth=(get,len,lim)=>{let tot=0;for(const f of [.35,.5,.65]){const e=get(f,1);let s=1;
-      while(s<lim){const p=get(f,s);if(Math.hypot(p[0]-e[0],p[1]-e[1],p[2]-e[2])>55)break;s++}tot+=s}return tot/3};
-  return [
-    depth((f,s)=>px(Math.round(f*(W-1)),s),W,H*.45),          // 上
-    depth((f,s)=>px(W-1-s,Math.round(f*(H-1))),H,W*.45),      // 右
-    depth((f,s)=>px(Math.round(f*(W-1)),H-1-s),W,H*.45),      // 下
-    depth((f,s)=>px(s,Math.round(f*(H-1))),H,W*.45),          // 左
-  ];
-}
+/* ---------- 自动找相纸 ----------
+   拍立得有两条很稳的线索：画面窗口的四条边很清楚，窗口外面是一圈同样的纸，而且每种相纸四边白边占多宽是定的（底边最厚）。
+   1. 缩到长边 640 算梯度，按梯度方向投票找出最明显的几十条直线；图片四条边也算一条（扫描件常常就切在相纸边上）。
+   2. 直线两两配成四边形，四条边都得真有边。每个四边形当「画面窗口」往外找平行的边，当「整张相纸」往里找，配成一对；
+      某一边找不到，就按各种相纸的标准白边补一条（分数打折）。
+   3. 量这一对四边白边各占相纸多少（把相纸映成正方形来量，斜着拍也不变），最接近哪种相纸就是哪种，方向也跟着定（底边最厚）；
+      外形比例对不上、或白边哪种都不像，就只框画面、按「原比例」拉正，不硬拉成某种相纸。
+   4. 打分：画面窗口四边清不清楚、白边是不是一圈匀净的同一种纸、外沿有没有边（或正好贴着图片边缘）、白边比例像不像。
+      背景太匀时，「桌面」会被当成白边、真相纸被当成画面窗口：画面窗口自己又是另一对的相纸的，降分。
+   分数高、只有一张：直接拉正；有好几张或把握一般：框好等确认；都不像：照旧显示整张原图让人自己框。
+   准确率：tests/fixtures/real-prints 里的实拍标好了四角，python tests/detect_report.py 出表。 */
+// 各种相纸四边白边占相纸的比例（左、上、右、下）。宝丽来用几张扫描件量的实际值，比标称尺寸略宽
+const FILM_EDGES={mini:[.074,.081,.074,.198],square:[.069,.081,.069,.198],wide:[.042,.081,.042,.198],polaroid:[.058,.06,.058,.216],go:[.064,.068,.064,.242]};
+function scanMaps(img){
+  const S=Math.min(1,640/Math.max(img.width,img.height)),w=Math.max(8,Math.round(img.width*S)),h=Math.max(8,Math.round(img.height*S)),n=w*h;
+  const c=mkCv(w,h),x=c.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';x.drawImage(img,0,0,w,h);
+  const d=x.getImageData(0,0,w,h).data,L=new Float32Array(n),T=new Float32Array(n);
+  for(let i=0;i<n;i++)L[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];
+  // [1,2,1] 横竖各模糊两遍，压掉纸纹和颗粒
+  for(let pass=0;pass<2;pass++){
+    for(let y=0;y<h;y++){const o=y*w;for(let i=0;i<w;i++)T[o+i]=(L[o+Math.max(0,i-1)]+2*L[o+i]+L[o+Math.min(w-1,i+1)])/4}
+    for(let y=0;y<h;y++){const o=y*w,u=Math.max(0,y-1)*w,v=Math.min(h-1,y+1)*w;for(let i=0;i<w;i++)L[o+i]=(T[u+i]+2*T[o+i]+T[v+i])/4}}
+  const gx=new Float32Array(n),gy=new Float32Array(n),mag=new Float32Array(n);
+  for(let y=1;y<h-1;y++)for(let i=1;i<w-1;i++){const p=y*w+i,a=L[p-w-1],b=L[p-w],e=L[p-w+1],f=L[p-1],g=L[p+1],k=L[p+w-1],m=L[p+w],o=L[p+w+1];
+    gx[p]=(e+2*g+o-a-2*f-k)/8;gy[p]=(k+2*m+o-a-2*b-e)/8;mag[p]=Math.hypot(gx[p],gy[p])}
+  return {w,h,S,d,L,gx,gy,mag,R:Math.ceil(Math.hypot(w,h))}}
+const angGap=(a,b)=>{const d=Math.abs(a-b)%Math.PI;return Math.min(d,Math.PI-d)};
+// 某一点是不是一条法向为 (c,s) 的边：法向上 ±1.5px 内有梯度主要沿法向的点
+function edgeAt(M,x,y,c,s){for(let o=-1.5;o<=1.5;o+=.75){const i=Math.round(y+s*o)*M.w+Math.round(x+c*o),g=Math.abs(M.gx[i]*c+M.gy[i]*s);if(g>=3.2&&g>=.75*M.mag[i])return 1}return 0}
+// 直线 x·cosθ + y·sinθ = r。沿线每 1px 记「在图里」「是边」的累计数，量一段线上有多少是真边就只要查两次
+function lineOf(M,t,r,edge){const {w,h,R}=M,c=Math.cos(t),s=Math.sin(t),N=2*R+1,hit=new Uint16Array(N+1),inn=new Uint16Array(N+1);
+  for(let k=0;k<N;k++){const u=k-R,x=r*c-s*u,y=r*s+c*u;let a=0,b=0;
+    if(x>=2&&y>=2&&x<=w-3&&y<=h-3){b=1;a=edge?1:edgeAt(M,x,y,c,s)}
+    else if(edge&&x>=-1&&y>=-1&&x<=w+1&&y<=h+1){a=b=1}
+    hit[k+1]=hit[k]+a;inn[k+1]=inn[k]+b}
+  return {t,r,c,s,hit,inn,edge}}
+function lineThrough(p,q){let t=Math.atan2(q[0]-p[0],-(q[1]-p[1]));if(t<0)t+=Math.PI;if(t>=Math.PI)t-=Math.PI;const c=Math.cos(t),s=Math.sin(t);return {t,c,s,r:p[0]*c+p[1]*s}}
+// 线上 p→q 这一段有多少是真边（p、q 先投到线上）；大半段在图外的算 0。补出来的线（没有累计表）也算 0
+function lineSup(M,L,p,q){if(!L.hit)return 0;const R=M.R,u=pt=>Math.round(-pt[0]*L.s+pt[1]*L.c)+R,a=Math.max(0,Math.min(2*R+1,Math.min(u(p),u(q)))),b=Math.max(0,Math.min(2*R+1,Math.max(u(p),u(q))));
+  const I=L.inn[b]-L.inn[a];return b-a<4||I<(b-a)*.5?0:(L.hit[b]-L.hit[a])/I}
+// 不在直线表里的边：直接沿线段取样量
+function segSup(M,p,q){const dx=q[0]-p[0],dy=q[1]-p[1],len=Math.hypot(dx,dy),c=-dy/len,s=dx/len,k=Math.max(6,Math.min(90,Math.round(len/2)));let hit=0,tot=0;
+  for(let j=0;j<k;j++){const x=p[0]+dx*(j+.5)/k,y=p[1]+dy*(j+.5)/k;if(x<2||y<2||x>M.w-3||y>M.h-3)continue;tot++;hit+=edgeAt(M,x,y,c,s)}
+  return tot<k*.5?0:hit/tot}
+function scanLines(M,max=48){const {w,h,gx,gy,mag,R}=M,NT=180,RW=2*R+1,acc=new Float32Array(NT*RW),cs=[],sn=[];
+  for(let t=0;t<NT;t++){cs.push(Math.cos(t*Math.PI/NT));sn.push(Math.sin(t*Math.PI/NT))}
+  // 只让「沿梯度方向是局部最大」的细边投票，票投在它自己的方向附近；强边封顶，长而淡的纸边也能被找出来
+  for(let y=2;y<h-2;y++)for(let x=2;x<w-2;x++){const i=y*w+x,m=mag[i];if(m<2.5)continue;
+    const ux=gx[i]/m,uy=gy[i]/m,o=Math.round(uy)*w+Math.round(ux);if(m<mag[i+o]||m<mag[i-o])continue;
+    let th=Math.atan2(uy,ux);if(th<0)th+=Math.PI;const t0=Math.round(th/Math.PI*NT)%NT,wt=Math.min(m,16);
+    for(let dt=-2;dt<=2;dt++){const t=(t0+dt+NT)%NT;acc[t*RW+Math.round(x*cs[t]+y*sn[t])+R]+=wt*(dt?.6:1)}}
+  const peaks=[];
+  for(let t=0;t<NT;t++)for(let r=1;r<RW-1;r++){const v=acc[t*RW+r];if(v<60)continue;let top=true;
+    for(let dt=-3;dt<=3&&top;dt++){const tt=t+dt;if(tt<0||tt>=NT)continue;for(let dr=-4;dr<=4;dr++){const rr=r+dr;if(rr<0||rr>=RW||(!dt&&!dr))continue;if(acc[tt*RW+rr]>v){top=false;break}}}
+    if(top)peaks.push({t:t*Math.PI/NT,r:r-R,v})}
+  peaks.sort((a,b)=>b.v-a.v);const out=[];
+  for(const p of peaks){if(out.length>=max)break;if(out.some(q=>angGap(q.t,p.t)<.07&&Math.abs(q.r-p.r)<7))continue;out.push(p)}
+  // 图片自己的四条边
+  return [...out.map(p=>lineOf(M,p.t,p.r)),lineOf(M,Math.PI/2,0,1),lineOf(M,Math.PI/2,h,1),lineOf(M,0,0,1),lineOf(M,0,w,1)]}
+function meetLines(a,b){const det=a.c*b.s-a.s*b.c;return Math.abs(det)<1e-6?null:[(a.r*b.s-b.r*a.s)/det,(a.c*b.r-b.c*a.r)/det]}
+const mapH=(H,u,v)=>{const d=H[6]*u+H[7]*v+1;return [(H[0]*u+H[1]*v+H[2])/d,(H[3]*u+H[4]*v+H[5])/d]};
+const quadOf=Ls=>[0,1,2,3].map(i=>meetLines(Ls[(i+3)%4],Ls[i]));
+// 线段是不是贴着（或在）图片边缘之外：扫描件切在相纸上时，那条外沿就是图片边
+function onImageEdge(M,p,q){const m=Math.max(3,.015*Math.max(M.w,M.h));return (p[0]<=m&&q[0]<=m)||(p[1]<=m&&q[1]<=m)||(p[0]>=M.w-m&&q[0]>=M.w-m)||(p[1]>=M.h-m&&q[1]>=M.h-m)}
+const midOf=q=>[(q[0][0]+q[1][0]+q[2][0]+q[3][0])/4,(q[0][1]+q[1][1]+q[2][1]+q[3][1])/4];
+const inQuad=(p,q)=>{let c=0;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])c^=1}return c};
+const diagOf=q=>Math.max(dist(q[0],q[2]),dist(q[1],q[3]));
+// 两层四边形之间那一圈的颜色：亮度中位数、离散，和色度（按亮度归一，光线明暗不影响）
+function bandStats(M,a0,a1,b0,b1){const cols=[],lum=[];let all=0;
+  for(let i=0;i<14;i++){const s=.08+.84*i/13,o=[a0[0]+(a1[0]-a0[0])*s,a0[1]+(a1[1]-a0[1])*s],n=[b0[0]+(b1[0]-b0[0])*s,b0[1]+(b1[1]-b0[1])*s];
+    for(const t of [.3,.5,.7]){const x=o[0]+(n[0]-o[0])*t,y=o[1]+(n[1]-o[1])*t;all++;if(x<0||y<0||x>=M.w||y>=M.h)continue;
+      const k=Math.floor(y)*M.w+Math.floor(x);cols.push([M.d[k*4],M.d[k*4+1],M.d[k*4+2]]);lum.push(M.L[k])}}
+  if(lum.length<all*.3)return null;const med=v=>{const s=[...v].sort((p,q)=>p-q);return s[s.length>>1]},m=med(lum),rgb=[0,1,2].map(c=>med(cols.map(p=>p[c]))),sum=rgb[0]+rgb[1]+rgb[2]+1;
+  return {lum:m,mad:med(lum.map(v=>Math.abs(v-m))),chroma:[rgb[0]/sum*255,rgb[1]/sum*255]}}
+// 一圈纸：匀（亮度离散小）、四边同一种纸（色度近、明暗差别不太大）、不太暗（黑框少见，打个折）
+function paperRing(M,O,I){const bands=[0,1,2,3].map(i=>bandStats(M,O[i],O[(i+1)%4],I[i],I[(i+1)%4])).filter(Boolean);if(bands.length<3)return {s:0,lum:0};
+  // 每一边都得是匀净的纸（看最差的那一边）：有一边其实是照片内容，这一对就不成立
+  const flat=Math.min(...bands.map(b=>Math.max(0,1-b.mad/24)));let hue=0,lo=255,hi=0;
+  for(const a of bands){lo=Math.min(lo,a.lum);hi=Math.max(hi,a.lum);for(const b of bands)hue=Math.max(hue,Math.hypot(a.chroma[0]-b.chroma[0],a.chroma[1]-b.chroma[1]))}
+  const same=Math.max(0,1-Math.max(0,hue-6)/14)*(hi<=lo*1.6+8?1:.3);return {s:flat*same*(lo>=70?1:.6),lum:lo}}
+// 相纸 C 映成单位正方形，量画面窗口 W 四边离相纸边多远（占相纸宽、高的比例；斜着拍也不变）：左、上、右、下
+function marginsOf(C,W){const H=solveH(C,[[0,0],[1,0],[1,1],[0,1]]),w=W.map(p=>mapH(H,p[0],p[1]));
+  return [(w[0][0]+w[3][0])/2,(w[0][1]+w[1][1])/2,1-(w[1][0]+w[2][0])/2,1-(w[2][1]+w[3][1])/2]}
+// 相纸外沿得是画面窗口往外碰到的第一条清楚的边：中间夹着另一条清楚的平行边，说明外沿越过了真相纸，跑到背景上了
+function overshoot(M,lines,C,W){const dg=diagOf(C);
+  for(let i=0;i<4;i++){const a=W[i],b=W[(i+1)%4],P=lineThrough(C[i],C[(i+1)%4]),m=[(a[0]+b[0])/2,(a[1]+b[1])/2],gap=Math.abs(m[0]*P.c+m[1]*P.s-P.r);
+    for(const L of lines){if(L.edge||angGap(L.t,P.t)>.06)continue;const dw=m[0]*L.c+m[1]*L.s-L.r,dcard=(()=>{const n=[(C[i][0]+C[(i+1)%4][0])/2,(C[i][1]+C[(i+1)%4][1])/2];return n[0]*L.c+n[1]*L.s-L.r})();
+      const near=Math.max(4,.025*dg);if(dw*dcard<0&&Math.abs(dw)>near&&Math.abs(dcard)>near&&Math.abs(dw)<gap&&lineSup(M,L,a,b)>=.5)return true}}
+  return false}
+// 相纸外沿两边的颜色差：真外沿外面是桌面、背景，和白边不一样（贴着图片边缘的不算）
+function sideContrast(M,C,i){const p=C[i],q=C[(i+1)%4],c=midOf(C),P=lineThrough(p,q),sc=c[0]*P.c+c[1]*P.s-P.r>0?1:-1,inn=[],out=[];
+  for(let j=0;j<16;j++){const t=.1+.8*j/15,x=p[0]+(q[0]-p[0])*t,y=p[1]+(q[1]-p[1])*t;
+    for(const [arr,o] of [[inn,4*sc],[out,-4*sc]]){const X=Math.round(x+P.c*o),Y=Math.round(y+P.s*o);if(X<0||Y<0||X>=M.w||Y>=M.h)continue;const k=(Y*M.w+X)*4;arr.push([M.d[k],M.d[k+1],M.d[k+2]])}}
+  if(inn.length<8||out.length<8)return null;const med=a=>[0,1,2].map(ch=>{const v=a.map(x=>x[ch]).sort((u,w)=>u-w);return v[v.length>>1]});
+  const a=med(inn),b=med(out);return Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2])}
+// 一对（相纸外沿 C、画面窗口 W，四个角一一对应；wv、cv 是两层各边真边的比例）：四种摆法里白边最像哪种相纸，方向也就定了
+function judgePair(M,C,W,wv,cv,fmts,lines){if(W.some(p=>!p||!inQuad(p,C))||C.some(p=>!p))return null;
+  // 画面窗口一定整个在照片里：扫描件可以切到相纸的白边，但切到画面就不是完整的一张了
+  const rim=.01*Math.max(M.w,M.h);if(W.some(p=>p[0]<rim||p[1]<rim||p[0]>M.w-rim||p[1]>M.h-rim))return null;if(lines&&overshoot(M,lines,C,W))return null;
+  const wm=(wv[0]+wv[1]+wv[2]+wv[3])/4;if(wm<.45||Math.min(...wv)<.15)return null;
+  // 外沿每条边得像真的相纸边：贴着图片边缘（扫描切的），或者两边颜色明显不一样，或者是一条很清楚的线（两张相纸挨着时颜色一样，但有缝）
+  // 贴着图片边缘的那条边只在白边够亮时才算（扫描件都是浅色相纸切边，深色布面、桌面贴着边缘的不算）
+  const ring=paperRing(M,C,W);if(!ring.s)return null;let best=null;
+  const border=[0,1,2,3].map(i=>onImageEdge(M,C[i],C[(i+1)%4])),cred=[0,1,2,3].map(i=>border[i]?(ring.lum>=150?.55:0):Math.max(cv[i],Math.min(1,(sideContrast(M,C,i)||0)/30)));
+  if(Math.min(...cred)<.25)return null;const om=(cred[0]+cred[1]+cred[2]+cred[3])/4;
+  for(let k=0;k<4;k++){const Ck=rotQuad(C,k),Wk=rotQuad(W,k),m=marginsOf(Ck,Wk);if(m.some(v=>v<.008||v>.4))continue;
+    const a=(dist(Ck[0],Ck[1])+dist(Ck[3],Ck[2]))/2,b=(dist(Ck[0],Ck[3])+dist(Ck[1],Ck[2]))/2;
+    for(const f of fmts){const n=FILM_EDGES[f],F=FORMATS[f],aErr=Math.abs(Math.log(a/b/(F.W/F.H))),e=(Math.abs(m[0]-n[0])+Math.abs(m[1]-n[1])+Math.abs(m[2]-n[2])+Math.abs(m[3]-n[3]))/4;
+      // 比例差太多（斜拍也解释不了）、或白边不像：这种相纸就不算
+      const g=aErr<.12&&e<.03?Math.exp(-((e/.025)**2)):0;if(g&&(!best||g>best.g))best={C:Ck,W:Wk,f,e,aErr,m,g}}
+    // 不认识的相纸：白边一圈都有、底边不比顶边窄太多、纸够亮，按原比例框，分数打折
+    if(m[3]>=Math.max(m[0],m[1],m[2])&&ring.lum>=120&&(!best||best.g<.4))best={C:Ck,W:Wk,f:'free',e:1,aErr:1,m,g:.4}}
+  if(!best)return null;const s=wm*ring.s*(.45+.55*om)*best.g;return s>.05?{...best,s,border:border.some(Boolean)}:null}
+// 四边形 Q 第 i 条边往外（相纸外沿）或往里（画面窗口）能配的边：由近到远，碰到一条很清楚的真边就停（再远就越过它了）；
+// 真边前面还可以按标准白边补一条（宽、窄各一）
+function sideCands(M,lines,Q,i,out){const p=Q[i],q=Q[(i+1)%4],c=midOf(Q),m=[(p[0]+q[0])/2,(p[1]+q[1])/2],P=lineThrough(p,q),dg=diagOf(Q),list=[];
+  for(const L of lines){if((!out&&L.edge)||angGap(L.t,P.t)>.06)continue;const sm=m[0]*L.c+m[1]*L.s-L.r,sc=c[0]*L.c+c[1]*L.s-L.r,d=Math.abs(sm);
+    if((out?sm*sc<=0||Math.abs(sc)<=d:sm*sc>=0)||d<.012*dg||d>.3*dg)continue;const v=L.edge?1:lineSup(M,L,p,q);if(v>=.35)list.push({L,v,d})}
+  list.sort((a,b)=>a.d-b.d);const res=[];for(const x of list){res.push(x);if(x.v>=.5)break}
+  const stop=res.length&&res[res.length-1].v>=.5?res[res.length-1].d:Infinity,span=2*Math.abs(c[0]*P.c+c[1]*P.s-P.r),toC=[c[0]-m[0],c[1]-m[1]],tl=Math.hypot(...toC);
+  for(const f of [.06,.21]){const d=out?f*span/(1-2*f):f*span;if(d>=stop||d<.012*dg)continue;const k=(out?-d:d)/tl;
+    res.push({L:lineThrough([p[0]+toC[0]*k,p[1]+toC[1]*k],[q[0]+toC[0]*k,q[1]+toC[1]*k]),v:.5,d,fake:1})}
+  return res.slice(0,4)}
+// 四边形 Q 第 i 条边所在的直线（从直线表里找回来，找不到就用两点连线）
+function QL(lines,Q,i){const p=Q[i],q=Q[(i+1)%4],P=lineThrough(p,q),m=[(p[0]+q[0])/2,(p[1]+q[1])/2];let best=null,bd=3;
+  for(const L of lines){if(angGap(L.t,P.t)>.03)continue;const d=Math.abs(m[0]*L.c+m[1]*L.s-L.r);if(d<bd){bd=d;best=L}}return best||P}
+// 四边各有多少是真边：直线表里那条线和直接沿边取样，取好的那个（表里的线可能偏了一两个像素）
+const quadSup=(M,lines,Q)=>[0,1,2,3].map(i=>{const L=QL(lines,Q,i);return L.edge?1:Math.max(L.hit?lineSup(M,L,Q[i],Q[(i+1)%4]):0,segSup(M,Q[i],Q[(i+1)%4]))});
+function pairsAround(M,lines,Q,out,fmts){const cand=[0,1,2,3].map(i=>sideCands(M,lines,Q,i,out)),own=quadSup(M,lines,Q),res=[];
+  for(const a of cand[0])for(const b of cand[1])for(const c of cand[2])for(const d of cand[3]){const set=[a,b,c,d];if(set.filter(x=>x.fake).length>2)continue;
+    const R=quadOf(set.map(x=>x.L));if(R.some(p=>!p))continue;const v=set.map(x=>x.v);
+    const r=out?judgePair(M,R,Q,own,v,fmts,lines):judgePair(M,Q,R,v,own,fmts,lines);if(r)res.push({...r,fake:set.some(x=>x.fake)})}
+  return res}
+// 两组大致平行的直线围成的四边形，四条边都得真有边；最清楚的排前面。edge：几条边是图片自己的边
+function lineQuads(M,lines){const {w,h}=M,quads=[],pairs=[];
+  for(let i=0;i<lines.length;i++)for(let j=i+1;j<lines.length;j++){const a=lines[i],b=lines[j];
+    if(angGap(a.t,b.t)>.4)continue;const da=w/2*a.c+h/2*a.s-a.r,db=w/2*b.c+h/2*b.s-b.r;if(Math.abs(da-db)>.06*Math.min(w,h))pairs.push([a,b])}
+  for(let i=0;i<pairs.length;i++)for(let j=i+1;j<pairs.length;j++){const [a1,a2]=pairs[i],[b1,b2]=pairs[j];if(angGap(a1.t,b1.t)<.8)continue;
+    const P=[meetLines(a1,b1),meetLines(a1,b2),meetLines(a2,b2),meetLines(a2,b1)];
+    if(P.some(p=>!p||p[0]<-.04*w||p[1]<-.04*h||p[0]>1.04*w||p[1]>1.04*h))continue;
+    const sides=[[a1,P[0],P[1]],[b2,P[1],P[2]],[a2,P[2],P[3]],[b1,P[3],P[0]]].map(([L,p,q])=>lineSup(M,L,p,q));
+    const sm=(sides[0]+sides[1]+sides[2]+sides[3])/4;if(sm<.45||Math.min(...sides)<.2)continue;
+    const q=orderQuad(P);if(area(q)<.015*w*h)continue;
+    let ok=true;for(let k=0;k<4&&ok;k++){const a=q[k],b=q[(k+1)%4],c=q[(k+2)%4];if((b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0])<=0)ok=false}
+    if(ok)quads.push({q,sm,edge:[a1,a2,b1,b2].filter(L=>L.edge).length})}
+  return quads.sort((a,b)=>b.sm-a.sm)}
+// 找相纸：返回 {q 四角（原图像素，按相纸方向排好）, fmt, score, rivals 别的像相纸的有几张, sure 能不能不问直接拉正}，找不到返回 null
+function findFilm(img,fmts){const M=scanMaps(img),lines=scanLines(M),{w,h}=M,quads=lineQuads(M,lines),scored=[],seen=new Set();
+  const add=r=>{const key=[...r.C,...r.W].map(p=>Math.round(p[0]/3)+','+Math.round(p[1]/3)).join('|');if(!seen.has(key)){seen.add(key);scored.push(r)}};
+  // 画面窗口的四边不会是图片边缘；相纸可以
+  for(const {q,edge} of quads.slice(0,160)){if(!edge)for(const r of pairsAround(M,lines,q,true,fmts))add(r);for(const r of pairsAround(M,lines,q,false,fmts))add(r)}
+  scored.sort((a,b)=>b.s-a.s);
+  // 前几名重新量一遍：补出来的边在附近直接找真边贴上去，再按真实量到的边打分
+  const refined=[];
+  for(const c of scored.slice(0,40)){const dg=diagOf(c.C),snap=Q=>[0,1,2,3].map(i=>{const L0=lineThrough(Q[i],Q[(i+1)%4]),p=Q[i],q=Q[(i+1)%4];let bv=segSup(M,p,q),bo=0;
+      for(let o=-.02*dg;o<=.02*dg;o+=1){const v=segSup(M,[p[0]+L0.c*o,p[1]+L0.s*o],[q[0]+L0.c*o,q[1]+L0.s*o]);if(v>bv+.05){bv=v;bo=o}}return {...L0,r:L0.r+bo,v:bv}});
+    const ws=snap(c.W),cs=snap(c.C),W=quadOf(ws),C=quadOf(cs);
+    const r=judgePair(M,C,W,ws.map(x=>x.v),cs.map((x,i)=>onImageEdge(M,C[i],C[(i+1)%4])?1:x.v),fmts,lines);if(r)refined.push(r)}
+  // 带补线的只是线索：只让重新量过的那份参加评比
+  const kept=scored.filter(c=>!c.fake);scored.length=0;scored.push(...kept,...refined);
+  // 画面窗口自己又是另一对的相纸：外面这层是背景，降分
+  for(const a of scored)if(scored.some(b=>b!==a&&b.s>.25&&b.C.every((p,i)=>dist(p,a.W[i])<.03*diagOf(a.W))||b!==a&&b.s>.25&&b.C.every(p=>a.W.some(q=>dist(p,q)<.03*diagOf(a.W)))))a.s*=.25;
+  scored.sort((a,b)=>b.s-a.s);const found=[];
+  // 同一张相纸的不同说法只留最好的；中心落在别人里面就算同一张
+  for(const c of scored)if(!found.some(f=>inQuad(midOf(c.C),f.C)||inQuad(midOf(f.C),c.C)))found.push(c);
+  const best=found[0];if(!best||best.s<(best.f==='free'?.35:.3))return null;
+  const rivals=found.slice(1).filter(f=>f.s>=best.s*.6).length,clip=p=>[Math.min(w,Math.max(0,p[0]))/M.S,Math.min(h,Math.max(0,p[1]))/M.S];
+  // 认不出型号的相纸只框画面：「原比例」会自己补一圈白边
+  return {q:(best.f==='free'?best.W:best.C).map(clip),fmt:best.f,score:best.s,rivals,
+    sure:best.f!=='free'&&best.s>=.5&&best.e<.02&&best.aErr<.08&&!rivals&&area(best.C)>=(best.border?.6:.12)*w*h}}
+/* 相纸背面没有画面窗口，只能认外形：四边清楚、和背景分得开、比例和正面一样的一张卡片。只当建议，等人确认 */
+function findCard(img,ratio){const M=scanMaps(img),lines=scanLines(M);let best=null;
+  for(const {q,sm,edge} of lineQuads(M,lines).slice(0,160)){if(edge||area(q)<.06*M.w*M.h)continue;
+    const a=(dist(q[0],q[1])+dist(q[3],q[2]))/2,b=(dist(q[0],q[3])+dist(q[1],q[2]))/2,e=Math.min(Math.abs(Math.log(a/b/ratio)),Math.abs(Math.log(b/a/ratio)));if(e>.12)continue;
+    const c=Math.min(...[0,1,2,3].map(i=>sideContrast(M,q,i)||0));if(c<15)continue;
+    // 长短边按正面摆：竖长的相纸，背面也竖着拉正
+    const s=sm*Math.min(1,c/30)*Math.exp(-((e/.15)**2));if(!best||s>best.s)best={q:(a>b)===(ratio>1)?q:rotQuad(q,1),s}}
+  return best&&best.s>=.3?best.q.map(p=>[Math.min(M.w,Math.max(0,p[0]))/M.S,Math.min(M.h,Math.max(0,p[1]))/M.S]):null}
 function rotQuad(q,times){let r=q;for(let i=0;i<times;i++)r=[r[1],r[2],r[3],r[0]];return r}
-/* instax SQUARE、宝丽来、Go 三种相纸外形比例只差 3% 以内，斜着拍一下就分不清。
-   改看白边：底边和顶边的厚度比（官方尺寸：SQUARE 17/7≈2.4，宝丽来 24/6=4，Go 16.1/4.5≈3.6），这个比例不太受透视影响 */
-const SQ_FAMILY=['square','polaroid','go'];
-function squareFamily(img,q){
-  const a=(dist(q[0],q[1])+dist(q[3],q[2]))/2,b=(dist(q[0],q[3])+dist(q[1],q[2]))/2,k=360/Math.max(a,b),W=Math.round(a*k),H=Math.round(b*k);
-  const im=warp(img,q,W,H),d=im.data,px=(x,y)=>{const i=(y*W+x)*4;return [d[i],d[i+1],d[i+2]]};
-  const med=v=>v.sort((x,y)=>x-y)[v.length>>1];
-  const depth=fromTop=>med([.2,.3,.4,.5,.6,.7,.8].map(f=>{const x=Math.round(f*(W-1)),y0=fromTop?2:H-3,e=px(x,y0);let s=2;
-    // 白边上写的字是细笔画：连续不同色超过 6% 高度才算进了画面
-    let run=0,st0=0;while(s<H*.45){const c=px(x,fromTop?s:H-1-s);if(Math.hypot(c[0]-e[0],c[1]-e[1],c[2]-e[2])>45){if(!run)st0=s;if(++run>H*.06)return st0/H}else run=0;s++}return s/H}));
-  const t=depth(true),bt=depth(false);if(t<.02||bt<.08)return null;
-  let best=null,bd=9;for(const id of SQ_FAMILY){const F=FORMATS[id],ft=F.img[1]/F.H,fb=(F.H-F.img[1]-F.img[3])/F.H;
-    const e=Math.abs(Math.log((bt/t)/(fb/ft)))+1.5*Math.abs(Math.log(bt/fb));if(e<bd){bd=e;best=id}}
-  return best}
-/* 以前只看外形比例就套进最接近的相纸，再把最厚的一边当底边：普通照片会被转 90° 再拉伸变形（方图被压 19%）。
-   现在两个条件都满足才算拍立得：外形比例和某种相纸对得上（误差 7.5% 内），而且那条底边确实厚（官方底边约占整张 20%，这里按 9% 算）。
-   底边只在和相纸方向一致的两条边里挑，不会把长边当底边 */
-function orientFilm(img,q){
-  const a=(dist(q[0],q[1])+dist(q[3],q[2]))/2,b=(dist(q[0],q[3])+dist(q[1],q[2]))/2,t=thickSide(img,q),k=160/Math.max(a,b),Wp=a*k,Hp=b*k;
-  const rel=[t[0]/Hp,t[1]/Wp,t[2]/Hp,t[3]/Wp],fmts=camera?.film?[camera.film]:Object.keys(FORMATS).filter(f=>f!=='free');let best=null;
-  for(const f of fmts){const F=FORMATS[f],ta=F.W/F.H;
-    for(const turn of [0,1]){const err=Math.abs(Math.log((turn?b/a:a/b)/ta)),c=turn?[1,3]:[0,2],bi=rel[c[0]]>=rel[c[1]]?c[0]:c[1];
-      if(!best||err<best.err)best={f,err,bi,thick:rel[bi]}}}
-  // 有相机时直接信相机的相纸；否则要外形对得上、底边厚、四周一圈边是同一种纸
-  const ok=camera?.film?best.err<.2:(best.err<.15&&best.thick>=.08&&hasFrame(img,q));
-  return ok?{fmt:best.f,q:rotQuad(q,(best.bi+2)%4)}:null}
-// 四条边往里一点点取一圈：每条边颜色都很匀，而且四条边是同一个颜色（同一张相纸）。普通照片的边缘是天、海、沙，颜色一路在变
-function hasFrame(img,q){const a=(dist(q[0],q[1])+dist(q[3],q[2]))/2,b=(dist(q[0],q[3])+dist(q[1],q[2]))/2,k=220/Math.max(a,b),W=Math.round(a*k),H=Math.round(b*k);
-  const im=warp(img,q,W,H),d=im.data,px=(x,y)=>{const i=(Math.round(y)*W+Math.round(x))*4;return [d[i],d[i+1],d[i+2]]};
-  const side=get=>{const v=[];for(let f=.12;f<=.88;f+=.04)v.push(get(f));const m=[0,1,2].map(c=>v.reduce((s,p)=>s+p[c],0)/v.length);
-    const sd=Math.sqrt(v.reduce((s,p)=>s+(p[0]-m[0])**2+(p[1]-m[1])**2+(p[2]-m[2])**2,0)/v.length/3);return {m,sd}};
-  const dx=Math.max(2,W*.025),dy=Math.max(2,H*.025);
-  const S=[side(f=>px(f*(W-1),dy)),side(f=>px(W-1-dx,f*(H-1))),side(f=>px(f*(W-1),H-1-dy)),side(f=>px(dx,f*(H-1)))];
-  let far=0;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)far=Math.max(far,Math.hypot(...S[i].m.map((v,c)=>v-S[j].m[c])));
-  return S.every(s=>s.sd<20)&&far<45}
 /* 原比例：不按任何相纸，照片保持原来的宽高比，外面补一圈拍立得式的白边（毫米口径：画面长边 62，上左右 4，底 16） */
 function setFree(q){const a=(dist(q[0],q[1])+dist(q[3],q[2]))/2,b=(dist(q[0],q[3])+dist(q[1],q[2]))/2,L=62,w=a>=b?L:L*a/b,h=a>=b?L*b/a:L;
   FORMATS.free={name:'原比例',label:'原比例 · 不按相纸',W:w+8,H:h+20,img:[4,4,w,h],free:true}}
@@ -868,7 +960,7 @@ const blank=()=>({filter:'原片',bright:0,contrast:0,warm:0,grain:0,frame:'orig
   memo:{place:'',people:'',story:'',print:[]}});
 const newId=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 let src=null,srcData=null,quad=null,format='mini',autoFound=false,scanNeedsConfirm=true;
-let ed=null; // 当前调色对象
+let ed=null,editLoadToken=0; // 当前调色对象；异步读取只响应最后一次打开
 let history=[];
 let backupBusy=false,backupRestoring=false,pendingBackup=null,backupReturn='home';
 
@@ -927,7 +1019,7 @@ function renderHome(){
   ['homeSample','homeSecond','homeThird'].forEach((id,i)=>{const img=$(id),item=hero[i],figure=img.parentElement;
     figure.hidden=!!last&&!item;figure.classList.toggle('personal',!!item);img.style.objectFit=item?'contain':'';
     if(figure.hidden){img.removeAttribute('src');img.alt='';return}
-    img.src=item?item.photoCv.toDataURL('image/jpeg',.7):samples[i];
+    img.src=item?(item.thumb||item.photoCv).toDataURL('image/jpeg',.7):samples[i];
     img.alt=item?`收藏照片 · ${item.st.memo?.place||item.st.caption||dLabel(item.st.date)||'某一天'}`:['匹兹堡河边的拍立得翻拍','人像拍立得翻拍','河边风景的拍立得翻拍'][i];
     if(item&&!restoring)homePreview(item,url=>img.src=url,token);
   });
@@ -941,7 +1033,7 @@ function renderHome(){
   if(last){resume.title=[dLabel(last.st.date),last.st.memo?.place,last.st.caption].filter(Boolean).join(' · ');resume.onclick=()=>openEdit(scans.indexOf(last))}
   const gallery=$('homeGallery'),recent=own.slice().reverse().slice(0,4);gallery.replaceChildren();gallery.hidden=!recent.length||restoring;
   recent.forEach(s=>{const b=document.createElement('button'),img=document.createElement('img'),title=document.createElement('b'),date=document.createElement('small');
-    b.dataset.id=s.id;b.setAttribute('aria-label',`打开${s.st.memo?.place||s.st.caption||'收藏照片'}`);img.className='home-thumb';img.alt='';img.src=s.photoCv.toDataURL('image/jpeg',.7);
+    b.dataset.id=s.id;b.setAttribute('aria-label',`打开${s.st.memo?.place||s.st.caption||'收藏照片'}`);img.className='home-thumb';img.alt='';img.src=(s.thumb||s.photoCv).toDataURL('image/jpeg',.7);
     title.textContent=s.st.memo?.place||s.st.caption||'未写下名字的照片';date.textContent=dLabel(s.st.date)||'某一天';b.append(img,title,date);b.onclick=()=>openEdit(scans.indexOf(s));gallery.append(b);
     homePreview(s,url=>{img.src=url;img.dataset.ready='1'},token)});
   $('homeEmpty').hidden=!restoring&&!restoreFailed;$('homeEmpty').textContent=restoring?'正在读取本机收藏…':'本机收藏暂时无法完整读取。旧数据仍保留，重试读取成功后可以继续整理。';
@@ -949,7 +1041,7 @@ function renderHome(){
   $('homePending').hidden=!pendingFiles.length;$('homePending').textContent=`继续框选 · ${pendingFiles.length} 张`;
   revealHome();
 }
-function showHome(){closePanels(backupRestoring);backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
+function showHome(){editLoadToken++;closePanels(backupRestoring);backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
 function chooseHomePhoto(cameraInput){backFor=mergeFor=-1;$(cameraInput?'camIn':'fileIn').click()}
 $('homeShoot').onclick=()=>chooseHomePhoto(true);$('homeImport').onclick=()=>chooseHomePhoto(false);
 $('homeLibrary').onclick=()=>openLib();$('editHome').onclick=$('scanHome').onclick=showHome;
@@ -1014,20 +1106,24 @@ async function importFiles(list){
   else if(ok){openEdit(scans.length-1);toast(`${ok} 张都拉正了${tail}，${innerWidth>=900?'点右边的小图切换着调':'点「‹ 重扫」能看到全部，点小图切换'}`,4200)}
   else toast('这些图都打不开');
 }
-let srcDate='',srcDsrc='';
+let srcDate='',srcDsrc='',scanRivals=0;
 function setSource(img, presetQuad, quiet){
+  editLoadToken++;
   srcDate=img._date?.d||'';srcDsrc=img._date?.src||'';
   const k=Math.min(1,2400/Math.max(img.width,img.height)), W=Math.round(img.width*k), H=Math.round(img.height*k);
   src=document.createElement('canvas');src.width=W;src.height=H;const x=src.getContext('2d',{willReadFrequently:true});
   x.drawImage(img,0,0,W,H);srcData=x.getImageData(0,0,W,H);
   src._file=img._file||null;src._ow=img.width;   // 原文件留着不解码：认边框只用 2400 的缩小图，高清导出时再从原文件解一次
-  let q=presetQuad||detect(src);autoFound=!!q;scanNeedsConfirm=true;
-  if(q){const o=orientFilm(srcData,q);
-    if(o){q=o.q;format=o.fmt;scanNeedsConfirm=area(q)/(W*H)<.12;if(!camera?.film&&SQ_FAMILY.includes(format))format=squareFamily(srcData,q)||format}
-    // 没有足够相纸特征时，不采用画面内部的可疑轮廓，先展示完整原图。
-    else{q=[[0,0],[W,0],[W,H],[0,H]];setFree(q);format='free'}}
-  else{q=[[0,0],[W,0],[W,H],[0,H]];setFree(q);format='free'}
-  quad=q;if(!quiet)showScan();
+  // 示例直接给好四角。背面只认外形，按正面的比例；补拍、或者选了相机，只按那一种相纸找
+  let r=null;scanRivals=0;
+  if(presetQuad)r={q:presetQuad.map(p=>[...p]),fmt:format,sure:true};
+  else try{if(backFor>=0){const A=scans[backFor],q=A&&findCard(src,A.W/A.H);r=q&&{q,fmt:format,sure:false}}
+    else{const film=mergeFor>=0?scans[mergeFor]?.fmt:camera?.film;r=findFilm(src,FILM_EDGES[film]?[film]:Object.keys(FILM_EDGES))}}
+  catch(e){r=null}   // 认边框出错也不挡住导入：照旧给整张原图
+  if(r){quad=r.q;format=r.fmt;autoFound=true;scanNeedsConfirm=!r.sure;scanRivals=r.rivals||0;if(format==='free')setFree(quad)}
+  // 没认出相纸时，不采用画面内部的可疑轮廓，先展示完整原图。
+  else{quad=[[0,0],[W,0],[W,H],[0,H]];setFree(quad);format='free';autoFound=false;scanNeedsConfirm=true}
+  if(!quiet)showScan();
 }
 
 /* 扫描提示是保守的像素启发式，不判断原片好坏，也不阻止拉正。 */
@@ -1119,7 +1215,9 @@ function drawQuad(){
 function showScan(){
   stopHomeMotion();
   $('homeView').hidden=true;$('scanView').hidden=false;$('editView').hidden=true;$('straighten').textContent=backFor>=0?'确认选框，存成背面':mergeFor>=0?'确认选框并合成':'确认选框并拉正';
-  $('found').textContent=scanNeedsConfirm?'没认出相纸边框。拖四角框住相纸，或直接用整张原图。':format==='free'?'按原比例拉正，确认四角贴齐就可以继续。':`认出了 ${FORMATS[format].label}，确认四角贴齐就可以拉正。`;
+  $('found').textContent=!autoFound?'没认出相纸边框。拖四角框住相纸，或直接用整张原图。'
+    :scanNeedsConfirm?(scanRivals?'照片里不止一张相纸，先框了最清楚的一张。要另一张就把四角拖过去。':format==='free'?'认不出是哪种相纸，先按原比例框了画面。确认四角贴齐再拉正。':`框出了 ${FORMATS[format].label}，不太有把握：确认四角贴齐再拉正。`)
+    :format==='free'?'按原比例拉正，确认四角贴齐就可以继续。':`认出了 ${FORMATS[format].label}，确认四角贴齐就可以拉正。`;
   $('fullPhoto').hidden=backFor>=0||mergeFor>=0;
   renderFormats();renderTray();renderCamBtn();scheduleScanCheck();requestAnimationFrame(layoutDesk);
 }
@@ -1152,8 +1250,8 @@ function showLoupe(e){const L=$('loupe'),r=$('desk').getBoundingClientRect(),S=1
   x.strokeStyle='rgba(255,255,255,.9)';x.lineWidth=dpr;x.beginPath();x.moveTo(o[0]-9*dpr,o[1]);x.lineTo(o[0]+9*dpr,o[1]);x.moveTo(o[0],o[1]-9*dpr);x.lineTo(o[0],o[1]+9*dpr);x.stroke()}
 
 function renderTray(){for(const id of ['tray','tray2'])renderTrayInto($(id))}
-function thumbOf(s){const c=document.createElement('canvas');c.width=80;c.height=104;const x=c.getContext('2d'),k=Math.max(80/s.photoS.width,104/s.photoS.height);
-  x.drawImage(s.photoCv,(80-s.photoS.width*k)/2,(104-s.photoS.height*k)/2,s.photoS.width*k,s.photoS.height*k);return c}
+function thumbOf(s){const t=s.thumb||s.photoCv,c=document.createElement('canvas');c.width=80;c.height=104;const x=c.getContext('2d'),k=Math.max(80/t.width,104/t.height);
+  x.drawImage(t,(80-t.width*k)/2,(104-t.height*k)/2,t.width*k,t.height*k);return c}
 function renderTrayInto(t){
   t.innerHTML='';
   scans.forEach((s,i)=>{const b=document.createElement('button');b.className='t'+(i===curScan?' cur':'');b.setAttribute('aria-label',`第 ${i+1} 张`);
@@ -1184,25 +1282,31 @@ function warpFilm(sd,q,F,W,H){if(!F.free)return warp(sd,q,W,H);
 // 相纸上画面的位置（像素），往里收一点，免得带进白边
 function filmRect(F,W,H){const [ix,iy,iw,ih]=F.img,ins=.012;return [Math.round((ix/F.W+ins)*W),Math.round((iy/F.H+ins)*H),Math.round((iw/F.W-2*ins)*W),Math.round((ih/F.H-2*ins)*H)]}
 // 从拉正后的整张相纸（ImageData）生成一条扫描记录；meta 记原图和四个角，idx 指定时覆盖那一条（补拍合成用）
-function buildScan(film,meta,open,idx){
-  const F=meta.F||FORMATS[meta.fmt],W=film.width,H=film.height;
-  const scanCv=document.createElement('canvas');scanCv.width=W;scanCv.height=H;scanCv.getContext('2d').putImageData(film,0,0);
-  const rect=filmRect(F,W,H);
+// 拉正后的整张相纸（画在 scanCv 上）算出调色要用的几样：画面位置、全尺寸画面、720 的预览和反光图
+function filmParts(scanCv,F){const W=scanCv.width,H=scanCv.height,rect=filmRect(F,W,H);
   const photoFull=scanCv.getContext('2d').getImageData(...rect);
   const pk=Math.min(1,720/Math.max(rect[2],rect[3])), pW=Math.round(rect[2]*pk), pH=Math.round(rect[3]*pk);
   const tmp=document.createElement('canvas');tmp.width=rect[2];tmp.height=rect[3];tmp.getContext('2d').putImageData(photoFull,0,0);
   const photoCv=document.createElement('canvas');photoCv.width=pW;photoCv.height=pH;photoCv.getContext('2d').drawImage(tmp,0,0,pW,pH);
   const photoS=photoCv.getContext('2d').getImageData(0,0,pW,pH);
   // 反光：画面里「很亮、几乎没颜色」的点超过 0.6%
-  const glareS=glareMap(photoS,2),glareAmt=glareShare(glareS),glare=glareAmt>.006;
+  const glareS=glareMap(photoS,2),glareAmt=glareShare(glareS);
+  return {W,H,rect,scanCv,photoFull,photoCv,photoS,glare:glareAmt>.006,glareS,glareAmt}}
+// 缩略图：画面部分，长边 240。首页、托盘、相册封面都用它；不编辑的照片平时只有它留在内存里
+function thumbFrom(img,r){const k=Math.min(1,240/Math.max(r[2],r[3])),c=mkCv(Math.max(1,Math.round(r[2]*k)),Math.max(1,Math.round(r[3]*k))),x=c.getContext('2d');
+  x.imageSmoothingQuality='high';x.drawImage(img,r[0],r[1],r[2],r[3],0,0,c.width,c.height);return c}
+function buildScan(film,meta,open,idx){
+  const F=meta.F||FORMATS[meta.fmt];
+  const scanCv=document.createElement('canvas');scanCv.width=film.width;scanCv.height=film.height;scanCv.getContext('2d').putImageData(film,0,0);
+  const parts=filmParts(scanCv,F),{glare,photoCv}=parts;
   const now=new Date();
   const prev=idx>=0?scans[idx]:scans[curScan], same=idx>=0||(prev&&prev.src===meta.src);
   const st=same?prev.st:blank();if(!same){st.caption=`${now.getMonth()+1}.${now.getDate()} `;st.date.d=srcDate||new Date(now-now.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
-  const item={...meta,F,W,H,rect,film,scanCv,photoFull,photoCv,photoS,glare,glareS,glareAmt,st,hist:same?prev.hist:[],
+  const item={...meta,F,...parts,thumb:thumbFrom(photoCv,[0,0,photoCv.width,photoCv.height]),_pix:{},st,hist:same?prev.hist:[],
     id:meta.id||(same?prev.id:newId()),back:same?prev.back||null:null,scanDate:same?prev.scanDate:st.date.d,scanSrc:same?prev.scanSrc:(srcDate?srcDsrc:'today'),demo:meta.demo??(same?prev.demo:false)};
   const at=idx>=0?idx:curScan;
   if(same)scans[at]=item;else scans.push(item);
-  draftSoon();
+  useFull(item);draftSoon();
   if(!open)return item;
   openEdit(same?at:scans.length-1);
   if(glare&&!(idx>=0))toast('这张可能有反光。可以补拍尝试合成，或手动修补小光斑；原片本来明亮时可以忽略。',4600);
@@ -1260,8 +1364,9 @@ $('flip').onclick=flipCard;
 function startMerge(){if(!ed)return;mergeFor=curScan;
   toast(DESK?'选第二张：同一张拍立得、换个角度拍的。会自动对齐，把反光补掉。':'换个角度（手机往左或往右歪一点）再拍同一张拍立得',5000);
   $(DESK?'fileIn':'camIn').click()}
-function mergeInto(i){const A=scans[i],before=A.glareAmt,B=warpFilm(srcData,quad,A.F,A.W,A.H);
-  const {img}=mergeFilms(A.film,B,A.rect);
+function mergeInto(i){const A=scans[i];if(!isFull(A)){ensureFull(A).then(()=>mergeInto(i)).catch(()=>toast('这张照片没读出来，再试一次'));return}
+  const before=A.glareAmt,B=warpFilm(srcData,quad,A.F,A.W,A.H);
+  const {img}=mergeFilms(A.scanCv.getContext('2d').getImageData(0,0,A.W,A.H),B,A.rect);
   // merged：合成只做在标准尺寸上，高清导出不能再从原图重拉；before：留着合成前那张，先对比再决定要不要
   const item=buildScan(img,{src:A.src,srcData:A.srcData,quad:A.quad,fmt:A.fmt,F:A.F,merged:true},true,i);item.before=A;syncGlare();
   toast(item.glareAmt<before*.6?`合成好了，反光从 ${(before*100).toFixed(1)}% 降到 ${(item.glareAmt*100).toFixed(1)}%`:'两张的反光位置差不多，没补掉多少。换个更大的角度再拍一张试试',5200)}
@@ -1306,9 +1411,11 @@ function syncGlare(){const on=ed&&ed.glare,mb=ed&&ed.before;$('gbar').hidden=!on
   const fb=$('fixBtn');if(fb){fb.classList.toggle('on',brushing);fb.textContent=brushing?'涂完了':'涂掉光斑'}
   const n=(ed&&ed.st.spots||[]).length,cb=$('spotClr');if(cb){cb.hidden=!n;$('bSizeL').hidden=!brushing}}
 /* ---------- 调色界面 ---------- */
-function openEdit(i){
+async function openEdit(i){const it=scans[i],token=++editLoadToken;if(!it)return;
+  if(!isFull(it)){try{await ensureFull(it)}catch(e){if(token===editLoadToken)toast('这张照片没读出来，再点一次试试');return}
+    if(token!==editLoadToken||scans[i]!==it)return}
   stopHomeMotion();
-  backFor=mergeFor=-1;curScan=i;ed=scans[i];history=ed.hist;brushing=false;$('card').classList.remove('brush');showingBack=false;$('card').classList.remove('backside');syncFlip();
+  backFor=mergeFor=-1;curScan=i;ed=scans[i];useFull(ed);history=ed.hist;brushing=false;$('card').classList.remove('brush');showingBack=false;$('card').classList.remove('backside');syncFlip();
   if(!ed.demo)lastRealId=ed.id;
   $('homeView').hidden=true;$('scanView').hidden=true;$('editView').hidden=false;syncDraftStatus();
   buildFilterStrip();buildSliders();buildFrames();syncControls();
@@ -1446,7 +1553,12 @@ function setFrame(c){commit();ed.st.frame=c;syncControls();layoutCard();renderCa
 function commit(stay){if(showingBack&&!stay)setSide(false);history.push(JSON.stringify(ed.st));if(history.length>60)history.shift();$('undo').disabled=false}
 $('undo').onclick=()=>{if(!history.length)return;ed.st=JSON.parse(history.pop());syncGlare();$('cap').textContent=ed.st.caption;syncControls();layoutCard();renderCard()};
 $('back').onclick=()=>{setSourceFromScan()};
-function setSourceFromScan(){src=ed.src;srcData=ed.srcData;quad=ed.quad.map(p=>[...p]);format=ed.fmt;if(ed.F.free)FORMATS.free={...ed.F};autoFound=true;scanNeedsConfirm=false;showScan()}
+function setSourceFromScan(){const it=ed,token=++editLoadToken;
+  // 原图平时不留在内存里：重扫前先读回来；还在内存里时照常同步进入扫描页
+  if(!it.src.width||!it.srcData){fillCv(it.src).then(()=>{if(token!==editLoadToken||ed!==it)return;
+    it.srcData=it.srcData||it.src.getContext('2d',{willReadFrequently:true}).getImageData(0,0,it.src.width,it.src.height);setSourceFromScan()})
+    .catch(()=>{if(token===editLoadToken)toast('原图没读出来，再试一次')});return}
+  src=it.src;srcData=it.srcData;quad=it.quad.map(p=>[...p]);format=it.fmt;if(it.F.free)FORMATS.free={...it.F};autoFound=true;scanNeedsConfirm=false;showScan()}
 
 /* 卡片尺寸：按舞台可用空间算，画布只画画面和框，字和贴纸是可编辑的浮层 */
 function cardDims(){
@@ -1634,26 +1746,29 @@ function backAt(it,long){const b=it.back,k=Math.min(1,long/Math.max(b.width,b.he
 function pairCv(a,b){const h=a.height,bw=Math.round(b.width*h/b.height),g=Math.round(h*.04),c=mkCv(a.width+bw+g*3,h+g*2),x=c.getContext('2d');
   x.fillStyle='#ECE8E0';x.fillRect(0,0,c.width,c.height);x.drawImage(a,g,g);x.imageSmoothingQuality='high';x.drawImage(b,g*2+a.width,g,bw,h);return c}
 // 翻拍原图里这张相纸实际有多少像素（长边）。补拍合成过的只在标准尺寸上合成，不能再从原图重拉
-function nativeLong(it){if(it.merged)return 0;const q=it.quad,F=it.F,u=it.src._file?Math.min(6000,it.src._ow||it.src.width)/it.src.width:1,a=Math.max(dist(q[0],q[1]),dist(q[3],q[2]))*u,b=Math.max(dist(q[0],q[3]),dist(q[1],q[2]))*u;
+function nativeLong(it){if(it.merged)return 0;const q=it.quad,F=it.F,sw=it.src.width||it.src._w,u=it.src._file&&sw?Math.min(6000,it.src._ow||sw)/sw:1,a=Math.max(dist(q[0],q[1]),dist(q[3],q[2]))*u,b=Math.max(dist(q[0],q[3]),dist(q[1],q[2]))*u;
   return Math.round(F.free?Math.max(a,b)*Math.max(F.W,F.H)/Math.max(F.img[2],F.img[3]):Math.max(a,b))}
 const hdLong=it=>{const n=nativeLong(it);return n>=1900?Math.min(n,3200):0};
 // 高清：按更大的尺寸从原图重新拉正一份（只用来导出，不改扫描记录）
 async function itemAt(it,long){if(!long||long<=Math.max(it.W,it.H)*1.05||it.merged)return it;
-  let sd=it.srcData,q=it.quad;
+  let sd=null,q=it.quad;await srcSize(it.src);
   if(it.src._file){try{const im=await decodeFile(it.src._file),k=Math.min(1,6000/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
-    const cx=c.getContext('2d');cx.drawImage(im,0,0,c.width,c.height);sd=cx.getImageData(0,0,c.width,c.height);const u=c.width/it.src.width;q=q.map(p=>[p[0]*u,p[1]*u])}catch(e){}}
+    const cx=c.getContext('2d');cx.drawImage(im,0,0,c.width,c.height);sd=cx.getImageData(0,0,c.width,c.height);const u=c.width/(it.src.width||it.src._w);q=q.map(p=>[p[0]*u,p[1]*u])}catch(e){}}
+  if(!sd){await fillCv(it.src);sd=it.srcData||it.src.getContext('2d',{willReadFrequently:true}).getImageData(0,0,it.src.width,it.src.height);dropSrc(it.src)}
   const F=it.F,sc=long/Math.max(F.W,F.H),W=Math.round(F.W*sc),H=Math.round(F.H*sc),rect=filmRect(F,W,H),scanCv=document.createElement('canvas');
   scanCv.width=W;scanCv.height=H;const x=scanCv.getContext('2d');x.putImageData(warpFilm(sd,q,F,W,H),0,0);
   return {...it,W,H,rect,scanCv,photoFull:x.getImageData(...rect),_fixFull:null,_fixFullKey:null}}
 // 把一张照片画成成品。o.bare 只要画面；o.long 整张相纸的长边，比标准小就缩小，比标准大就从原图重拉
 async function renderItem(it,o={}){const st=o.bare?{...it.st,frame:'none'}:it.st;
   try{const f=fontOf(st);await Promise.all([document.fonts.load(fontCss(f,40),(st.caption||'字')+memoLine(st)),document.fonts.load('900 40px "Zen Maru Gothic"')])}catch(e){}
-  const big=await itemAt(it,o.long),keep=ed;ed=big;   // composite 这些函数都读 ed，同步画完马上换回来
+  pinFull(it);   // 画的过程中别把它的大图释放掉
+  try{const base=isFull(it)?it:await tempFull(it,o.long);   // 不在内存里的：临时按要的尺寸解一份，画完就丢
+  const big=await itemAt(base,o.long),keep=ed;ed=big;   // composite 这些函数都读 ed，同步画完马上换回来
   try{const bare=st.frame==='none',W=bare?ed.rect[2]:ed.W,H=bare?ed.rect[3]:ed.H,k=o.long?Math.min(1,o.long/Math.max(ed.W,ed.H)):1;
     const p=processImage(basePhoto(true),st),pc=document.createElement('canvas');pc.width=p.width;pc.height=p.height;pc.getContext('2d').putImageData(p,0,0);
     let c=document.createElement('canvas');c.width=W;c.height=H;composite(c.getContext('2d'),W,H,pc,st,true);
     if(k<.99){const s=document.createElement('canvas');s.width=Math.round(W*k);s.height=Math.round(H*k);const sx=s.getContext('2d');sx.imageSmoothingQuality='high';sx.drawImage(c,0,0,s.width,s.height);c=s}
-    return c}finally{ed=keep}}
+    return c}finally{ed=keep}}finally{unpinFull(it)}}
 async function exportBlob(){return toBlob(await renderItem(ed),'image/jpeg',.92)}
 /* 打包 zip：不压缩（照片本来就压缩过），文件名按 UTF-8 */
 const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
@@ -1670,14 +1785,17 @@ function memoTxt(list,names){if(!list.some(s=>{const m=s.st.memo||{};return m.pl
     m.place&&`地点：${m.place}`,m.people&&`人物：${m.people}`,m.story&&`故事：${m.story}`].filter(Boolean).join('\r\n')}).join('\r\n\r\n')+'\r\n'}
 const stamp=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`};
 let downloads=null;
-(async()=>{try{downloads=await window.claude?.use?.('downloads')}catch(e){downloads=null}})();
+(async()=>{try{downloads=DESKTOP?desktopSaver():await window.claude?.use?.('downloads')}catch(e){downloads=null}})();
+// 电脑版和 Claude 里的保存用同一个接口：取消时抛出 declined
+function desktopSaver(){return {save:async({filename,data})=>{const r=await DESKTOP.saveFile(filename,new Uint8Array(await data.arrayBuffer()));
+  if(!r)throw Object.assign(new Error('declined'),{code:'declined'});return r}}}
 // 普通浏览器：显示出来，再给一个下载链接；手机上长按图片也能存
 function showFile(file,tip){const u=URL.createObjectURL(file),img=file.type.startsWith('image/'),a=$('sheetDl');
   $('sheetImg').hidden=!img;if(img)$('sheetImg').src=u;a.href=u;a.download=file.name;a.textContent=img?'下载文件':`下载 ${file.name}`;$('sheetTip').textContent=tip;$('sheet').hidden=false}
 // 保存一个文件：能直接存就直接存（Claude 里），不能就显示出来让人自己存
 async function deliver(file){const zip=file.name.endsWith('.zip');
-  if(downloads){try{await downloads.save({filename:file.name,data:file});
-      toast(zip?'打包好了，去下载文件夹解压':DESK?'保存好了，去下载文件夹看看。':'存好了。手机上如果弹出分享菜单，选「存储图像」就进相册了。',4200);return}
+  if(downloads){try{const saved=await downloads.save({filename:file.name,data:file});
+      toast(saved?.path?`存好了：${saved.path}`:zip?'打包好了，去下载文件夹解压':DESK?'保存好了，去下载文件夹看看。':'存好了。手机上如果弹出分享菜单，选「存储图像」就进相册了。',4200);return}
     catch(e){const code=e&&e.code;if(code==='declined'){toast('这次没存。');return}if(code==='rate_limited'){toast('上一个保存窗口还开着，先处理它。');return}}}
   showFile(file,zip?'点「下载」把压缩包存下来，解压后就是全部照片':DESK?'点「下载文件」，或者右键图片选「图片另存为」':'长按图片选「存储到照片」，或者点「下载文件」')}
 $('bigview').onclick=async()=>showFile(new File([await exportBlob()],`instant-${stamp()}.jpg`,{type:'image/jpeg'}),DESK?'右键图片可以另存，也可以直接拖到别的地方':'长按图片可以存，也可以截图发给朋友');
@@ -1701,7 +1819,7 @@ function renderExport(){const n=outList().length,hd=hdLong(ed),hasBack=(exp.all?
     (n>1?`<div class="opt">几张<div>${c('all',false,'这一张')}${c('all',true,`全部 ${n} 张 · 打包 zip`)}</div></div>`:'')+
     `<p class="mh">${why}${exp.all?' 填过「回忆」的会附一份回忆.txt。':''}</p>`+
     `<div class="acts"><button class="big" id="expGo">${multi?'打包保存':SAVE_T}</button>${canShare?'<button class="sm" id="expShare">分享</button>':''}<button class="sm" id="expClose">取消</button></div>`+
-    `<div class="draft"><span id="draftInfo">照片和调整会自动存成草稿，下次打开接着来。草稿只在这个浏览器里，清理浏览器数据就没了，调好的记得导出。</span>`+
+    `<div class="draft"><span id="draftInfo">照片和调整会自动存成草稿，下次打开接着来。${DESKTOP?'草稿存在这台电脑上，换电脑前记得做个完整备份。':'草稿只在这个浏览器里，清理浏览器数据就没了，调好的记得导出。'}</span>`+
     `<button class="chip" id="dropOne">删掉这一张</button><button class="chip" id="dropAll">清空全部草稿</button></div>`;
   navigator.storage?.estimate?.().then(e=>{const el=$('draftInfo');if(el&&e.usage>1e6)el.textContent+=` 现在占用约 ${Math.round(e.usage/1e6)} MB。`}).catch(()=>{})}
 $('save').onclick=openExport;
@@ -1717,7 +1835,8 @@ async function doExport(share){const btn=$('expGo'),label=btn.textContent,list=e
     const key=JSON.stringify([exp.frame,exp.type,exp.size,exp.back,list.map(renderKey)]);
     if(!expCache||expCache.key!==key){const files=[],fronts=[],t0=stamp(),ext=exp.type==='png'?'png':'jpg',type=exp.type==='png'?'image/png':'image/jpeg';
       for(const [i,it] of list.entries()){btn.textContent=list.length>1?`在做 ${i+1}/${list.length}…`:'在做…';
-        const c=await renderItem(it,{bare:exp.frame==='photo',long:sizeFor(it)}),bk=it.back&&exp.back!=='no'?backAt(it,Math.max(c.width,c.height)):null;
+        if(exp.size==='hd')await srcSize(it.src);
+        const c=await renderItem(it,{bare:exp.frame==='photo',long:sizeFor(it)}),bk=it.back&&exp.back!=='no'?await backAtAsync(it,Math.max(c.width,c.height)):null;
         const base=`instant-${t0}${list.length>1?'-'+String(i+1).padStart(2,'0'):''}`;fronts.push(`${base}.${ext}`);
         files.push(new File([await toBlob(bk&&exp.back==='pair'?pairCv(c,bk):c,type,.92)],`${base}.${ext}`,{type}));
         if(bk&&exp.back==='sep')files.push(new File([await toBlob(bk,type,.92)],`${base}-back.${ext}`,{type}))}
@@ -1732,24 +1851,30 @@ async function doExport(share){const btn=$('expGo'),label=btn.textContent,list=e
   finally{btn.disabled=false;btn.textContent=label}}
 async function dropCurrent(){const i=curScan;$('expPanel').hidden=true;scans.splice(i,1);
   if(scans.length)openEdit(Math.min(i,scans.length-1));else{ed=null;curScan=-1;showHome()}
-  const saved=await mutateDraft(()=>saveDraft(true));toast(saved?'这一张删掉了':'已从当前页面移除，但草稿删除失败；请刷新后重新删除，或清理浏览器数据',5200)}
+  const saved=await mutateDraft(()=>saveDraft(true));toast(saved?'这一张删掉了':`已从当前页面移除，但草稿删除失败；请刷新后重新删除${DESKTOP?'':'，或清理浏览器数据'}`,5200)}
 async function clearAll(){$('expPanel').hidden=true;clearTimeout(draftT);
   await mutateDraft(async()=>{try{await KV.run('readwrite',s=>s.clear())}catch(e){draftState='error';syncDraftStatus();toast('清空草稿失败，照片仍保留，可以稍后重试');return}
+    LITE.run('readwrite',s=>s.clear()).catch(()=>{});fullLRU.length=0;
     pendingFiles=[];pendingSource=null;scans.length=0;ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;cols=[];pages=[];alb=newAlb();draftPending=false;clearTimeout(draftT);draftSavedKey=draftKey();draftState='empty';syncDraftStatus();showHome();toast('草稿清空了')})}
 
 /* ---------- 本地草稿 ----------
    照片、四个角、所有调整自动存进这个浏览器的 IndexedDB，刷新或下次打开接着来。
    图片只存一次（翻拍原图 + 拉正后的整张），调整每次改都重写。示例照片不存 */
-const KV={p:null,db(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open('tiejin-drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}).catch(e=>{this.p=null;throw e}))},
+const idbStore=name=>({p:null,db(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open(name,1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}).catch(e=>{this.p=null;throw e}))},
   async run(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction('kv',mode);let q,callbackError;t.oncomplete=()=>res(q&&q.result);t.onerror=t.onabort=()=>rej(callbackError||t.error);
     try{q=fn(t.objectStore('kv'))}catch(e){callbackError=e;try{t.abort()}catch(ignore){}rej(e)}})},
-  get(k){return this.run('readonly',s=>s.get(k))},keys(){return this.run('readonly',s=>s.getAllKeys())}};
+  get(k){return this.run('readonly',s=>s.get(k))},keys(){return this.run('readonly',s=>s.getAllKeys())},
+  // 一个事务里逐个读：任何一个读不出来都算整体失败
+  many(ks){return this.run('readonly',s=>{const q=ks.map(k=>s.get(k));return {get result(){return q.map(r=>r.result)}}})}});
+const KV=idbStore('tiejin-drafts');
+// 每张照片的缩略图和尺寸：只为打开快、占内存少，丢了可以从草稿重新算，所以不进完整备份。按相纸文件大小核对是不是最新的
+const LITE=idbStore('tiejin-lite');
 let draftT=0,draftBusy=false,draftWarned=false,restoring=true,restoreFailed=false,persistAsked=false,draftRunning=null,draftEpoch=0,draftLocks=0,draftPending=false;
 let draftState='empty',draftSavedKey='',draftTargetKey='';
 const draftRefs=new WeakMap();let draftRefN=0;
 const draftRef=o=>{if(!o)return 0;if(!draftRefs.has(o))draftRefs.set(o,++draftRefN);return draftRefs.get(o)};
 // 不把查看原图、切标签和缩放当成编辑；图片与元数据变动才需要另存。
-function draftKey(){return JSON.stringify([realFocus(),scans.filter(s=>!s.demo).map(s=>[s.id,s.st,s.quad,s.F,s.merged,s.scanDate,s.scanSrc,draftRef(s.src),draftRef(s.scanCv),draftRef(s.back)]),cols,pages,draftRef(customFrame),draftRef(uploadFrame)])}
+function draftKey(){return JSON.stringify([realFocus(),scans.filter(s=>!s.demo).map(s=>[s.id,s.st,s.quad,s.F,s.merged,s.scanDate,s.scanSrc,draftRef(s.src),draftRef(s._pix||s.scanCv),draftRef(s.back)]),cols,pages,draftRef(customFrame),draftRef(uploadFrame)])}
 function syncDraftStatus(){const el=$('draftStatus'),demo=ed?.demo,state=demo?'demo':draftState;
   el.dataset.state=state;$('draftText').textContent=({demo:'示例体验 · 不会保存到你的收藏',empty:'还没有需要保存的照片',pending:'有修改，等待保存到本机…',saving:'正在保存到本机…',saved:'已保存到本机 · 导出图片可另存到设备',error:'保存失败 · 修改尚未存好，请重试或导出图片'})[state];$('draftRetry').hidden=state!=='error';
 }
@@ -1777,12 +1902,13 @@ async function saveDraft(force=false){if(restoring||restoreFailed||backupRestori
     const keep=new Set(['meta',...(customFrame?['frame:draw']:[]),...(uploadFrame?['frame:upload']:[]),...meta.list.flatMap(r=>['film:'+r.id,'src:'+r.srcId,'orig:'+r.srcId,...(r.back?['back:'+r.id]:[])])]),old=await KV.keys();
     if(epoch!==draftEpoch)return false;
     await KV.run('readwrite',st=>{put.forEach(([k,b])=>st.put(b,k));st.put(meta,'meta');old.forEach(k=>{if(!keep.has(k))st.delete(k)})});
-    put.forEach(q=>q[2]._saved=true);
+    put.forEach(q=>{q[2]._saved=true;if(q[2] instanceof HTMLCanvasElement&&/^(src|back):/.test(q[0]))q[2]._key=q[0]});   // 存过的原图、背面以后可以先放掉像素
+    liteSave(put.filter(q=>q[0].startsWith('film:')).map(q=>[q[2],q[1].size]),meta.list.map(r=>r.id));trimFull();
     if(epoch!==draftEpoch)return false;
     draftSavedKey=key;draftWarned=false;
     if(draftKey()===key){clearTimeout(draftT);draftState=list.length||cols.length||pages.length?'saved':'empty'}else{draftState='pending';clearTimeout(draftT);draftT=setTimeout(()=>saveDraft(),1200)}syncDraftStatus();
     if(list.length&&!persistAsked){persistAsked=true;navigator.storage?.persist?.().catch(()=>{})}return true}   // 请浏览器别在空间紧张时自动清掉
-  catch(e){draftState='error';syncDraftStatus();if(!draftWarned){draftWarned=true;toast(e&&e.name==='QuotaExceededError'?'浏览器存储满了，草稿没存上。调好的先导出吧':'这个浏览器存不了草稿，刷新就没了，调好的记得导出',5200)}return false}
+  catch(e){draftState='error';syncDraftStatus();if(!draftWarned){draftWarned=true;toast(e&&e.name==='QuotaExceededError'?`${DESKTOP?'存储空间':'浏览器存储'}满了，草稿没存上。调好的先导出吧`:'这个浏览器存不了草稿，刷新就没了，调好的记得导出',5200)}return false}
   finally{draftBusy=false}})();return draftRunning}
 addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(draftT);saveDraft()}});
 async function restoreDrafts(){const meta=await KV.get('meta');if(!meta)return null;if(!Array.isArray(meta.list))throw new Error('Draft metadata is unreadable');
@@ -1790,14 +1916,75 @@ async function restoreDrafts(){const meta=await KV.get('meta');if(!meta)return n
   const cvOf=async k=>{const b=await KV.get(k);if(!b)return null;const im=await createImageBitmap(b),c=document.createElement('canvas');c.width=im.width;c.height=im.height;c.getContext('2d',{willReadFrequently:true}).drawImage(im,0,0);return c};
   for(const k of ['draw','upload']){const c=await cvOf('frame:'+k);if(c){c._saved=true;if(k==='draw')customFrame=c;else uploadFrame=c}}
   if(meta.list.some(r=>r.st?.frame==='draw')&&!customFrame||meta.list.some(r=>r.st?.frame==='upload')&&!uploadFrame)throw new Error('Draft frame is missing');
-  const srcs={};let n=0;
-  for(const r of meta.list){try{
-    if(!srcs[r.srcId]){const c=await cvOf('src:'+r.srcId);if(!c)throw new Error('Draft source is missing');c._id=r.srcId;c._saved=true;c._file=await KV.get('orig:'+r.srcId)||null;c._ow=r.ow||c.width;srcs[r.srcId]={c,d:c.getContext('2d').getImageData(0,0,c.width,c.height)}}
-    const fc=await cvOf('film:'+r.id);if(!fc)throw new Error('Draft photo is missing');const S=srcs[r.srcId];curScan=-1;
-    const it=buildScan(fc.getContext('2d').getImageData(0,0,fc.width,fc.height),{src:S.c,srcData:S.d,quad:r.quad,fmt:r.fmt,F:r.F,merged:r.merged,id:r.id},false);
-    Object.assign(it,{st:r.st,scanDate:r.scanDate,scanSrc:r.scanSrc,_saved:true});
-    if(r.back){const b=await cvOf('back:'+r.id);if(!b)throw new Error('Draft back is missing');b._saved=true;it.back=b}n++}catch(e){throw e}}
-  return n?{n,cur:Math.min(meta.cur||0,n-1)}:null}
+  // 只读每张照片的文件句柄、不解码：读不到就当整体读取失败，不会把没读出来的照片当成已删除。
+  // 平时只留缩略图和尺寸，大图编辑或导出时再读（ensureFull）；「继续整理」那张先读好
+  const rows=meta.list,keys=new Set(await KV.keys());
+  for(const r of rows)for(const k of ['src:'+r.srcId,...(r.back?['back:'+r.id]:[])])if(!keys.has(k))throw new Error('Draft image is missing');
+  const films=await KV.many(rows.map(r=>'film:'+r.id)),srcIds=[...new Set(rows.map(r=>r.srcId))],origs=await KV.many(srcIds.map(id=>'orig:'+id));
+  let lite=[];try{lite=await LITE.many(rows.map(r=>r.id))}catch(e){}
+  const srcs=new Map(srcIds.map((id,i)=>[id,Object.assign(lazyCv('src:'+id),{_id:id,_file:origs[i]||null,_ow:0})]));
+  for(const [i,r] of rows.entries()){const film=films[i],rec=lite[i],F=r.F||FORMATS[r.fmt];if(!film)throw new Error('Draft photo is missing');
+    const sc=srcs.get(r.srcId);if(r.ow&&!sc._ow)sc._ow=r.ow;
+    const it={id:r.id,fmt:r.fmt,F,quad:r.quad,merged:!!r.merged,src:sc,srcData:null,st:r.st,hist:[],scanDate:r.scanDate,scanSrc:r.scanSrc,demo:false,_saved:true,_pix:{},
+      back:r.back?lazyCv('back:'+r.id):null};
+    if(rec&&rec.film===film.size&&rec.thumb&&rec.W&&rec.H){it.W=rec.W;it.H=rec.H;it.thumb=await blobCv(rec.thumb)}
+    else{Object.assign(it,await liteFromFilm(film,F));it._lite=film.size}   // 旧草稿或缓存对不上：解一次相纸算缩略图，读完再写进缓存
+    it.rect=filmRect(F,it.W,it.H);scans.push(it)}
+  if(!scans.length)return null;
+  const cur=Math.min(meta.cur||0,scans.length-1);await ensureFull(scans[cur]);
+  return {n:scans.length,cur}}
+
+/* ---------- 内存：照片多了也不卡 ----------
+   不在编辑的照片只留缩略图和尺寸。拉正后的大图、调色用的像素只给正在编辑的这张和最近用过的两张；
+   原图和背面存过草稿后先放掉像素（画布本身留着，草稿和缓存的判断不受影响），用到时再从草稿里读回来。
+   没存进草稿的（刚导入、示例）一直留着，不会丢。 */
+const FULL_KEEP=3,fullLRU=[],fullPins=new Map();
+const isFull=it=>!!(it&&it.scanCv);
+const pinFull=it=>fullPins.set(it,(fullPins.get(it)||0)+1);
+const unpinFull=it=>{const n=(fullPins.get(it)||1)-1;if(n)fullPins.set(it,n);else fullPins.delete(it)};
+function useFull(it){const i=fullLRU.indexOf(it);if(i>=0)fullLRU.splice(i,1);fullLRU.unshift(it);trimFull()}
+function trimFull(){let kept=0;
+  for(const it of fullLRU.slice()){const i=fullLRU.indexOf(it);
+    if(!isFull(it)||!scans.includes(it)){fullLRU.splice(i,1);continue}
+    if(it===ed||it.demo||!it._saved||fullPins.has(it)||kept<FULL_KEEP){kept++;continue}
+    releaseFull(it);fullLRU.splice(i,1)}}
+function releaseFull(it){for(const k of ['scanCv','photoFull','photoCv','photoS','glareS','_fixFull','_fixS','_fixFullKey','_fixSKey','srcData','before'])it[k]=null;
+  if(it.back)shrinkCv(it.back);dropSrc(it.src)}
+async function ensureFull(it){
+  if(!isFull(it)){it._loading=it._loading||(async()=>{const b=await KV.get('film:'+it.id);if(!b)throw new Error('Draft photo is missing');
+      const bmp=await createImageBitmap(b),c=mkCv(bmp.width,bmp.height);c.getContext('2d').drawImage(bmp,0,0);bmp.close();
+      if(!isFull(it))Object.assign(it,filmParts(c,it.F))})().finally(()=>{it._loading=null});
+    await it._loading}
+  await Promise.all([it.back?fillCv(it.back):0,srcSize(it.src)]);useFull(it);return it}
+// 不在内存里的照片画预览、导出时用：按要的尺寸临时解一份，不进上面的名单，画完就丢
+async function tempFull(it,long){const b=await KV.get('film:'+it.id);if(!b)throw new Error('Draft photo is missing');
+  const k=long?Math.min(1,long/Math.max(it.W,it.H)):1,bmp=await createImageBitmap(b,k<1?{resizeWidth:Math.round(it.W*k),resizeHeight:Math.round(it.H*k),resizeQuality:'high'}:undefined);
+  const c=mkCv(bmp.width,bmp.height);c.getContext('2d').drawImage(bmp,0,0);bmp.close();return {...it,...filmParts(c,it.F)}}
+// 原图、背面这类可以从草稿读回来的画布：放掉像素时只把尺寸设成 0，同一个画布对象一直留着
+function lazyCv(key){const c=mkCv(0,0);c._key=key;c._saved=true;return c}
+function shrinkCv(c){if(c&&c._key&&c._saved&&c.width){c._w=c.width;c._h=c.height;c.width=c.height=0}}
+async function fillCv(c){if(!c||c.width||!c._key)return c;
+  c._fill=c._fill||(async()=>{const b=await KV.get(c._key);if(!b)throw new Error('Draft image is missing');const bmp=await createImageBitmap(b);
+    if(!c.width){c.width=bmp.width;c.height=bmp.height;c.getContext('2d',{willReadFrequently:true}).drawImage(bmp,0,0)}bmp.close();c._w=c.width;c._h=c.height})().finally(()=>{c._fill=null});
+  await c._fill;return c}
+function dropSrc(c){if(c&&c!==src&&!scans.some(o=>o.src===c&&isFull(o)))shrinkCv(c)}
+// 高清导出要知道原图多大：读 JPEG 文件头就够，不用解码
+async function srcSize(c){if(!c||c.width||c._w||!c._key)return;const b=await KV.get(c._key),d=b&&await jpegSize(b);
+  if(d){c._w=d.w;c._h=d.h}else{await fillCv(c);dropSrc(c)}}
+async function jpegSize(b){const v=new DataView(await b.slice(0,1<<17).arrayBuffer());if(v.byteLength<4||v.getUint16(0)!==0xFFD8)return null;
+  for(let i=2;i+9<v.byteLength;){if(v.getUint8(i)!==0xFF){i++;continue}const m=v.getUint8(i+1);
+    if(m===0xFF||m===0x01||(m>=0xD0&&m<=0xD8)){i+=m===0xFF?1:2;continue}
+    if(m>=0xC0&&m<=0xCF&&m!==0xC4&&m!==0xC8&&m!==0xCC)return {h:v.getUint16(i+5),w:v.getUint16(i+7)};
+    i+=2+v.getUint16(i+2)}return null}
+async function blobCv(b){const bmp=await createImageBitmap(b),c=mkCv(bmp.width,bmp.height);c.getContext('2d').drawImage(bmp,0,0);bmp.close();return c}
+async function liteFromFilm(b,F){const bmp=await createImageBitmap(b);try{const W=bmp.width,H=bmp.height;return {W,H,thumb:thumbFrom(bmp,filmRect(F,W,H))}}finally{bmp.close()}}
+async function liteSave(list,ids){try{const recs=await Promise.all(list.map(async([it,size])=>[it.id,{film:size,W:it.W,H:it.H,thumb:await toBlob(it.thumb,'image/jpeg',.85)}]));
+  const keep=new Set(ids),stale=(await LITE.keys()).filter(k=>!keep.has(k));
+  if(recs.length||stale.length)await LITE.run('readwrite',st=>{recs.forEach(([k,v])=>st.put(v,k));stale.forEach(k=>st.delete(k))})}catch(e){}}
+// 背面：没在内存里就临时解一份来画
+async function backImage(it){return it.back.width?{img:it.back,done(){}}:await createImageBitmap(await KV.get(it.back._key)).then(b=>({img:b,done(){b.close()}}))}
+async function backInto(it,cv,w){const {img,done}=await backImage(it);try{cv.width=w;cv.height=Math.round(w*img.height/img.width);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height)}finally{done()}}
+async function backAtAsync(it,long){const {img,done}=await backImage(it);try{return backAt({back:img},long)}finally{done()}}
 
 /* ---------- 拼一页：选几张调好的照片，拼成一张能分享的图 ---------- */
 const ALBUMS={wall:['手账贴纸墙',9],contact:['胶片接触印',12],postcard:['旅行明信片',2],timeline:['回忆时间线',8]};
@@ -1817,7 +2004,8 @@ const fillRR=(x,a,b,w,h,r)=>{x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.
 function cover(x,im,dx,dy,dw,dh){const k=Math.max(dw/im.width,dh/im.height),sw=dw/k,sh=dh/k;x.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,dx,dy,dw,dh)}
 function wrapLines(x,t,w){const out=[];let line='';for(const ch of t.replace(/\s+/g,' ')){if(line&&x.measureText(line+ch).width>w){out.push(line);line=ch===' '?'':ch}else line+=ch}if(line)out.push(line);return out}
 function dropCard(x,c,cx,cy,w,rot){const h=w*c.height/c.width;x.save();x.translate(cx,cy);x.rotate(rot);x.shadowColor='rgba(0,0,0,.3)';x.shadowBlur=w*.05;x.shadowOffsetY=w*.02;x.drawImage(c,-w/2,-h/2,w,h);x.restore();return h}
-async function cardOf(it,bare){const k=JSON.stringify([renderKey(it),bare]);if(!cardCache.has(k)){if(cardCache.size>40)cardCache.clear();cardCache.set(k,await renderItem(it,{bare,long:900}))}return cardCache.get(k)}
+async function cardOf(it,bare,long=900){const k=JSON.stringify([renderKey(it),bare,long]);if(cardCache.has(k))return cardCache.get(k);
+  const cv=await renderItem(it,{bare,long});if(cardCache.size>=40)cardCache.delete(cardCache.keys().next().value);cardCache.set(k,cv);return cv}
 const ALBUM_DRAW={
   wall(items,cards,title,o){const n=cards.length,W=1600,cols=n===1?1:n<=4?2:3,cellW=(W-160)/cols,cw=cellW*(cols===1?.56:.8),R=seeded('wall'+items.map(i=>i.id).join()+(o.seed||'')),top=title?230:110,j=Math.min(1,o.tilt);
     const hs=cards.map(c=>cw*c.height/c.width),rows=Math.ceil(n/cols),rowH=[];for(let r=0;r<rows;r++)rowH.push(Math.max(...hs.slice(r*cols,r*cols+cols))+140);
@@ -1851,7 +2039,7 @@ const ALBUM_DRAW={
     // 邮票：白底齿孔，里面是第一张的画面
     x.fillStyle='#FFFDF8';x.fillRect(1360,80,150,180);x.fillStyle='#F5EFE3';
     for(let t=0;t<=150;t+=15){x.beginPath();x.arc(1360+t,80,5,0,7);x.arc(1360+t,260,5,0,7);x.fill()}for(let t=0;t<=180;t+=15){x.beginPath();x.arc(1360,80+t,5,0,7);x.arc(1510,80+t,5,0,7);x.fill()}
-    cover(x,it.photoCv,1374,94,122,124);x.fillStyle='#C8553D';x.fillRect(1374,218,122,28);x.fillStyle='#FFFDF8';x.font=`700 16px ${MONO}`;x.textBaseline='middle';x.fillText('INSTANT',1382,232);x.textAlign='right';x.fillText('80',1490,232);x.textAlign='left';
+    cover(x,it.thumb||it.photoCv,1374,94,122,124);x.fillStyle='#C8553D';x.fillRect(1374,218,122,28);x.fillStyle='#FFFDF8';x.font=`700 16px ${MONO}`;x.textBaseline='middle';x.fillText('INSTANT',1382,232);x.textAlign='right';x.fillText('80',1490,232);x.textAlign='left';
     // 邮戳
     x.strokeStyle=ink;x.lineWidth=4;x.beginPath();x.arc(1250,190,78,0,7);x.stroke();x.lineWidth=2;x.beginPath();x.arc(1250,190,64,0,7);x.stroke();
     x.fillStyle=ink;x.textAlign='center';x.font=`600 20px ${SANS}`;x.fillText((m.place||'POST').slice(0,6),1250,160);x.font=`700 22px ${MONO}`;x.fillText(dLabel(it.st.date),1250,194);x.font=`600 16px ${MONO}`;x.fillText('INSTANT',1250,226);x.textAlign='left';
@@ -1952,7 +2140,7 @@ const libAll=()=>{const l=scans.filter(s=>!s.demo);return l.length||libFromHome?
 function libList(){const ts=lib.q.trim().toLowerCase().replace(/\//g,'.').split(/\s+/).filter(Boolean),c=colOf(lib.col);
   return libAll().filter(s=>(lib.pick||!c||c.ids.includes(s.id))&&ts.every(t=>hay(s).includes(t))).sort((a,b)=>cmpD(b,a))}
 function openLib(){libFromHome=!$('homeView').hidden;lib.pick=false;$('libQ').value=lib.q;$('libClose').textContent=libFromHome?'‹ 首页':'‹ 编辑';$('libPanel').hidden=false;renderLib()}
-function coverCv(s,size){const c=mkCv(size,size);if(s){const x=c.getContext('2d');cover(x,s.photoCv,0,0,size,size)}return c}
+function coverCv(s,size){const c=mkCv(size,size);if(s){const x=c.getContext('2d');cover(x,s.thumb||s.photoCv,0,0,size,size)}return c}
 function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.pick=false}const c=colOf(lib.col),live=id=>scans.some(s=>s.id===id);
   const tags=[...new Set(libAll().flatMap(s=>{const m=s.st.memo||{};return [m.place,m.people]}).map(v=>(v||'').trim()).filter(Boolean))].slice(0,10);
   $('libTags').innerHTML=tags.map(t=>`<button class="chip${lib.q===t?' on':''}" data-q="${esc(t)}">${esc(t)}</button>`).join('');
@@ -1972,10 +2160,10 @@ function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=l
       `<figcaption><span>${esc([dLabel(s.st.date),m.place].filter(Boolean).join(' · ')||'日期未知')}</span>${s.back?'<i>有背面</i>':''}${s.demo?'<i>示例</i>':''}</figcaption>`+
       (lib.pick||!(s.back||c)?'':`<div class="ops">${s.back?'<button data-op="open">打开</button><button data-op="flip">翻面</button>':''}${c?`<button data-op="cover"${cov===s?' class="on"':''}>${cov===s?'是封面':'设为封面'}</button>`:''}</div>`);
     g.appendChild(f);const fr=f.querySelector('.fc'),[w,h]=s.st.frame==='none'?[s.rect[2],s.rect[3]]:[s.W,s.H];fr.width=280;fr.height=Math.round(280*h/w);
-    if(s.back){const b=f.querySelector('.bk');b.width=280;b.height=Math.round(280*s.back.height/s.back.width);b.getContext('2d').drawImage(s.back,0,0,b.width,b.height)}
-    cardOf(s,false).then(cv=>{if(t!==libTok)return;fr.height=Math.round(280*cv.height/cv.width);const x=fr.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(cv,0,0,fr.width,fr.height)}).catch(()=>{})}}
+    if(s.back)backInto(s,f.querySelector('.bk'),280).catch(()=>{})
+    cardOf(s,false,560).then(cv=>{if(t!==libTok)return;fr.height=Math.round(280*cv.height/cv.width);const x=fr.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(cv,0,0,fr.width,fr.height)}).catch(()=>{})}}
 function renderLib(){renderLibHead();renderLibGrid()}
-$('libBtn').onclick=openLib;$('libClose').onclick=()=>{if(libFromHome)showHome();else $('libPanel').hidden=true};
+$('libBtn').onclick=openLib;$('libClose').onclick=()=>{editLoadToken++;if(libFromHome)showHome();else $('libPanel').hidden=true};
 $('libImport').onclick=()=>{backFor=mergeFor=-1;$('fileIn').click()};
 let libT=0;$('libQ').oninput=()=>{lib.q=$('libQ').value;clearTimeout(libT);libT=setTimeout(renderLib,200)};
 $('libTags').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;lib.q=lib.q===b.dataset.q?'':b.dataset.q;$('libQ').value=lib.q;renderLib()};
@@ -2673,6 +2861,8 @@ $('shoot').onclick=()=>$('camIn').click();
 $('pick').onclick=()=>$('fileIn').click();
 for(const id of ['camIn','fileIn']){$(id).onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
   $(id).addEventListener('cancel',()=>{backFor=mergeFor=-1})}   // 没选就关掉：下一张照常导入，不当成背面或补拍
+if(DESKTOP){$('homeFootNote').textContent='照片保存在这台电脑上，记得定期备份。';$('backupExport').textContent='保存完整备份…';
+  $('backupKeepNote').textContent='包含原图、编辑参数、相册和拼页。换电脑后，可以恢复并继续编辑。';$('backupRestoreNote').textContent='先选择备份查看内容，确认后才会替换这台电脑上的收藏。'}
 if(DESK){$('homeShoot').hidden=true;$('shoot').hidden=true;$('pick').textContent='上传照片';$('fileIn').setAttribute('aria-label','上传照片');
   $('tdHint').textContent='拖动旋转 · 滚轮缩放 · 点击部件把它拆出来'}
 $('save').textContent='导出图片';
@@ -2754,21 +2944,24 @@ $('backupClose').onclick=()=>{if(backupBusy)return;$('backupPanel').hidden=true;
 $('backupChoose').onclick=()=>$('backupIn').click();
 async function readBackupEntries(){const db=await KV.db();return new Promise((resolve,reject)=>{const tx=db.transaction('kv','readonly'),store=tx.objectStore('kv'),keys=store.getAllKeys(),values=store.getAll();tx.oncomplete=()=>resolve(keys.result.map((key,i)=>[key,values.result[i]]));tx.onerror=tx.onabort=()=>reject(tx.error)})}
 $('backupExport').onclick=async()=>{if(backupBusy)return;setBackupBusy(true);backupMessage('正在把照片和回忆收进备份…');
-  try{const entries=await mutateDraft(async()=>{if(!await saveDraft(true))throw new Error('Save failed');return readBackupEntries()});const blob=await AlbumBackup.create(entries),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`instant-album-${new Date().toISOString().slice(0,10)}.instant-album.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);backupMessage('完整备份已生成，请查看浏览器下载。以后在这里选择该文件即可恢复。')}
-  catch(e){backupMessage('备份未能完成。请确认草稿已保存、浏览器有足够空间，再重试。',true)}finally{setBackupBusy(false)}};
+  try{const entries=await mutateDraft(async()=>{if(!await saveDraft(true))throw new Error('Save failed');return readBackupEntries()});const blob=await AlbumBackup.create(entries),name=`instant-album-${new Date().toISOString().slice(0,10)}.instant-album.json`;
+    if(DESKTOP){const saved=await DESKTOP.saveFile(name,new Uint8Array(await blob.arrayBuffer()));backupMessage(saved?`完整备份已保存到 ${saved.path}。以后在这里选择该文件即可恢复。`:'这次没有保存备份。');return}
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);backupMessage('完整备份已生成，请查看浏览器下载。以后在这里选择该文件即可恢复。')}
+  catch(e){backupMessage(`备份未能完成。请确认草稿已保存、${DESKTOP?'电脑':'浏览器'}有足够空间，再重试。`,true)}finally{setBackupBusy(false)}};
 $('backupIn').onchange=async e=>{if(backupBusy)return;const file=e.target.files[0];if(!file)return;pendingBackup=null;$('backupSummary').hidden=$('backupApply').hidden=true;setBackupBusy(true);backupMessage('正在检查备份的照片和内容…');
   try{const entries=await AlbumBackup.parse(file),meta=entries.find(([key])=>key==='meta')?.[1],count=meta?.list?.length||0;pendingBackup=entries;
-    $('backupSummary').textContent=`${file.name}\n${count} 张照片 · ${meta?.cols?.length||0} 本相册 · ${meta?.pages?.length||0} 张拼页\n恢复将替换当前浏览器内的收藏，建议先下载当前收藏的完整备份。`;$('backupSummary').hidden=$('backupApply').hidden=false;backupMessage('备份检查完成。确认替换后才会写入本机收藏。')}
+    $('backupSummary').textContent=`${file.name}\n${count} 张照片 · ${meta?.cols?.length||0} 本相册 · ${meta?.pages?.length||0} 张拼页\n恢复将替换${DESKTOP?'这台电脑上':'当前浏览器内'}的收藏，建议先下载当前收藏的完整备份。`;$('backupSummary').hidden=$('backupApply').hidden=false;backupMessage('备份检查完成。确认替换后才会写入本机收藏。')}
   catch(e){backupMessage('这个文件不是可恢复的完整备份，或其中的内容已损坏。当前收藏没有改变，请重新选择。',true)}finally{e.target.value='';setBackupBusy(false)}};
 $('backupApply').onclick=async()=>{if(backupBusy||!pendingBackup)return;setBackupBusy(true);backupRestoring=true;clearTimeout(draftT);backupMessage('正在恢复收藏，请稍等…');
   try{const entries=pendingBackup;await mutateDraft(async()=>{await KV.run('readwrite',store=>{store.clear();entries.forEach(([key,value])=>store.put(value,key))});draftPending=false});
-    pendingBackup=null;pendingFiles=[];pendingSource=null;cardCache.clear();homePreviewCache.clear();await loadHomeDrafts();toast(restoreFailed?'备份已写入，请在首页重试读取收藏':'收藏已恢复，可以继续编辑了',4200)}
-  catch(e){backupMessage('恢复没有完成，原有收藏仍保留。请确认浏览器有足够空间后重试。',true)}finally{backupRestoring=false;setBackupBusy(false);if(!$('backupPanel').hidden)draftSoon()}};
+    pendingBackup=null;pendingFiles=[];pendingSource=null;cardCache.clear();homePreviewCache.clear();await LITE.run('readwrite',s=>s.clear()).catch(()=>{});await loadHomeDrafts();toast(restoreFailed?'备份已写入，请在首页重试读取收藏':'收藏已恢复，可以继续编辑了',4200)}
+  catch(e){backupMessage(`恢复没有完成，原有收藏仍保留。请确认${DESKTOP?'电脑':'浏览器'}有足够空间后重试。`,true)}finally{backupRestoring=false;setBackupBusy(false);if(!$('backupPanel').hidden)draftSoon()}};
 
 // 打开时恢复数据，再由首页选择继续整理或导入新照片。
 async function loadHomeDrafts(){restoring=true;restoreFailed=false;clearTimeout(draftT);homePreviewCache.clear();scans.length=0;cols=[];pages=[];ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;renderHome();
   let r=null;try{r=await restoreDrafts()}catch(e){restoreFailed=true}restoring=false;clearTimeout(draftT);
-  if(r){curScan=r.cur;ed=scans[curScan];lastRealId=ed.id;history=ed.hist}
+  if(r){curScan=r.cur;ed=scans[curScan];lastRealId=ed.id;history=ed.hist;
+    const miss=scans.filter(s=>s._lite);liteSave(miss.map(s=>[s,s._lite]),scans.filter(s=>!s.demo).map(s=>s.id));miss.forEach(s=>delete s._lite)}
   draftSavedKey=restoreFailed?'':draftKey();draftState=restoreFailed?'error':scans.some(s=>!s.demo)||cols.length?'saved':'empty';syncDraftStatus();showHome();
   if(restoreFailed)toast('本机收藏暂时读取失败，旧数据仍保留，请重试读取',5200)}
 $('homeRestoreRetry').onclick=loadHomeDrafts;loadHomeDrafts();
