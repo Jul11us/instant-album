@@ -12,7 +12,7 @@ with sync_playwright() as playwright:
     page = browser.new_page(viewport={"width": 1440, "height": 900})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    source = Path(os.environ.get("ALBUM_TEST_HTML", ROOT / "贴进相册.html"))
+    source = Path(os.environ.get("ALBUM_TEST_HTML", ROOT / "相角.html"))
     page.goto(source.resolve().as_uri())
     page.wait_for_function("() => !restoring")
     page.locator("#homeDemo").click()

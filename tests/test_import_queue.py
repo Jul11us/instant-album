@@ -5,7 +5,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGE = Path(os.environ.get('INSTANT_ALBUM_TEST_PAGE', ROOT / '贴进相册.html'))
+PAGE = Path(os.environ.get('INSTANT_ALBUM_TEST_PAGE', ROOT / '相角.html'))
 with sync_playwright() as p:
     options = {'headless': True}
     if os.environ.get('PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH'):

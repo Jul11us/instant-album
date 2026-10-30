@@ -17,7 +17,7 @@ with sync_playwright() as playwright:
     page = browser.new_page(viewport={"width": 1440, "height": 900})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    page.goto((ROOT / "贴进相册.html").as_uri())
+    page.goto((ROOT / "相角.html").as_uri())
     page.wait_for_function("() => !restoring")
     page.locator("#homeDemo").click()
     page.wait_for_selector("#save", state="visible", timeout=30000)

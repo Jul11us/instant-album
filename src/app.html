@@ -1,77 +1,147 @@
-<title>贴进相册</title>
+<title>相角</title>
+<meta name="description" content="把拍立得收进电子相册，留下正反面、日期和照片里的故事。">
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Long+Cang&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Liu+Jian+Mao+Cao&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@600&family=Noto+Sans+SC:wght@500&family=Caveat:wght@600&family=Special+Elite&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23F6F3EC'/%3E%3Cpath d='M8 18V8h10M22 8h10v10M32 22v10H22M18 32H8V22' fill='none' stroke='%232E2C27' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Long+Cang&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Liu+Jian+Mao+Cao&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Caveat:wght@600&family=Special+Elite&display=swap">
 <style>
-/* 暗房：炭灰底，让白色的拍立得成为画面里最亮的东西；只有一个暖琥珀色当强调（像暗房安全灯）。不歪、不贴硬阴影，界面字用干净的无衬线。 */
+/* 剪贴簿：旧相册的米色衬纸当底，墨色写字和按钮，不另设彩色强调；照片靠三角相角固定，铅笔灰写型号和日期。 */
 :root{
-  --bg:#1A1918;--surface:#232220;--surface2:#2D2B28;--line:#393632;--text:#F1EDE6;--muted:#A29C92;--faint:#6E6961;
-  --accent:#F2B544;--accent-ink:#1A1918;--danger:#FF7A6B;
+  --bg:#F2EFE8;--surface:#FAF8F3;--surface2:#EAE6DD;--line:#DBD6CB;--edge:#CBC4B6;--text:#2E2C27;--muted:#655F55;--faint:#979084;
+  --accent:#2E2C27;--accent-ink:#FAF8F3;--danger:#A8402C;
   /* 旧名字留着给零星的内联样式用 */
-  --paper:#F1EDE6;--blue:#F2B544;--deep:#1A1918;--tape:#F2B544;--ink:#1A1918;--soft:#A29C92;--pink:#FF8FB1;
-  --ui:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --paper:#FDFBF6;--blue:#2E2C27;--deep:#2E2C27;--tape:#2E2C27;--ink:#2E2C27;--soft:#655F55;--pink:#C0566E;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --serif:"Noto Serif SC","Songti SC",SimSun,serif;
+  --ui:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
   --round:"Zen Maru Gothic","PingFang SC","Noto Sans SC",system-ui,sans-serif;
   --hand:"Long Cang","Kaiti SC","STKaiti",cursive;
-  color-scheme:dark;
+  color-scheme:light;
 }
 html,body{height:100%}
 [hidden]{display:none!important}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ui);font-size:14px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg) var(--grain);color:var(--text);font-family:var(--ui);font-size:14px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.app{max-width:440px;height:100%;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button:disabled{cursor:default}
+::selection{background:#DCD5C6;color:var(--text)}
+.app{max-width:440px;height:100%;margin:0 auto;background:transparent;display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media(min-width:700px){.app{max-width:none}}
 .view{flex:1;display:flex;flex-direction:column;min-height:0}
 .pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* 通用按钮 */
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));font-size:13px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:58px;padding:14px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));font-size:13px;border-bottom:1px solid var(--line)}
 .grp{display:flex;gap:6px}
-.chip{background:var(--surface2);border-radius:8px;padding:7px 12px;font-weight:600;font-size:13px;white-space:nowrap;color:var(--text);transition:background .15s,color .15s}
-.chip:hover{background:#38352F}
+.chip{background:var(--surface2);border-radius:6px;padding:8px 12px;font-weight:500;font-size:13px;line-height:1.4;white-space:nowrap;color:var(--text);transition:background .18s,color .18s,box-shadow .18s}
+.chip:hover{background:#DED9CF}
 .chip.on{background:var(--accent);color:var(--accent-ink)}
+.chip.on:hover{background:#48443B}
+.chip:active:not(:disabled){box-shadow:inset 0 2px 4px #2E2C271C}
+/* 按钮三级：深色实心 = 这一步的主操作；描边 line = 次要操作；纯文字 ghost = 去别的页面。灰底小块只用来做选项，选中变深。 */
+.chip.line:not(.on){background:transparent;box-shadow:inset 0 0 0 1px var(--edge)}
+.chip.line:not(.on):not(:disabled):hover{background:var(--surface2)}
+.chip.ghost{background:transparent;padding-left:8px;padding-right:8px}
+.chip.ghost:hover{background:var(--surface2)}
 .chip:disabled{background:transparent;color:var(--faint);box-shadow:inset 0 0 0 1px var(--line);cursor:default}
-.home{overflow:auto;padding:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 28px;min-height:0}
-.home-wrap{width:100%;max-width:1060px;margin:auto}
-.home-brand{display:flex;justify-content:space-between;align-items:center;padding-bottom:24px;border-bottom:1px solid var(--line)}
-.home-brand b{font-size:18px;letter-spacing:.08em}.home-brand span{font-size:11px;color:var(--muted)}
-.home-hero{display:grid;gap:28px;padding:36px 0 28px;align-items:center}
-.home-kicker{font-size:10px;letter-spacing:.18em;color:var(--accent);font-weight:600}
-.home h1{font-size:clamp(36px,4.5vw,64px);font-weight:600;line-height:1.28;letter-spacing:-.04em;white-space:pre-line;margin:14px 0}
-.home-copy>p{font-size:13px;color:var(--muted);line-height:1.9;margin:0;max-width:32em}
-.home-print{display:none;background:#F1EDE6;padding:16px 16px 32px;width:240px;justify-self:center;transform:rotate(4deg);box-shadow:0 20px 70px #08080766}
-.home-print img{display:block;width:100%;height:255px;object-fit:cover}.home-print figcaption{font-family:var(--hand);font-size:20px;color:#365493;text-align:center;margin-top:14px}
+.home{overflow:hidden auto;padding:max(24px,env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 24px;min-height:0}
+.home-wrap{width:100%;max-width:1120px;margin:0 auto}
+.home-brand{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.home-wordmark{display:inline-flex;align-items:center;gap:12px;flex:none}
+.home-mark{display:block;position:relative;width:24px;height:28px;background:linear-gradient(var(--text),var(--text)) 0 0/8px 2px no-repeat,linear-gradient(var(--text),var(--text)) 0 0/2px 8px no-repeat,linear-gradient(var(--text),var(--text)) 100% 0/8px 2px no-repeat,linear-gradient(var(--text),var(--text)) 100% 0/2px 8px no-repeat,linear-gradient(var(--text),var(--text)) 0 100%/8px 2px no-repeat,linear-gradient(var(--text),var(--text)) 0 100%/2px 8px no-repeat,linear-gradient(var(--text),var(--text)) 100% 100%/8px 2px no-repeat,linear-gradient(var(--text),var(--text)) 100% 100%/2px 8px no-repeat}
+.home-brand b{font-family:var(--serif);font-size:24px;font-weight:600;letter-spacing:.12em}
+.home-brand>.home-wordmark{color:var(--text)}
+.home-hero{display:grid;gap:28px;padding:34px 0 32px;align-items:center}
+.home-copy{display:block;min-width:0}
+.home h1{font-family:var(--serif);font-size:32px;font-weight:500;line-height:1.45;letter-spacing:-.045em;white-space:pre-line;text-wrap:balance;margin:0 0 18px}
+.home-copy>p{font-size:13px;color:var(--muted);line-height:1.95;margin:0;max-width:29em;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.home-visual{position:relative;height:292px;width:100%;max-width:500px;justify-self:center}
+/* 示例是真实翻拍的相纸，自带纸边；阴影只要纸贴在衬纸上的那一点。最上面那张用老相册的三角相角固定；轮换时相角先松开，等新的一张到位再贴上。照片下面不再写说明，来源写在页脚 */
+.home-print{display:block;position:absolute;margin:0;width:178px;top:12px;left:calc(50% - 89px);transform:rotate(1.5deg);box-shadow:0 1px 2px #3C2D1E24,0 12px 22px -10px #3C2D1E45;z-index:2}
+.home-print img{display:block;width:100%;height:auto}
+.home-print:after{content:'';position:absolute;inset:-4px;pointer-events:none;--c:#35322C;--s:15px;background:linear-gradient(135deg,var(--c) 50%,#0000 50%) 0 0/var(--s) var(--s) no-repeat,linear-gradient(225deg,var(--c) 50%,#0000 50%) 100% 0/var(--s) var(--s) no-repeat,linear-gradient(45deg,var(--c) 50%,#0000 50%) 0 100%/var(--s) var(--s) no-repeat,linear-gradient(315deg,var(--c) 50%,#0000 50%) 100% 100%/var(--s) var(--s) no-repeat;opacity:0;transition:opacity .15s}
+.home-print:not(.rear):after{opacity:1;transition:opacity .25s .38s}
+.home-print.rear{width:138px;top:38px;z-index:1}
+.home-print.left{left:calc(50% - 150px);transform:rotate(-8deg)}.home-print.right{left:calc(50% + 28px);top:64px;transform:rotate(7deg)}
+.home-visual .home-print.personal img{max-height:280px;object-fit:contain}
+.home-visual.personal{height:292px}.home-visual.personal .home-print img{max-height:240px}
+/* 照片轮换、悬停摊开、微倾斜和淡入：视觉参考 React Bits，使用本页自己的 CSS / Web Animations 实现。 */
+#homeStack{cursor:pointer;touch-action:pan-y;user-select:none;outline-offset:5px;--card-rx:0deg;--card-ry:0deg}
+#homeStack[aria-disabled="true"]{cursor:default}
+#homeStack:focus-visible{outline:2px solid var(--accent);border-radius:6px}
+#homeStack .home-print{transition:transform .55s cubic-bezier(.22,.8,.28,1),box-shadow .4s,left .6s cubic-bezier(.5,0,.2,1),top .6s cubic-bezier(.5,0,.2,1),width .6s cubic-bezier(.5,0,.2,1)}
+#homeStack .home-print.incoming{transition-delay:.09s}
+#homeStack .home-print:not(.rear){transform:perspective(900px) rotateX(var(--card-rx)) rotateY(var(--card-ry)) rotate(var(--paper-angle,1.5deg)) translateY(var(--paper-lift,0px)) scale(var(--paper-scale,1));transform-origin:50% 65%}
+@media(hover:hover) and (pointer:fine){
+  #homeStack:hover .home-print:not(.rear){--paper-angle:0deg;--paper-lift:-4px;--paper-scale:1.02;box-shadow:0 2px 3px #3C2D1E40,0 14px 24px -10px #3C2D1E66}
+  #homeStack:hover .home-print.left{transform:translate(-16px,-2px) rotate(-10deg)}
+  #homeStack:hover .home-print.right{transform:translate(16px,-2px) rotate(9deg)}
+}
+.home-gallery button{transition:transform .22s ease}
+@media(hover:hover) and (pointer:fine){.home-gallery button:hover,.home-gallery button:focus-visible{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){#homeStack .home-print{transition:none!important}#homeStack .home-print:after{transition:none!important}#homeStack:hover .home-print.left{transform:rotate(-8deg)}#homeStack:hover .home-print.right{transform:rotate(7deg)}#homeStack .home-print:not(.rear){transform:rotate(1.5deg)!important}.home-gallery button:hover,.home-gallery button:focus-visible{transform:none!important}}
 .home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
-.home-actions .chip{padding:13px 18px;font-size:14px}
-.home-text{display:inline-block;margin-top:18px;font-size:12px;color:var(--muted);padding:4px 0;text-decoration:underline;text-underline-offset:4px}
-.home-shelf{border-top:1px solid var(--line);padding-top:20px;display:grid;gap:12px}
-.home-shelf-head{display:flex;justify-content:space-between;align-items:center}.home-shelf-head h2{font-size:14px;margin:0}.home-shelf-head span{font-size:12px;color:var(--muted)}
-.home-resume{display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface);border-radius:12px;width:100%;text-align:left}
-.home-resume canvas{width:50px;height:66px;object-fit:cover;border:4px solid var(--paper);border-bottom-width:10px;flex:none}
-.home-resume div{flex:1;min-width:0}.home-resume b{display:block;font-size:14px}.home-resume small{display:block;color:var(--muted);font-size:12px;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.home-resume>span{font-size:20px;color:var(--accent)}
-.home-empty{margin:0;color:var(--muted);font-size:13px;line-height:1.8;padding:12px 0}
-.home-foot{display:flex;gap:8px;align-items:center;margin-top:24px;font-size:11px;color:var(--muted);line-height:1.6}
-.home-foot:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+.home-actions .chip{min-height:44px;padding:11px 20px;font-size:14px;border-radius:5px;background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px #BDB6A8}.home-actions .chip.on{background:var(--text);color:var(--surface);box-shadow:none}
+.home-actions .chip:hover{background:var(--surface2)}.home-actions .chip.on:hover{background:#48443B}
+.home-text{display:inline-block;margin-top:16px;font-size:12px;color:var(--muted);padding:4px 0;text-decoration:underline;text-decoration-color:#BDB6A8;text-underline-offset:5px;transition:color .18s}
+.home-text:hover{color:var(--text);text-decoration-color:currentColor}
+.home-shelf{border-top:1px solid var(--line);padding-top:24px;display:grid;gap:14px}
+.home-shelf-head{display:flex;justify-content:space-between;align-items:center;gap:16px}.home-shelf-head h2{font-family:var(--serif);font-size:20px;font-weight:500;margin:0}.home-shelf-head span{font-size:12px;color:var(--muted)}
+.home-shelf-head .chip{padding:8px 0 8px 12px;background:transparent;font-size:12px}
+.home-empty{margin:0;color:var(--muted);font-size:13px;line-height:1.8;padding:0}
+/* 还没有照片：一页空着的相册，按四种相纸的真实比例留出位置，只有相角；说明写在这一页的下面，和空位是一组 */
+.home-wall{margin:0;min-width:0;display:grid;justify-items:center;gap:20px;padding:30px 16px 24px;background:#FAF8F38C;box-shadow:inset 0 0 0 1px var(--line);border-radius:3px}.home-slots{display:flex;gap:12px;align-items:flex-end;justify-content:center}
+.slot-wrap{text-align:center;flex:none}.slot-wrap small{display:block;font-size:11px;color:var(--muted);margin-top:10px}
+.slot{display:block;position:relative;width:calc(var(--w)*.76px);height:calc(var(--h)*.76px);border:1px solid var(--line);background:#FAF8F36B}
+.slot:after{content:'';position:absolute;inset:-3px;--c:#9B9385;--s:7px;background:linear-gradient(135deg,var(--c) 50%,#0000 50%) 0 0/var(--s) var(--s) no-repeat,linear-gradient(225deg,var(--c) 50%,#0000 50%) 100% 0/var(--s) var(--s) no-repeat,linear-gradient(45deg,var(--c) 50%,#0000 50%) 0 100%/var(--s) var(--s) no-repeat,linear-gradient(315deg,var(--c) 50%,#0000 50%) 100% 100%/var(--s) var(--s) no-repeat}
+.home-wall figcaption{font-size:12px;color:var(--muted);line-height:1.8;text-align:center;max-width:26em;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.home-gallery{display:grid;grid-auto-flow:column;grid-auto-columns:132px;overflow-x:auto;gap:12px;padding:4px 3px 16px;min-width:0;scroll-snap-type:x proximity}
+.home-gallery button{scroll-snap-align:start;min-width:0;text-align:left;padding:0}
+.home-gallery .home-thumb{width:100%;height:166px;display:block;object-fit:contain;filter:drop-shadow(0 3px 5px #3C2D1E44)}
+.home-gallery b{display:block;font-size:12px;font-weight:500;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-gallery small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.home-foot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.8}
+.home-credit{flex-basis:100%;font-size:11px;color:var(--muted)}
+.home-foot button{margin-left:auto;font-size:12px;white-space:nowrap;color:var(--text);text-decoration:underline;text-decoration-color:#BDB6A8;text-underline-offset:5px;padding:4px 0}
+.backup-body{font-size:13px;line-height:1.8;max-width:620px}
+.backup-intro{color:var(--muted);font-size:15px;line-height:1.9;margin:20px 0 28px}
+.backup-section{padding:22px 0;border-top:1px solid var(--line)}
+.backup-section h2{font-size:17px;font-weight:600;margin:0 0 8px}.backup-section p{color:var(--muted);margin:0 0 16px}.backup-section .chip{padding:11px 16px}
+#backupSummary{margin:16px 0;padding:14px;background:var(--surface2);border-radius:10px;color:var(--text);white-space:pre-line;overflow-wrap:anywhere}
+#backupMessage{color:var(--muted);font-size:12px;overflow-wrap:anywhere}#backupMessage[data-error="true"]{color:var(--danger)}
 .scan-top{flex-wrap:wrap}.scan-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.scan-choice{padding-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-.draft-status{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center;min-height:24px;padding-top:5px}
+/* 扫描侧栏只留一行状态：现在该做什么；相纸和「整张原图」并排成一行选择 */
+.scan-status{margin:0 0 12px;font-size:13px;line-height:1.7;color:var(--text);text-wrap:pretty}
+.scan-choice{display:flex;gap:8px;align-items:stretch}
+.scan-choice .format-toggle{flex:1;min-width:0}.scan-choice .chip{flex:none;padding-left:14px;padding-right:14px}
+.draft-status{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;min-height:24px;padding-top:5px}
 .draft-status[data-state="error"]{color:var(--danger)}
-.draft-status button{font-size:11px;text-decoration:underline;text-underline-offset:3px;padding:2px}
-@media(min-width:700px){.home{padding:40px}.home-hero{grid-template-columns:1.2fr 1fr;min-height:430px;padding:54px 0}.home-print{display:block}.home-shelf{max-width:620px}}
-.big{margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));height:50px;border-radius:12px;font-weight:700;font-size:16px;letter-spacing:.02em}
+.draft-status button{font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:2px}
+@media(min-width:700px){.home{padding:34px 56px 26px}.home-brand{padding-bottom:24px}.home-hero{grid-template-columns:1.1fr 1fr;min-height:480px;padding:48px 0 42px;gap:48px}.home h1{font-size:clamp(36px,3.8vw,52px);line-height:1.4;margin-bottom:24px}.home-copy>p{font-size:14px;max-width:28em}.home-actions{margin-top:30px}.home-actions .chip{min-height:48px;padding:13px 24px}.home-visual,.home-visual.personal{height:390px}.home-visual.personal .home-print img{max-height:310px}.home-print{width:248px;left:calc(50% - 124px);top:20px}.home-print.rear{width:198px;top:48px}.home-print.left{left:calc(50% - 214px)}.home-print.right{left:calc(50% + 38px);top:94px}.home-shelf{padding-top:26px}.home-gallery{grid-auto-columns:154px;gap:24px}.home-gallery .home-thumb{height:196px}.home-wall{gap:28px;padding:48px 24px 40px}.home-wall figcaption{max-width:none}.home-slots{gap:48px}.slot{width:calc(var(--w)*1.3px);height:calc(var(--h)*1.3px)}.slot:after{--s:10px}}
+@media(min-width:700px) and (max-width:1050px){.home{padding-left:32px;padding-right:32px}.home-hero{gap:18px}.home-print{width:204px;left:calc(50% - 102px)}.home-print.rear{width:140px}.home-print.left{left:calc(50% - 142px)}.home-print.right{left:calc(50% + 22px)}}
+@media(max-width:360px){.home{padding-left:20px;padding-right:20px}.home h1{font-size:29px}.home-hero{gap:22px;padding-top:30px}.home-visual,.home-visual.personal{height:266px}.home-print{width:158px;left:calc(50% - 79px);top:12px}.home-print.rear{width:118px;top:34px}.home-print.left{left:calc(50% - 126px)}.home-print.right{left:calc(50% + 24px);top:58px}.slot{width:calc(var(--w)*.64px);height:calc(var(--h)*.64px)}.home-wall{padding:22px 0 18px}.home-slots{gap:8px}.home-foot{gap:8px}.home-foot button{margin-left:0}}
+.big{margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));min-height:48px;height:48px;border-radius:7px;font-weight:600;font-size:14px;letter-spacing:.02em}
 .big.yellow{background:var(--accent);color:var(--accent-ink)}
 .big.yellow:hover{filter:brightness(1.06)}
 
 /* 扫描 */
-.desk{flex:1;min-height:0;margin:12px max(12px,env(safe-area-inset-left,0px)) 0;border-radius:14px;background:#121110;position:relative;overflow:hidden;touch-action:none;box-shadow:inset 0 0 0 1px var(--line)}
+.desk{flex:1;min-height:0;margin:12px max(12px,env(safe-area-inset-left,0px)) 0;border-radius:8px;background:#E5E0D6;position:relative;overflow:hidden;touch-action:none;box-shadow:inset 0 0 0 1px #D4CEC1}
 .desk canvas{position:absolute;left:0;top:0}
 .desk svg{position:absolute;inset:0;width:100%;height:100%}
-.handle{fill:var(--text);stroke:var(--accent);stroke-width:3;cursor:grab}
-.bubble,.bubble2{position:absolute;max-width:72%;background:rgba(26,25,24,.88);color:var(--text);font-weight:600;font-size:12px;border-radius:8px;padding:6px 10px;pointer-events:none;backdrop-filter:blur(6px);line-height:1.5}
-.bubble{right:10px;top:10px}.bubble2{left:10px;bottom:10px;color:var(--accent)}
+.handle{fill:var(--paper);stroke:var(--text);stroke-width:2.5;cursor:grab;filter:drop-shadow(0 1px 2px #2E2C2733)}
+.bubble{position:absolute;right:10px;top:10px;max-width:72%;background:rgba(43,38,32,.88);color:#F4EFE5;font-weight:500;font-size:11px;border-radius:6px;padding:6px 10px;pointer-events:none;backdrop-filter:blur(6px);line-height:1.5}
 .formats{display:flex;gap:6px;padding-top:12px;flex-wrap:wrap}
 .formats .chip{font-size:12px;padding:6px 10px}
+.scan-format{padding-top:12px}
+.scan-format .formats{padding:8px 0 0}
+.format-toggle{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-size:12px;padding:12px;border:1px solid var(--line);border-radius:7px;background:transparent;transition:background .18s}
+.format-toggle:hover{background:var(--surface2)}
+.tool-heading{display:none}
+.format-toggle>span:first-child{color:var(--muted);flex:none}.format-toggle b{font-size:12px;font-weight:500;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.format-toggle>span:last-child{color:var(--accent);font-size:12px;flex:none}
+.scan-more{padding-top:8px;font-size:12px;color:var(--muted)}
+.scan-more summary{cursor:pointer;width:max-content;padding:6px 0}
+.scan-more .camrow{padding:5px 0 8px}
 .glaretip{font-size:12px;color:var(--muted);line-height:1.7;padding-top:10px;margin:0}
 .glaretip b{color:var(--accent);margin-right:6px;font-weight:700}
 #scanView{overflow-y:auto}
@@ -89,24 +159,23 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
 #scanCheckBody span{display:block;color:var(--muted)}
 #scanIgnore{margin-top:8px;font-size:12px}
 #scanMarks{pointer-events:none}
-#scanMarks circle{fill:#1A1918;stroke:var(--accent);stroke-width:2}
+#scanMarks circle{fill:#2B2620;stroke:#F4EFE5;stroke-width:2}
 #scanMarks text{fill:var(--accent);font:bold 12px system-ui;text-anchor:middle;dominant-baseline:central}
-@media(max-width:899px){#scanView>.big{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px var(--bg),0 -10px 20px var(--bg)}}
+@media(max-width:899px){#scanView>.big{position:sticky;bottom:12px;z-index:3;box-shadow:0 0 0 8px var(--bg),0 -10px 20px var(--bg)}#scanView>.desk{min-height:250px}#scanView .bubble{display:none}#scanView .tray{min-height:64px}}
 .tray{display:flex;gap:8px;padding-top:12px;align-items:center;min-height:72px;overflow-x:auto;scrollbar-width:none}
 .tray::-webkit-scrollbar{display:none}
-.tray .t{flex:0 0 auto;border-radius:6px;overflow:hidden;cursor:pointer;line-height:0;box-shadow:0 0 0 1px var(--line);transition:box-shadow .15s}
-.tray .t canvas{width:44px;height:56px;object-fit:cover;display:block}
-.tray .t.cur{box-shadow:0 0 0 2px var(--accent)}
+.tray .t{flex:0 0 auto;cursor:pointer;line-height:0;margin:3px}
+.tray .t canvas{width:44px;height:56px;object-fit:cover;display:block;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
 .tray .add{flex:0 0 44px;height:56px;border:1.5px dashed var(--faint);border-radius:6px;display:grid;place-items:center;font-size:20px;color:var(--muted)}
-.tray small{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap;align-self:center}
+.tray small{margin-left:6px;font-size:12px;color:var(--muted);white-space:nowrap;align-self:center}
 .camrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:12px;font-size:13px;color:var(--muted)}
 .camrow .chip{background:var(--surface2);color:var(--text)}
 .camrow #td3d{background:transparent!important;color:var(--muted)!important;box-shadow:inset 0 0 0 1px var(--line)}
 
 /* 调色：卡片 */
-.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:14px 0 4px;background:radial-gradient(ellipse at 50% 45%,#2A2826 0%,var(--bg) 70%)}
-.amb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1.8s ease}.amb.on{opacity:.9}
-.card{position:relative;line-height:0;box-shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -12px rgba(0,0,0,.65)}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:14px 0 4px;background:radial-gradient(ellipse at 50% 40%,#FDFBF6 0%,transparent 75%)}
+.amb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1.8s ease}.amb.on{opacity:.24}
+.card{position:relative;line-height:0;box-shadow:0 0 0 1px #5B4B3210,0 2px 3px #3C2D1E12,0 18px 36px -14px #3C2D1E45}
 .card canvas{display:block;width:100%;height:100%}
 /* 翻面：卡片绕竖轴转到侧面，换成另一面再转回来 */
 .card{transition:transform .17s ease-in}.card.turn{transform:perspective(900px) rotateY(90deg)}
@@ -116,14 +185,14 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
 .cap.round{font-family:var(--round);font-weight:900}
 .sticker{position:absolute;border-radius:50%;background:var(--pink);color:#10153A;font-weight:900;display:grid;place-items:center;text-align:center;line-height:1.05;touch-action:none;cursor:grab;transform:translate(-50%,-50%) rotate(12deg);box-shadow:0 2px 6px rgba(0,0,0,.25);font-family:var(--round)}
 .card.brush canvas{cursor:crosshair;touch-action:none}
-.peek{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(26,25,24,.9);color:var(--text);font-size:12px;font-weight:600;border-radius:8px;padding:5px 10px;pointer-events:none}
-.note{position:absolute;left:max(14px,env(safe-area-inset-left,0px));top:10px;z-index:3;max-width:62%;background:rgba(45,43,40,.92);color:var(--text);font-weight:600;font-size:12px;line-height:1.45;border-radius:10px;padding:7px 11px 7px 26px;text-align:left;backdrop-filter:blur(6px)}
-.note::before{content:"";position:absolute;left:11px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--accent)}
-.note:hover{background:rgba(56,53,47,.95)}
-.gbar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;background:rgba(26,25,24,.94);border-radius:12px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(0,0,0,.4),inset 0 0 0 1px var(--line);white-space:nowrap}
-.gbar b{font-size:12px;font-weight:700;color:var(--accent)}
+.peek{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(43,38,32,.9);color:#F4EFE5;font-size:12px;font-weight:600;border-radius:8px;padding:5px 10px;pointer-events:none}
+.note{position:absolute;left:max(18px,env(safe-area-inset-left,0px));top:14px;z-index:3;max-width:70%;background:transparent;color:var(--muted);font-weight:400;font-size:12px;line-height:1.5;padding:5px 0;text-align:left}
+.note:hover,.note-side:hover{color:var(--text);text-decoration:underline;text-underline-offset:4px}
+.note-side{display:block;margin-top:2px;padding:2px 0;font-size:12px;line-height:1.6;color:var(--muted);text-align:left}
+.gbar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;background:rgba(43,38,32,.94);color:#F4EFE5;border-radius:12px;padding:6px 6px 6px 12px;box-shadow:0 8px 24px rgba(60,45,30,.3);white-space:nowrap}
+.gbar b{font-size:12px;font-weight:700;color:#F4EFE5}
 .gbar .chip{padding:5px 10px;font-size:12px}
-.gbar .gx{width:24px;height:24px;border-radius:6px;color:var(--muted);font-size:16px;line-height:1}
+.gbar .gx{width:24px;height:24px;border-radius:6px;color:#CFC5B3;font-size:16px;line-height:1}
 
 /* 调色：控件 */
 .side{display:contents}
@@ -132,27 +201,33 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline
   #editView>.top{flex:0 0 auto;position:relative;z-index:5;flex-wrap:wrap}
   #editView>.stage{min-height:100px;overflow:hidden}
   #editView>.side{display:flex;flex-direction:column;flex:0 1 auto;min-height:0;max-height:55%;overflow-y:auto}
-  #editView>.side>.pad:first-child{position:sticky;top:0;z-index:2;background:var(--bg);flex:0 0 auto}
-  #editView>.side>.savebar{position:sticky;bottom:0;z-index:2;flex:0 0 auto;background:var(--bg);padding-top:10px;border-top:1px solid var(--line);box-shadow:0 -6px 0 var(--bg)}
+  #editView>.top .chip{font-size:12px;padding:7px 10px}
+  #editView>.side{background:var(--surface);border-top:1px solid var(--line)}
+  #editView>.side>.pad:first-child{position:sticky;top:0;z-index:2;background:var(--surface);flex:0 0 auto}
+  #editView>.side>.savebar{position:sticky;bottom:0;z-index:2;flex:0 0 auto;background:var(--surface);padding-top:10px;border-top:1px solid var(--line);box-shadow:0 -6px 0 var(--surface)}
 }
 .tabs{display:flex;gap:2px;margin-top:10px;border-bottom:1px solid var(--line)}
-.tabs button{flex:1;padding:10px 0 9px;font-weight:600;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
+.tabs button{flex:1;padding:12px 0 11px;font-weight:400;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .18s}
 .tabs button:hover{color:var(--text)}
-.tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+.tabs button.on{color:var(--text);border-bottom-color:var(--accent);font-weight:500}
 .tp:not(.on){display:none!important}
 .fl{display:flex;gap:10px;overflow-x:auto;padding:14px max(16px,env(safe-area-inset-right,0px)) 4px max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
 .fl::-webkit-scrollbar{display:none}
+/* 选中：和首页那张照片一样用四个三角相角贴住，不再套描边圈 */
+.fl button,.fr .sw i,.lib .ac,.tray .t,.album .picks button,.lc .flip{position:relative}
+.fl button.on:after,.fr .sw.on i:after,.lib .ac.on:after,.tray .t.cur:after,.album .picks button.on:after,.lc.sel .flip:after{content:'';position:absolute;inset:-3px;pointer-events:none;--c:var(--text);--s:10px;background:linear-gradient(135deg,var(--c) 50%,#0000 50%) 0 0/var(--s) var(--s) no-repeat,linear-gradient(225deg,var(--c) 50%,#0000 50%) 100% 0/var(--s) var(--s) no-repeat,linear-gradient(45deg,var(--c) 50%,#0000 50%) 0 100%/var(--s) var(--s) no-repeat,linear-gradient(315deg,var(--c) 50%,#0000 50%) 100% 100%/var(--s) var(--s) no-repeat}
+.fl button.on:after{inset:-3px -3px auto;aspect-ratio:1}.lib .ac.on:after{inset:-3px auto auto -3px;width:82px;height:82px}.lc.sel .flip:after{inset:-4px;--s:16px}
 .fl button{flex:0 0 58px;text-align:center;font-weight:500;font-size:12px;line-height:1.4;color:var(--muted)}
-.fl canvas{width:58px;height:58px;display:block;border-radius:8px;margin-bottom:5px;object-fit:cover;background:var(--surface2);box-shadow:0 0 0 1px var(--line);transition:box-shadow .15s}
+.fl canvas{width:58px;height:58px;display:block;border-radius:5px;margin-bottom:7px;object-fit:cover;background:var(--surface2);box-shadow:0 0 0 1px var(--line);transition:box-shadow .18s}
 .fl button:hover canvas{box-shadow:0 0 0 1px var(--faint)}
-.fl button.on{color:var(--text);font-weight:600}.fl button.on canvas{box-shadow:0 0 0 2px var(--accent)}
+.fl button.on{color:var(--text);font-weight:600}
 .sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;padding-top:12px}
 .sliders.tp{padding-top:16px;row-gap:16px}
 .sl{display:grid;grid-template-columns:32px 1fr 26px;align-items:center;font-weight:500;font-size:12px;color:var(--muted)}
 .sl output{font-size:12px;color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;background:transparent;height:24px;margin:0;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:99px;background:var(--line)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--text);margin-top:-6.5px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--text);margin-top:-6.5px;box-shadow:0 1px 3px #2E2C2729}
 input[type=range]::-moz-range-track{height:3px;border-radius:99px;background:var(--line)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--text)}
 .slx{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:6px;border-top:1px solid var(--line);margin-top:4px;padding-top:14px}
@@ -165,10 +240,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .frames .push{margin-left:auto}
 .fr{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:thin;align-items:flex-start}
 .fr .sw{flex:0 0 54px;font-weight:500;font-size:11px;line-height:1.3;text-align:center;color:var(--muted);white-space:nowrap}
-.fr .sw canvas{width:40px;display:block;margin:0 auto 4px;border-radius:2px;box-shadow:0 0 0 1px var(--line);transition:box-shadow .15s}
+.fr .sw i{display:block;width:40px;margin:3px auto 6px;line-height:0}
+.fr .sw canvas{width:100%;display:block;border-radius:2px;box-shadow:0 0 0 1px var(--line);transition:box-shadow .15s}
 .fr .sw:hover canvas{box-shadow:0 0 0 1px var(--faint)}
-.fr .sw.on{color:var(--text);font-weight:600}.fr .sw.on canvas{box-shadow:0 0 0 2px var(--accent)}
-.fr .grp{flex:0 0 auto;writing-mode:vertical-rl;font-size:11px;font-weight:600;color:var(--faint);padding:2px 0 2px 6px;border-left:1px solid var(--line);letter-spacing:.05em}
+.fr .sw.on{color:var(--text);font-weight:600}
+.fr .grp{flex:0 0 auto;writing-mode:vertical-rl;font-size:11px;font-weight:600;color:var(--muted);padding:2px 0 2px 6px;border-left:1px solid var(--line);letter-spacing:.05em}
 @media (min-width:900px){.fr{flex-wrap:wrap;overflow:visible;row-gap:12px;column-gap:6px}.fr .grp{writing-mode:horizontal-tb;flex-basis:100%;border:0;padding:8px 0 0;color:var(--muted)}}
 .fontrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:14px;font-size:12px}
 .fontrow b{font-weight:600;font-size:12px;color:var(--muted);flex:0 0 auto;margin-right:2px}
@@ -178,18 +254,20 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .daterow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:14px;font-size:12px}
 .daterow b{font-weight:600;font-size:12px;color:var(--muted);margin-right:2px}
 .daterow .chip{padding:6px 10px;font-size:12px}
-.daterow input[type=date]{background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:6px 10px;font:500 12px var(--ui);color-scheme:dark}
+.daterow input[type=date]{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:400 12px var(--ui);color-scheme:light}
 .daterow .sep{width:1px;height:16px;background:var(--line)}
 .savebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
 .savebar .draft-status{flex-basis:100%;padding:0;min-height:18px}
 .savebar .big{margin:0;flex:1;background:var(--accent);color:var(--accent-ink)}
 .savebar .big:hover{filter:brightness(1.06)}
-.savebar .sm{flex:0 0 auto;height:50px;padding:0 16px;border-radius:12px;background:var(--surface2);color:var(--text);font-weight:600;font-size:13px}
+.savebar .sm{flex:0 0 auto;height:48px;padding:0 14px;border-radius:7px;background:transparent;box-shadow:inset 0 0 0 1px var(--edge);color:var(--text);font-weight:500;font-size:12px;transition:background .18s}
+.savebar .sm:hover{background:var(--surface2)}
+.draft-status[data-state="saved"]::before{content:'';width:5px;height:5px;border-radius:50%;background:#78836D;flex:none}
 
 /* 浮层 */
-.toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 56px);transform:translateX(-50%);background:rgba(17,16,15,.95);color:var(--text);font-weight:500;font-size:13px;border-radius:10px;padding:10px 14px;max-width:86%;text-align:center;z-index:35;line-height:1.55;box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 0 0 1px var(--line)}
-.sheet{position:absolute;inset:0;background:rgba(10,10,9,.94);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
-.sheet img{max-width:100%;max-height:70%;box-shadow:0 20px 50px rgba(0,0,0,.6);-webkit-touch-callout:default}
+.toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 56px);transform:translateX(-50%);background:rgba(43,38,32,.96);color:#F4EFE5;font-weight:500;font-size:13px;border-radius:10px;padding:10px 14px;max-width:86%;text-align:center;z-index:35;line-height:1.55;box-shadow:0 10px 30px rgba(60,45,30,.3)}
+.sheet{position:absolute;inset:0;background:rgba(236,229,215,.98);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.sheet img{max-width:100%;max-height:70%;box-shadow:0 1px 2px rgba(60,45,30,.3),0 16px 36px -12px rgba(60,45,30,.5);-webkit-touch-callout:default}
 .sheet p{font-size:14px;text-align:center;line-height:1.6;color:var(--muted)}
 .sheet .chip{font-size:14px;padding:9px 20px}
 .sheet .grp{gap:8px}.sheet a.chip{text-decoration:none}
@@ -198,16 +276,16 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 /* 回忆 */
 .memo{display:grid;gap:12px;padding-top:14px;font-size:12px}
 .memo label{display:grid;gap:5px;color:var(--muted);font-weight:600}
-.memo input,.memo textarea{width:100%;background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:8px 10px;font:500 13px var(--ui);color-scheme:dark}
+.memo input,.memo textarea{width:100%;background:#FDFBF7;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:400 13px var(--ui);color-scheme:light}
 .memo input:disabled{color:var(--muted);background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
 .memo textarea{min-height:66px;resize:vertical;line-height:1.6}
 .memo .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .memo .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--muted);font-weight:600}
 .memo .chip{padding:6px 10px;font-size:12px}
-.mh{font-weight:400;color:var(--faint);line-height:1.6;margin:0}
+.mh{font-weight:400;color:var(--muted);line-height:1.6;margin:0}
 /* 导出 */
-.exp{position:absolute;inset:0;z-index:28;background:rgba(10,10,9,.72);display:flex;align-items:flex-end;justify-content:center}
-.exp .box{width:100%;max-width:440px;max-height:92%;overflow-y:auto;background:var(--surface);border-radius:16px 16px 0 0;padding:18px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -10px 40px rgba(0,0,0,.5),inset 0 1px 0 var(--line)}
+.exp{position:absolute;inset:0;z-index:28;background:rgba(43,38,32,.4);display:flex;align-items:flex-end;justify-content:center}
+.exp .box{width:100%;max-width:440px;max-height:92%;overflow-y:auto;background:var(--surface);border-radius:16px 16px 0 0;padding:18px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -10px 40px rgba(60,45,30,.25),inset 0 1px 0 var(--line)}
 @media (min-width:900px){.exp{align-items:center}.exp .box{border-radius:16px}}
 .exp h2{font-size:16px;font-weight:700;margin:0 0 8px}
 .exp .opt{display:grid;grid-template-columns:3.2em 1fr;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted);font-weight:600}
@@ -216,7 +294,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .exp .acts{display:flex;gap:8px;margin-top:12px}
 .exp .acts .big{margin:0;flex:1;background:var(--accent);color:var(--accent-ink)}
 .exp .acts .big:disabled{opacity:.6}
-.exp .acts .sm{height:50px;padding:0 16px;border-radius:12px;background:var(--surface2);font-weight:600;font-size:13px}
+.exp .acts .sm{height:48px;padding:0 16px;border-radius:7px;background:transparent;box-shadow:inset 0 0 0 1px var(--edge);font-weight:500;font-size:13px}
+.exp .acts .sm:hover{background:var(--surface2)}
 .exp .draft{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6}
 .exp .draft span{flex-basis:100%}
 .exp .draft .chip{background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
@@ -227,11 +306,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .album .tpl{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px}
 .album .ttl{background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:9px 12px;font:500 13px var(--ui)}
 .album .sub{margin:0}.album .sub b{color:var(--text)}
-.album .picks{display:flex;gap:8px;overflow-x:auto;padding:2px;scrollbar-width:thin}
-.album .picks button{flex:0 0 auto;line-height:0;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--line);opacity:.4;transition:opacity .15s}
-.album .picks button.on{opacity:1;box-shadow:0 0 0 2px var(--accent)}
-.album .picks canvas{width:44px;height:56px;display:block}
-.album .pv{width:100%;height:auto;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.5);background:var(--surface)}
+.album .picks{display:flex;gap:10px;overflow-x:auto;padding:4px;scrollbar-width:thin}
+.album .picks button{flex:0 0 auto;line-height:0;opacity:.4;transition:opacity .15s}
+.album .picks button.on{opacity:1}
+.album .picks canvas{width:44px;height:56px;display:block;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
+.album .pv{width:100%;height:auto;border-radius:2px;box-shadow:0 1px 2px rgba(60,45,30,.3),0 12px 28px -10px rgba(60,45,30,.45);background:var(--surface)}
 .album .pages{display:flex;gap:6px;overflow-x:auto;padding-top:12px;align-items:center;font-size:12px;color:var(--muted);font-weight:600;scrollbar-width:none}
 .album .pages>span{flex:none;margin-right:2px}
 .album .pages .chip{flex:none;font-size:12px;padding:6px 10px}
@@ -253,19 +332,25 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .memo .bk canvas{width:54px;height:auto;border-radius:3px;box-shadow:0 0 0 1px var(--line);flex:none;cursor:pointer}
 .memo .bk>div{display:grid;gap:6px}.memo .bk b{color:var(--text)}
 .memo .newcol{width:8em;padding:5px 8px;font-size:12px}
-.memo select{width:100%;background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:8px 6px;font:500 13px var(--ui);color-scheme:dark}
+.memo select{width:100%;background:#FDFBF7;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:9px 6px;font:400 13px var(--ui);color-scheme:light}
 .memo .dsel{display:flex;gap:6px}.memo .dsel>*{min-width:0;flex:1}
 /* 我的相册：分类、搜索、翻面 */
-.lib .q{width:100%;margin-top:12px;background:var(--surface2);color:var(--text);border:0;border-radius:10px;padding:10px 12px;font:500 14px var(--ui)}
+.library-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:28px 0 12px}
+.library-heading h1{font:500 28px/1.5 var(--serif);margin:0;letter-spacing:-.03em}.library-heading .home-text{margin:0;flex:none}
+.lib .q{width:100%;margin-top:8px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:13px 14px;font:400 13px var(--ui)}
+.lib .q::placeholder{color:var(--muted)}
 .lib .tags{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px}
 .lib .tags .chip{font-size:12px;padding:5px 10px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
 .lib .tags .chip.on{background:var(--accent);color:var(--accent-ink);box-shadow:none}
-.lib .cols{display:flex;gap:10px;overflow-x:auto;padding-top:12px;padding-bottom:4px;align-items:flex-start;scrollbar-width:none}
-.lib .ac{flex:0 0 72px;display:grid;gap:3px;text-align:left;font-size:12px}
-.lib .ac canvas{width:72px;height:72px;border-radius:8px;display:block;background:var(--surface2);box-shadow:inset 0 0 0 1px var(--line)}
-.lib .ac.on canvas{box-shadow:0 0 0 2px var(--accent)}
+/* 相册入口：每本都是同样大小的一张方照片，名字和张数写在下面；「新相册」是同样大小的空位 */
+.lib .cols{display:flex;gap:18px;overflow-x:auto;padding:16px 4px 4px;align-items:flex-start;scrollbar-width:none}
+.lib .ac{flex:0 0 76px;display:grid;gap:2px;text-align:left;font-size:12px;align-content:start}
+.lib .ac canvas{width:76px;height:76px;border-radius:2px;display:block;background:var(--surface2);box-shadow:0 1px 2px #3C2D1E1F,0 6px 12px -8px #3C2D1E59;margin-bottom:6px}
 .lib .ac b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lib .ac small{color:var(--muted)}
-.lib .cols .newcol{flex:0 0 118px;height:72px;border:1.5px dashed var(--faint);border-radius:8px;background:transparent;color:var(--text);padding:0 10px;font:500 12px var(--ui)}
+.lib .newtile>span{display:grid;place-items:center;width:76px;height:76px;margin-bottom:6px;border:1.5px dashed var(--faint);border-radius:2px;font-size:20px;color:var(--muted);cursor:text;transition:border-color .18s,color .18s}
+.lib .newtile:focus-within>span,.lib .newtile:hover>span{border-color:var(--text);color:var(--text)}
+.lib .newtile input{width:100%;min-width:0;padding:0;margin:0;background:transparent;border:0;color:var(--text);font:600 12px var(--ui)}
+.lib .newtile input::placeholder{color:var(--text);opacity:1}
 .lib .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:10px;font-size:12px;color:var(--muted)}
 .lib .bar input{flex:1;min-width:6em;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--text);font:700 16px var(--ui);padding:4px 0;border-radius:0}
 .lib .bar .chip{font-size:12px;padding:6px 10px}.lib .bar p{flex-basis:100%;margin:2px 0 0;line-height:1.6}
@@ -274,15 +359,15 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .lc{margin:0;display:grid;gap:6px;align-content:start;perspective:1000px;min-width:0}
 .lc .flip{position:relative;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
 .lc.turned .flip{transform:rotateY(180deg)}
-.lc canvas{display:block;width:100%;height:auto;-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 8px 20px -8px rgba(0,0,0,.7);background:var(--surface2)}
+.lc canvas{display:block;width:100%;height:auto;-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 2px 3px #3C2D1E14,0 12px 24px -12px #3C2D1E55;background:var(--surface2)}
 .lc .bk{position:absolute;inset:0;height:100%;object-fit:contain;transform:rotateY(180deg);background:transparent;box-shadow:none}
 .lc figcaption{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);min-width:0}
 .lc figcaption span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lc i{font-style:normal;font-size:11px;padding:1px 6px;border-radius:4px;box-shadow:inset 0 0 0 1px var(--line);flex:none}
 .lc .ops{display:flex;gap:12px}.lc .ops button{font-size:12px;font-weight:600;color:var(--text);padding:2px 0}.lc .ops button.on{color:var(--accent)}
-.lc.unsel{opacity:.38}.lc.sel .flip{box-shadow:0 0 0 3px var(--accent)}
+.lc.unsel{opacity:.38}
 .lib .empty{grid-column:1/-1;color:var(--muted);font-size:13px;line-height:1.7;text-align:center;padding:40px 10px}
-.drop{position:absolute;inset:10px;z-index:40;border:2px dashed var(--accent);border-radius:18px;background:rgba(26,25,24,.9);display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--accent);pointer-events:none}
+.drop{position:absolute;inset:10px;z-index:40;border:2px dashed var(--accent);border-radius:18px;background:rgba(236,229,215,.94);display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--accent);pointer-events:none}
 
 /* 面板：选相机、拍摄建议 */
 .panel{position:absolute;inset:0;z-index:25;background:var(--bg);display:flex;flex-direction:column}
@@ -296,7 +381,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .dx ul{margin:8px 0 0;padding-left:18px}
 .dx li{font-size:13px;line-height:1.7;margin-bottom:4px}
 .dx .fixbtn{margin-top:8px;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:6px 12px;font-weight:600;font-size:13px}
-.dx.good{box-shadow:inset 0 0 0 1px #3E5A45;background:#1F2A22}
+.dx.good{box-shadow:inset 0 0 0 1px #CDD5C5;background:#EDF0E8}
 .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
 .meters div{background:var(--surface);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
 .meters b{display:block;color:var(--text);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
@@ -309,7 +394,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .camgrid button:hover{background:var(--surface2)}
 .camgrid button small{display:block;font-size:12px;color:var(--muted);font-weight:400}
 .camgrid button.on{background:var(--accent);color:var(--accent-ink);box-shadow:none}
-.camgrid button.on small{color:#4A3B12}
+.camgrid button.on small{color:#DDD7CB}
 .camnote{margin:10px 0 0}
 .rec{width:100%;border-collapse:collapse;font-size:13px;line-height:1.65}
 .rec th{width:7em;text-align:left;vertical-align:top;font-weight:600;color:var(--muted);padding:8px 10px 8px 0;border-top:1px solid var(--line)}
@@ -319,9 +404,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .ask .row{display:flex;gap:8px;margin-top:10px}
 .ask .row button{background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px}
 .ask .row button.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
-.src{font-size:12px;color:var(--faint);line-height:1.6;margin-top:16px}
+.src{font-size:12px;color:var(--muted);line-height:1.6;margin-top:16px}
 /* 自己画边框 */
-.dstage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 16px;background:radial-gradient(ellipse at 50% 45%,#2A2826 0%,var(--bg) 70%)}
+.dstage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 16px;background:radial-gradient(ellipse at 50% 45%,#F3EEE4 0%,transparent 70%)}
 .dstage canvas{box-shadow:0 18px 40px -12px rgba(0,0,0,.65);touch-action:none;cursor:crosshair;background:#fff}
 .dtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:10px}
 .dtools .dot{width:26px;height:26px;border-radius:50%;box-shadow:0 0 0 1px var(--line);flex:0 0 auto}
@@ -363,29 +448,33 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .tddetail td:first-child{color:#4A5080;width:30%;padding-right:8px}
 .tddetail .gen{font-size:12px;color:#4A5080;margin-top:6px}
 /* 电脑：拖放、粘贴、宽屏两栏 */
-.dhint{display:none;font-size:12px;line-height:1.7;color:var(--muted);padding-top:12px}
 #tray2{display:none}
 @media (min-width:900px){
   .app{max-width:none}
-  [data-device="desktop"] .dhint{display:block}
   #tray2{display:flex}
-  .tray small{white-space:normal;max-width:120px;line-height:1.5}
+  .tray small{white-space:normal;max-width:180px;line-height:1.6}
   #scanView:not([hidden]),#editView:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:repeat(5,auto) 1fr;column-gap:0}
   #scanView>*,#editView>*{grid-column:2;min-width:0}
   /* 右栏是一块独立的侧边面板：用背景把右边 400px 铺成面板色，左边一条细线 */
   #scanView,#editView{background:linear-gradient(to left,var(--surface) 400px,var(--line) 400px,var(--line) 401px,transparent 401px)}
-  #scanView>.desk{grid-column:1;grid-row:1/-1;margin:16px;border-radius:14px}
+  #scanView>.desk{grid-column:1;grid-row:1/-1;margin:24px;border-radius:8px}
   #editView>.stage{grid-column:1;grid-row:1/-1;padding:28px 0}
-  #scanView>.big{align-self:end;margin:16px}
-  #scanView:not([hidden]){grid-template-rows:repeat(7,auto) minmax(66px,1fr)}
+  #scanView>.big{align-self:end;margin:16px;grid-row:-2}   /* 提醒块可能隐藏，按钮固定在最后一行 */
+  #scanView:not([hidden]){grid-template-rows:repeat(5,auto) minmax(66px,1fr)}
   #editView:not([hidden]){grid-template-rows:auto auto minmax(0,1fr)}
   #editView>.side{display:flex;flex-direction:column;overflow-y:auto;min-height:0;scrollbar-width:thin}
+  .tool-heading{display:block;padding:24px 0 22px}.tool-heading h2{font:500 25px/1.5 var(--serif);margin:0;letter-spacing:-.03em}
+  .scan-format{padding-top:0}.scan-format .tool-heading{padding-bottom:6px}.scan-status{margin-bottom:16px}
+  .edit-heading{padding-top:16px;padding-bottom:8px}
   #editView .side>.savebar{position:sticky;bottom:0;margin:auto 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) 16px 16px;background:var(--surface);border-top:1px solid var(--line);z-index:2}
   .top{padding-top:14px}
-  .fl{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 12px;overflow:visible;padding-top:16px}
+  .fl{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 16px;overflow:visible;padding-top:22px;padding-bottom:20px}
   .fl button{font-size:12px}.fl canvas{width:100%;height:auto;aspect-ratio:1}
-  .note{font-size:13px}
+  .note{display:none!important}
   .panel .body,.lib>.pad{max-width:760px;margin:0 auto;width:100%}
+  .lib>.pad,.lib>.body{max-width:1000px}.lib>.top{padding-left:max(28px,calc((100% - 968px)/2));padding-right:max(28px,calc((100% - 968px)/2))}
+  .library-heading{padding-top:36px}.library-heading h1{font-size:34px}
+  .lib .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:32px 28px;padding-top:16px}
   #tdPanel:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto auto auto auto 1fr}
   #tdPanel>*{grid-column:2;min-width:0}
   #tdPanel>.top,#tdPanel>.tdcams{grid-column:1/-1}
@@ -395,44 +484,57 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   .tdparts{flex-wrap:wrap;overflow:visible}
   .tddetail{flex:none;min-height:0;margin-bottom:16px}
 }
+/* 横屏手机把工具放到右边，避免长表单把照片压成一条。 */
+@media(min-width:700px) and (max-width:899px) and (max-height:500px){
+  #editView:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto minmax(0,1fr);background:linear-gradient(to left,var(--surface) 360px,var(--line) 360px,var(--line) 361px,transparent 361px)}
+  #editView>*{grid-column:2;min-width:0}
+  #editView>.stage{grid-column:1;grid-row:1/-1;min-height:0}
+  #editView>.side{max-height:none;overflow-y:auto;border-top:0}
+  #editView .side>.savebar{margin:auto 0 0;padding:12px 16px;background:var(--surface)}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="app" id="app">
   <section class="view home" id="homeView" aria-label="首页">
     <div class="home-wrap">
-      <header class="home-brand"><b>贴进相册</b><span>一张照片，一段回忆</span></header>
-      <div class="home-hero"><div class="home-copy"><span class="home-kicker">SCAN · KEEP · REMEMBER</span><h1 id="homeTitle">把手里的照片，
-慢慢收好。</h1><p id="homeIntro">拉正相纸，留下背面的字迹和照片里的故事，放进属于你的数字相册。</p>
-        <div class="home-actions"><button class="chip on" id="homeShoot" disabled>拍一张</button><button class="chip" id="homeImport" disabled>导入照片</button></div>
-        <button class="home-text" id="homeDemo" disabled>先用示例体验一下</button>
-      </div><figure class="home-print"><img id="homeSample" alt="海边的拍立得示例照片"><figcaption>把那天的海风也留下</figcaption></figure></div>
-      <div class="home-shelf"><div class="home-shelf-head"><h2>我的收藏</h2><button class="chip" id="homeLibrary" disabled>我的相册 ›</button></div>
-        <button class="home-resume" id="homeContinue" hidden><div><b>继续上次整理</b><small id="homeResumeInfo"></small></div><span aria-hidden="true">›</span></button>
-        <p class="home-empty" id="homeEmpty">正在读取本机收藏…</p><button class="chip on" id="homeRestoreRetry" hidden>重试读取本机收藏</button><button class="chip" id="homePending" hidden>继续框选</button>
-      </div><p class="home-foot">收藏保存在当前浏览器中，整理好后记得导出图片。</p>
+      <header class="home-brand"><span class="home-wordmark"><i class="home-mark" aria-hidden="true"></i><b>相角</b></span></header>
+      <div class="home-hero"><div class="home-copy"><h1 id="homeTitle">给拍立得，
+做一本电子相册。</h1><p id="homeIntro">拉正翻拍的照片，把正反面、那天的日期和故事，一起好好收藏。</p>
+        <div class="home-actions"><button class="chip on" id="homeContinue" hidden>继续整理</button><button class="chip on" id="homeShoot" disabled>拍一张</button><button class="chip" id="homeImport" disabled>导入照片</button></div>
+        <button class="home-text" id="homeDemo" disabled>先看看示例</button>
+      </div><div class="home-visual" id="homeStack" role="button" tabindex="0" aria-label="换一张照片"><figure class="home-print rear left" aria-hidden="true"><img id="homeSecond" alt=""></figure><figure class="home-print rear right" aria-hidden="true"><img id="homeThird" alt=""></figure><figure class="home-print"><img id="homeSample" alt="匹兹堡河边的拍立得翻拍"></figure></div></div>
+      <div class="home-shelf"><div class="home-shelf-head"><h2>我的照片</h2><button class="chip" id="homeLibrary" disabled>我的相册 ›</button></div>
+        <div class="home-gallery" id="homeGallery" hidden aria-label="最近的照片"></div>
+        <p class="home-empty" id="homeEmpty">正在读取本机收藏…</p>
+        <figure class="home-wall" id="homeWall" hidden><div class="home-slots" aria-hidden="true">
+          <div class="slot-wrap"><i class="slot" style="--w:54;--h:86"></i><small>instax mini</small></div>
+          <div class="slot-wrap"><i class="slot" style="--w:72;--h:86"></i><small>instax square</small></div>
+          <div class="slot-wrap"><i class="slot" style="--w:108;--h:86"></i><small>instax wide</small></div>
+          <div class="slot-wrap"><i class="slot" style="--w:88;--h:107"></i><small>Polaroid</small></div>
+        </div><figcaption>还没有照片</figcaption></figure><button class="chip on" id="homeRestoreRetry" hidden>重试读取本机收藏</button><button class="chip" id="homePending" hidden>继续框选</button>
+      </div><div class="home-foot"><span>照片仅保存在当前浏览器，记得定期备份。</span><button id="backupOpen" disabled>备份与恢复</button><small class="home-credit">首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）</small></div>
     </div>
   </section>
   <!-- 扫描 -->
   <section class="view" id="scanView" hidden>
-    <div class="top scan-top"><button class="chip" id="scanHome">‹ 首页</button>
-      <div class="scan-tools"><button class="chip" id="shoot">拍一张</button><button class="chip" id="pick">相册选</button><button class="chip" id="rot">转 90°</button></div></div>
+    <div class="top scan-top"><button class="chip ghost" id="scanHome">‹ 首页</button>
+      <div class="scan-tools"><button class="chip line" id="shoot">拍一张</button><button class="chip line" id="pick">相册选</button><button class="chip line" id="rot">转 90°</button></div></div>
     <div class="desk" id="desk"><canvas id="srcCv"></canvas>
-      <svg id="quadSvg"><polygon id="quadPoly" fill="rgba(242,181,68,.14)" stroke="#F2B544" stroke-width="2.5" stroke-linejoin="round"/><g id="scanMarks" aria-hidden="true"></g></svg><canvas class="loupe" id="loupe" hidden></canvas>
-      <span class="bubble" id="tip"></span><span class="bubble2" id="found"></span></div>
-    <div class="pad formats" id="formats"></div>
-    <div class="pad scan-choice"><button class="chip" id="fullPhoto">使用整张原图</button><span id="scanConfirmNote">先确认选框，再拉正</span></div>
-    <div class="pad scancheck"><details id="scanCheck"><summary id="scanCheckTitle">扫描检查</summary><div id="scanCheckBody"></div><button class="chip" id="scanIgnore">忽略本张提醒</button></details><p id="scanCheckLead" role="status" aria-live="polite"></p></div>
-    <div class="pad camrow"><span>我的相机</span><button class="chip" id="camBtn">选一下，教你怎么拍</button><button class="chip" id="td3d" style="background:rgba(255,255,255,.16);color:#fff">3D 拆开看</button></div>
+      <svg id="quadSvg"><polygon id="quadPoly" fill="rgba(163,124,81,.07)" stroke="#A37C51" stroke-width="2" stroke-linejoin="round"/><g id="scanMarks" aria-hidden="true"></g></svg><canvas class="loupe" id="loupe" hidden></canvas>
+      <span class="bubble" id="tip">白线是底边，方向不对点「转 90°」</span></div>
+    <div class="pad scan-format"><div class="tool-heading"><h2>先把相纸摆正</h2></div><p class="scan-status" id="found" role="status"></p>
+      <div class="scan-choice"><button class="format-toggle" id="formatToggle" aria-expanded="false" aria-controls="formats"><span>相纸</span><b id="formatCurrent">原比例</b><span>更换⌄</span></button><button class="chip line" id="fullPhoto">使用整张原图</button></div><div class="formats" id="formats" hidden></div></div>
+    <div class="pad scancheck" id="scanCheckWrap" hidden><details id="scanCheck"><summary id="scanCheckTitle">扫描检查</summary><div id="scanCheckBody"></div><button class="chip" id="scanIgnore">忽略本张提醒</button></details><p id="scanCheckLead" role="status" aria-live="polite"></p></div>
+    <details class="pad scan-more" id="scanMore"><summary>拍摄帮助与相机</summary><div class="camrow"><span>我的相机</span><button class="chip" id="camBtn">选一下，教你怎么拍</button><button class="chip" id="td3d">3D 拆开看</button></div></details>
     <div class="pad tray" id="tray"></div>
-    <p class="pad dhint">把照片拖进这个窗口、按 Ctrl+V 粘贴，或者点「上传照片」。可以一次放好几张，能认出边框的会自动拉正。</p>
     <button class="big yellow" id="straighten">确认选框并拉正</button>
   </section>
 
   <!-- 调色 -->
   <section class="view" id="editView" hidden>
-    <div class="top"><div class="grp"><button class="chip" id="editHome">首页</button><button class="chip" id="back">重扫</button><button class="chip" id="libBtn">相册</button></div>
-      <div class="grp"><button class="chip" id="flip" hidden>翻面</button><button class="chip" id="undo" disabled>撤销</button><button class="chip" id="peek">按住看原图</button></div></div>
+    <div class="top"><div class="grp"><button class="chip ghost" id="editHome">‹ 首页</button><button class="chip ghost" id="back">重扫</button><button class="chip ghost" id="libBtn">相册</button></div>
+      <div class="grp"><button class="chip line" id="flip" hidden>翻面</button><button class="chip line" id="undo" disabled>撤销</button><button class="chip line" id="peek">按住看原图</button></div></div>
     <div class="pad tray" id="tray2"></div>
     <div class="stage" id="stage"><canvas class="amb" id="amb" aria-hidden="true"></canvas>
       <div class="card" id="card"><div class="tape"></div><canvas id="cardCv"></canvas>
@@ -440,11 +542,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
         <div class="sticker" id="sticker" hidden></div></div>
       <span class="peek" id="peekTag" hidden>原图</span>
       <button class="note" id="note" hidden></button>
-      <div class="gbar" id="gbar" hidden><b>有反光</b><button class="chip" id="gShow">看看在哪</button><button class="chip" id="gMerge">补拍一张去掉</button><button class="chip" id="gFix">涂掉光斑</button><button class="gx" id="gHide" aria-label="先不管">×</button></div>
+      <div class="gbar" id="gbar" hidden><b>可能有反光</b><button class="chip" id="gShow">看看在哪</button><button class="chip" id="gMerge">补拍一张去掉</button><button class="chip" id="gFix">涂掉光斑</button><button class="gx" id="gHide" aria-label="先不管">×</button></div>
       <div class="gbar" id="mbar" hidden><b id="mInfo">合成好了</b><button class="chip" id="mPeek">按住看合成前</button><button class="chip on" id="mKeep">保留</button><button class="chip" id="mUndo">不要了</button></div>
     </div>
     <div class="side">
-    <div class="pad"><div class="tabs" id="tabs" role="tablist">
+    <div class="pad"><div class="tool-heading edit-heading"><h2>整理这一张</h2><button class="note-side" id="noteSide" hidden></button></div><div class="tabs" id="tabs" role="tablist">
       <button role="tab" data-t="fl">滤镜</button><button role="tab" data-t="sliders">调整</button><button role="tab" data-t="frames">边框</button><button role="tab" data-t="fontrow">文字</button><button role="tab" data-t="daterow">日期</button><button role="tab" data-t="memo">回忆</button></div></div>
     <div class="fl tp" id="fl"></div>
     <div class="pad sliders tp" id="sliders"></div>
@@ -461,17 +563,17 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   <input type="file" accept="image/*" id="frameIn" class="vh" aria-label="上传边框图">
   <div class="drop" id="drop" hidden>松手就导入</div>
   <section class="panel" id="drawPanel" hidden aria-label="自己画边框">
-    <div class="top"><button class="chip" id="drawCancel">‹ 不画了</button><div class="grp"><button class="chip" id="drawUndo">撤一笔</button><button class="chip" id="drawClear">清空</button><button class="chip on" id="drawDone">用这个边框</button></div></div>
+    <div class="top"><button class="chip ghost" id="drawCancel">‹ 不画了</button><div class="grp"><button class="chip line" id="drawUndo">撤一笔</button><button class="chip line" id="drawClear">清空</button><button class="chip on" id="drawDone">用这个边框</button></div></div>
     <div class="dstage" id="dStage"><canvas id="dCv"></canvas></div>
     <div class="pad dtools" id="dTools"></div>
     <p class="pad dsub">在边上随便画。中间虚线框里会被照片盖住，画了也看不到。「铺底色」把整张边框换成当前颜色。</p>
   </section>
   <section class="panel" id="camPanel" hidden aria-label="选相机">
-    <div class="top"><button class="chip" id="camClose">‹ 返回</button><span></span></div>
+    <div class="top"><button class="chip ghost" id="camClose">‹ 返回</button><span></span></div>
     <div class="body"><h2>你用的是哪台？</h2><p class="sub">选好后，扫描会按这台的相纸尺寸来拉正，拍摄建议也按这台的功能来给。</p><div id="camList"></div></div>
   </section>
   <section class="panel" id="guidePanel" hidden aria-label="拍摄建议">
-    <div class="top"><button class="chip" id="guideClose">‹ 回去调色</button><button class="chip" id="guideCam"></button></div>
+    <div class="top"><button class="chip ghost" id="guideClose">‹ 回去调色</button><button class="chip line" id="guideCam"></button></div>
     <div class="body" id="guideBody"></div>
   </section>
   <section class="panel td" id="tdPanel" hidden aria-label="3D 拆解">
@@ -488,20 +590,27 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   <div class="sheet" id="sheet" hidden><img id="sheetImg" alt="调好的拍立得"><p id="sheetTip">长按图片，选「存储到照片」</p><div class="grp"><a class="chip" id="sheetDl" download>下载文件</a><button class="chip on" id="sheetClose">好了</button></div></div>
   <div class="exp" id="expPanel" hidden><div class="box" id="expBox" role="dialog" aria-label="导出"></div></div>
   <section class="panel album" id="albumPanel" hidden aria-label="拼一页">
-    <div class="top"><button class="chip" id="albClose">‹ 回去调色</button><div class="grp"><button class="chip" id="albKeep">存成相册页</button><button class="chip on" id="albSave">导出图片</button></div></div>
+    <div class="top"><button class="chip ghost" id="albClose">‹ 回去调色</button><div class="grp"><button class="chip line" id="albKeep">存成相册页</button><button class="chip on" id="albSave">导出图片</button></div></div>
     <div class="body"><div class="pages" id="albPages" hidden></div><div class="tpl" id="albTpl"></div><input class="ttl" id="albTitle" maxlength="24" placeholder="写个标题，比如：2026 夏天" aria-label="标题">
       <p class="sub" id="albNote"></p><div class="picks" id="albPicks"></div><div class="ord" id="albOrder"></div><div class="look" id="albLook"></div><canvas class="pv" id="albCv"></canvas></div>
   </section>
   <section class="panel lib" id="libPanel" hidden aria-label="我的相册">
-    <div class="top"><button class="chip" id="libClose">‹ 首页</button><div class="grp"><button class="chip" id="libImport">＋ 导入</button><button class="chip on" id="libAlbum">用这些拼一页</button></div></div>
-    <div class="pad"><input class="q" id="libQ" type="search" placeholder="找日期、地点、人物：2025.07、海边、小雨" aria-label="查找照片"><div class="tags" id="libTags"></div>
+    <div class="top"><button class="chip ghost" id="libClose">‹ 首页</button><div class="grp"><button class="chip line" id="libImport">＋ 导入</button><button class="chip line" id="libAlbum">用这些拼一页</button></div></div>
+    <div class="pad"><div class="library-heading"><h1>我的相册</h1><button class="home-text" id="libBackup">备份与恢复</button></div><input class="q" id="libQ" type="search" placeholder="搜索日期、地点、人物或故事" aria-label="查找照片"><div class="tags" id="libTags"></div>
       <div class="cols" id="libCols"></div><div class="bar" id="libBar"></div></div>
     <div class="body"><div class="grid" id="libGrid"></div></div>
   </section>
+  <section class="panel" id="backupPanel" hidden aria-label="备份与恢复"><div class="top"><button class="chip ghost" id="backupClose">‹ 返回</button><b>带走你的收藏</b></div><div class="body backup-body">
+    <p class="backup-intro">照片的正反面、写下的故事和调好的样子，都收在同一个备份里。</p>
+    <section class="backup-section"><h2>保存完整备份</h2><p>包含原图、编辑参数、相册和拼页。换设备或浏览器后，可以恢复并继续编辑。</p><button class="chip on" id="backupExport">下载完整备份</button></section>
+    <section class="backup-section"><h2>从备份恢复</h2><p>先选择备份查看内容，确认后才会替换当前浏览器内的收藏。</p><button class="chip" id="backupChoose">选择备份文件</button><input class="vh" id="backupIn" type="file" accept=".json,application/json"><div id="backupSummary" hidden></div><button class="chip on" id="backupApply" hidden>替换本机收藏并恢复</button></section>
+    <p id="backupMessage" role="status" aria-live="polite"></p>
+  </div></section>
 </div>
 
 <script>
 const SAMPLE = "__IMG__";
+const HOME_FRONT="__HOME__",SAMPLE_SECOND="__IMG2__",SAMPLE_THIRD="__IMG3__";   // 首页叠放的三张真实相纸，和示例编辑用的照片分开
 const CARD_TILT=0;  // 卡片的倾斜角度（度），要和 CSS 里 .card 的 rotate 一致
 const $ = id => document.getElementById(id);
 // 有鼠标、能悬停的当电脑：改文案、开拖放和快捷键；宽屏布局另由 CSS 宽度决定
@@ -756,22 +865,86 @@ const newId=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 let src=null,srcData=null,quad=null,format='mini',autoFound=false,scanNeedsConfirm=true;
 let ed=null; // 当前调色对象
 let history=[];
+let backupBusy=false,backupRestoring=false,pendingBackup=null,backupReturn='home';
 
 function toast(msg,ms=2600){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,ms)}
 
 /* 首页：首次导入、继续编辑和相册各有入口，示例只在用户选择后载入。 */
+const homeReducedMotion=matchMedia('(prefers-reduced-motion: reduce)'),homeFinePointer=matchMedia('(hover: hover) and (pointer: fine)');
+const homeAnimations=new Set();let homeEntered=false,homeTiltFrame=0,homeTiltPoint=null,homeRevealObserver=null,homeIncomingTimer=0,homeHoverTimer=0;
+function homeAnimate(el,frames,options){if(homeReducedMotion.matches||typeof el.animate!=='function')return;try{const a=el.animate(frames,options);homeAnimations.add(a);a.onfinish=a.oncancel=()=>homeAnimations.delete(a)}catch(e){}}
+function resetHomeTilt(){if(homeTiltFrame)cancelAnimationFrame(homeTiltFrame);homeTiltFrame=0;homeTiltPoint=null;$('homeStack').style.setProperty('--card-rx','0deg');$('homeStack').style.setProperty('--card-ry','0deg')}
+function stopHomeMotion(){resetHomeTilt();stopHomeHover();clearTimeout(homeIncomingTimer);homeIncomingTimer=0;$('homeStack').querySelectorAll('.incoming').forEach(el=>el.classList.remove('incoming'));for(const a of homeAnimations)a.cancel();homeAnimations.clear();homeRevealObserver?.disconnect()}
+// 轮换：最前面那张从右边抽出、塞到最后，左后那张补到前面。鼠标停在照片上时轮换，移开就停；触屏和键盘靠点按。减少动态时只在点按时换，也不播动画。
+function setHomeSlot(el,slot){el.classList.remove('rear','left','right','incoming');if(slot!=='front')el.classList.add('rear',slot);el.setAttribute('aria-hidden',String(slot!=='front'))}
+function resetHomeStack(){setHomeSlot($('homeSample').parentElement,'front');setHomeSlot($('homeSecond').parentElement,'left');setHomeSlot($('homeThird').parentElement,'right')}
+function shuffleHome(){if(restoring||restoreFailed)return false;const prints=[...$('homeStack').querySelectorAll('.home-print:not([hidden])')];
+  const front=prints.find(p=>!p.classList.contains('rear')),left=prints.find(p=>p.classList.contains('left')),right=prints.find(p=>p.classList.contains('right'));
+  if(!front||!left)return false;setHomeSlot(front,right?'right':'left');setHomeSlot(left,'front');if(right)setHomeSlot(right,'left');
+  if(!homeReducedMotion.matches){left.classList.add('incoming');clearTimeout(homeIncomingTimer);homeIncomingTimer=setTimeout(()=>left.classList.remove('incoming'),760)}
+  // 抽出去的那张先微微提起、往右带一段，前 40% 还压在最上面，然后落到后面
+  homeAnimate(front,[{zIndex:3,translate:'0 0',scale:1,easing:'cubic-bezier(.3,.6,.3,1)'},{zIndex:3,translate:'20% -16px',scale:1.03,offset:.38},{zIndex:0,translate:'20% -16px',scale:1.03,offset:.4,easing:'cubic-bezier(.4,0,.2,1)'},{zIndex:0,translate:'0 0',scale:1}],{duration:700});return true;
+}
+function armHomeHover(){clearInterval(homeHoverTimer);homeHoverTimer=setInterval(()=>{if($('homeView').hidden||!shuffleHome())stopHomeHover()},1800)}
+function startHomeHover(e){if(e.pointerType==='touch'||!homeFinePointer.matches||homeReducedMotion.matches||homeHoverTimer||$('homeView').hidden)return;if(shuffleHome())armHomeHover()}
+function stopHomeHover(){clearInterval(homeHoverTimer);homeHoverTimer=0}
+function syncHomeStack(){const multiple=$('homeStack').querySelectorAll('.home-print:not([hidden])').length>1;$('homeStack').setAttribute('aria-disabled',String(restoring||restoreFailed||!multiple));$('homeStack').setAttribute('aria-label',multiple?'换一张照片':'当前收藏的照片')}
+$('homeStack').onclick=()=>{shuffleHome();if(homeHoverTimer)armHomeHover()};   // 悬停轮换中点一下：马上换，并重新计时
+$('homeStack').addEventListener('pointerenter',startHomeHover);$('homeStack').addEventListener('pointerleave',stopHomeHover);
+$('homeStack').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!e.repeat)shuffleHome()}});
+$('homeStack').addEventListener('pointermove',e=>{if(homeReducedMotion.matches||!homeFinePointer.matches||e.pointerType==='touch'||$('homeView').hidden)return;
+  homeTiltPoint=[e.clientX,e.clientY];if(homeTiltFrame)return;homeTiltFrame=requestAnimationFrame(()=>{homeTiltFrame=0;if(!homeTiltPoint||homeReducedMotion.matches||!homeFinePointer.matches||$('homeView').hidden)return;const r=$('homeStack').getBoundingClientRect();if(!r.width||!r.height)return;
+    const [x,y]=homeTiltPoint,clamp=v=>Math.max(-1,Math.min(1,v));$('homeStack').style.setProperty('--card-rx',`${(-clamp((y-r.top)/r.height*2-1)*3).toFixed(2)}deg`);$('homeStack').style.setProperty('--card-ry',`${(clamp((x-r.left)/r.width*2-1)*3).toFixed(2)}deg`);
+  })});
+$('homeStack').addEventListener('pointerleave',resetHomeTilt);$('homeStack').addEventListener('pointercancel',resetHomeTilt);
+homeReducedMotion.addEventListener('change',stopHomeMotion);
+homeFinePointer.addEventListener('change',()=>{resetHomeTilt();stopHomeHover()});
+function revealHome(){if(restoring||$('homeView').hidden)return;homeRevealObserver?.disconnect();syncHomeStack();if(homeReducedMotion.matches)return;
+  if(!homeEntered){homeEntered=true;
+    [$('homeTitle'),$('homeIntro'),document.querySelector('.home-actions')].forEach((el,i)=>homeAnimate(el,[{opacity:.15,translate:'0 8px'},{opacity:1,translate:'0 0'}],{duration:380,delay:i*45,easing:'cubic-bezier(.2,.7,.3,1)'}));
+    document.querySelectorAll('#homeStack .home-print').forEach((el,i)=>homeAnimate(el,[{opacity:.2,translate:'0 16px',scale:.94},{opacity:1,translate:'0 -2px',scale:1.01,offset:.8},{opacity:1,translate:'0 0',scale:1}],{duration:520,delay:i*55,easing:'cubic-bezier(.2,.7,.3,1)'}));
+  }
+  if(typeof IntersectionObserver==='function'){homeRevealObserver=new IntersectionObserver(entries=>{for(const e of entries){if(!e.isIntersecting)continue;homeRevealObserver.unobserve(e.target);if(e.target.isConnected&&!$('homeView').hidden)homeAnimate(e.target,[{opacity:.4,translate:'0 8px'},{opacity:1,translate:'0 0'}],{duration:300,easing:'ease-out'})}},{root:$('homeView'),threshold:.15});
+    document.querySelectorAll('#homeGallery button').forEach(el=>homeRevealObserver.observe(el));
+  }
+}
+let homeRenderToken=0;const homePreviewCache=new Map();
+function homePreview(item,apply,token){const key=renderKey(item),cached=homePreviewCache.get(key);
+  if(cached){apply(cached);return}
+  renderItem(item,{long:420}).then(c=>{const url=c.toDataURL('image/jpeg',.88);if(homePreviewCache.size>16)homePreviewCache.clear();homePreviewCache.set(key,url);
+    if(token===homeRenderToken&&!$('homeView').hidden&&renderKey(item)===key)apply(url)}).catch(()=>{});
+}
 function renderHome(){
+  const token=++homeRenderToken;
   const own=restoreFailed?[]:scans.filter(s=>!s.demo),last=own.find(s=>s.id===realFocus())||own[own.length-1],resume=$('homeContinue');
-  $('homeSample').src=SAMPLE;$('homeTitle').textContent=own.length?'回到你的\n小小相册。':'把手里的照片，\n慢慢收好。';
-  $('homeIntro').textContent=own.length?`这里收好了 ${own.length} 张照片。继续写下故事，或者带一张新照片回来。`:'拉正相纸，留下背面的字迹和照片里的故事，放进属于你的数字相册。';
-  for(const id of ['homeShoot','homeImport','homeDemo','homeLibrary'])$(id).disabled=restoring||restoreFailed;
-  resume.hidden=!last||restoring||restoreFailed;resume.querySelector('canvas')?.remove();
-  if(last){resume.prepend(thumbOf(last));$('homeResumeInfo').textContent=[dLabel(last.st.date),last.st.memo?.place,last.st.caption].filter(Boolean).join(' · ');resume.onclick=()=>openEdit(scans.indexOf(last))}
-  $('homeEmpty').hidden=!!last&&!restoreFailed&&!restoring;$('homeEmpty').textContent=restoring?'正在读取本机收藏…':restoreFailed?'本机收藏暂时无法完整读取。旧数据仍保留，重试读取成功后可以继续整理。':'还没有自己的照片。从第一张开始，也可以先体验示例。';
+  stopHomeMotion();resetHomeStack();
+  const hero=last?[last,...own.slice().reverse().filter(s=>s.id!==last.id)].slice(0,3):[],samples=[HOME_FRONT,SAMPLE_SECOND,SAMPLE_THIRD];
+  ['homeSample','homeSecond','homeThird'].forEach((id,i)=>{const img=$(id),item=hero[i],figure=img.parentElement;
+    figure.hidden=!!last&&!item;figure.classList.toggle('personal',!!item);img.style.objectFit=item?'contain':'';
+    if(figure.hidden){img.removeAttribute('src');img.alt='';return}
+    img.src=item?item.photoCv.toDataURL('image/jpeg',.7):samples[i];
+    img.alt=item?`收藏照片 · ${item.st.memo?.place||item.st.caption||dLabel(item.st.date)||'某一天'}`:['匹兹堡河边的拍立得翻拍','人像拍立得翻拍','河边风景的拍立得翻拍'][i];
+    if(item&&!restoring)homePreview(item,url=>img.src=url,token);
+  });
+  $('homeSample').closest('.home-visual').classList.toggle('personal',!!last);
+  $('homeWall').hidden=!!own.length||restoring||restoreFailed;
+  $('homeTitle').textContent=own.length?'接着整理\n你的相册。':'给拍立得，\n做一本电子相册。';
+  $('homeIntro').textContent=own.length?`已经收藏了 ${own.length} 张照片。`:'拉正翻拍的照片，把正反面、那天的日期和故事，一起好好收藏。';
+  for(const id of ['homeShoot','homeImport','homeDemo','homeLibrary'])$(id).disabled=restoring||restoreFailed;$('backupOpen').disabled=restoring;
+  // 有照片时首屏的主按钮是「继续整理」，拍照和导入退成描边；上面叠着的就是那一张，不再另放一张卡片
+  resume.hidden=!last||restoring||restoreFailed;$('homeImport').classList.toggle('on',DESK&&resume.hidden);$('homeShoot').classList.toggle('on',resume.hidden);
+  if(last){resume.title=[dLabel(last.st.date),last.st.memo?.place,last.st.caption].filter(Boolean).join(' · ');resume.onclick=()=>openEdit(scans.indexOf(last))}
+  const gallery=$('homeGallery'),recent=own.slice().reverse().slice(0,4);gallery.replaceChildren();gallery.hidden=!recent.length||restoring;
+  recent.forEach(s=>{const b=document.createElement('button'),img=document.createElement('img'),title=document.createElement('b'),date=document.createElement('small');
+    b.dataset.id=s.id;b.setAttribute('aria-label',`打开${s.st.memo?.place||s.st.caption||'收藏照片'}`);img.className='home-thumb';img.alt='';img.src=s.photoCv.toDataURL('image/jpeg',.7);
+    title.textContent=s.st.memo?.place||s.st.caption||'未写下名字的照片';date.textContent=dLabel(s.st.date)||'某一天';b.append(img,title,date);b.onclick=()=>openEdit(scans.indexOf(s));gallery.append(b);
+    homePreview(s,url=>{img.src=url;img.dataset.ready='1'},token)});
+  $('homeEmpty').hidden=!restoring&&!restoreFailed;$('homeEmpty').textContent=restoring?'正在读取本机收藏…':'本机收藏暂时无法完整读取。旧数据仍保留，重试读取成功后可以继续整理。';
   $('homeRestoreRetry').hidden=!restoreFailed;$('homeRestoreRetry').disabled=restoring;
   $('homePending').hidden=!pendingFiles.length;$('homePending').textContent=`继续框选 · ${pendingFiles.length} 张`;
+  revealHome();
 }
-function showHome(){closePanels();backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
+function showHome(){closePanels(backupRestoring);backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
 function chooseHomePhoto(cameraInput){backFor=mergeFor=-1;$(cameraInput?'camIn':'fileIn').click()}
 $('homeShoot').onclick=()=>chooseHomePhoto(true);$('homeImport').onclick=()=>chooseHomePhoto(false);
 $('homeLibrary').onclick=()=>openLib();$('editHome').onclick=$('scanHome').onclick=showHome;
@@ -810,6 +983,7 @@ async function openPending(){
 }
 /* 电脑上常一次拖进好几张：能认出边框的直接拉正，认不出的排队手动框 */
 async function loadFiles(list){
+  if(backupBusy||backupRestoring){toast('正在处理备份，请稍等');return}
   if(restoring||restoreFailed){toast(restoreFailed?'请先在首页重试读取本机收藏，避免覆盖旧数据':'正在读取本机收藏，请稍等');return}
   if(importBusy){toast('正在载入照片，请稍等再添加');return}
   importBusy=true;
@@ -901,13 +1075,15 @@ function drawScanMarks(){const g=$('scanMarks');g.replaceChildren();if(!src||ign
     circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',11);text.setAttribute('x',x);text.setAttribute('y',y);text.textContent=i+1;g.append(circle,text)})}
 function refreshScanCheck(){clearTimeout(scanCheckTimer);if(!src||$('scanView').hidden)return;
   const ignored=ignoredScans.has(src),body=$('scanCheckBody');body.replaceChildren();
-  try{scanHints=ignored?[]:scanQuality(srcData,quad,FORMATS[format],{trusted:autoFound,nativeScale:(src._ow||src.width)/src.width,back:backFor>=0})}
+  try{scanHints=ignored?[]:scanQuality(srcData,quad,FORMATS[format],{trusted:autoFound&&!scanNeedsConfirm,nativeScale:(src._ow||src.width)/src.width,back:backFor>=0})}
   catch(e){scanHints=[{code:'unavailable',title:'暂时无法检查这张照片',detail:'可以手动确认四角、反光和清晰度，再继续拉正。'}]}
   $('scanCheckTitle').textContent=ignored?'已忽略本张提醒':scanHints.length?`扫描提醒 · ${scanHints[0].title}${scanHints.length>1?`（共 ${scanHints.length} 条）`:''}`:'未发现明显扫描问题';
   $('scanCheckLead').textContent=ignored?'按当前选框继续拉正，或展开重新检查。':scanHints[0]?.detail||'确认四角贴齐相纸边缘，就可以拉正。';
   const list=document.createElement('ol');for(const hint of scanHints){const li=document.createElement('li'),b=document.createElement('b'),s=document.createElement('span');b.textContent=hint.title;s.textContent=hint.detail;li.append(b,s);list.append(li)}body.append(list);
   const note=document.createElement('p');note.textContent='提示仅供参考，不影响继续拉正。防反光：关闪光灯、避开顶灯，试试侧面的自然光。';body.append(note);
   $('scanIgnore').textContent=ignored?'重新检查本张':'忽略本张提醒';$('scanIgnore').hidden=!ignored&&!scanHints.length;
+  // 没问题、或者只是「先框住相纸」（上面的状态行已经说了）时不再重复一遍
+  $('scanCheckWrap').hidden=!ignored&&scanHints.every(h=>h.code==='framing');
   requestAnimationFrame(layoutDesk);
 }
 function scheduleScanCheck(){clearTimeout(scanCheckTimer);scanHints=[];$('scanMarks').replaceChildren();$('scanCheckTitle').textContent='正在检查选框…';$('scanCheckLead').textContent='';$('scanCheckBody').replaceChildren();$('scanIgnore').hidden=true;scanCheckTimer=setTimeout(refreshScanCheck,120)}
@@ -917,7 +1093,7 @@ $('scanCheck').addEventListener('toggle',()=>{if(!$('scanView').hidden)requestAn
 /* ---------- 扫描界面 ---------- */
 let view={k:1,ox:0,oy:0};
 function layoutDesk(){
-  if(!src)return;const desk=$('desk'),cw=desk.clientWidth,ch=desk.clientHeight,k=Math.min(cw/src.width,ch/src.height);
+  if(!src)return;const desk=$('desk'),cw=desk.clientWidth,ch=desk.clientHeight,gutter=Math.min(24,Math.min(cw,ch)*.08),k=Math.min((cw-2*gutter)/src.width,(ch-2*gutter)/src.height);
   view={k,ox:(cw-src.width*k)/2,oy:(ch-src.height*k)/2};
   const cv=$('srcCv'),dpr=Math.min(2,devicePixelRatio||1);
   cv.width=Math.round(src.width*k*dpr);cv.height=Math.round(src.height*k*dpr);
@@ -936,18 +1112,21 @@ function drawQuad(){
   drawScanMarks();
 }
 function showScan(){
+  stopHomeMotion();
   $('homeView').hidden=true;$('scanView').hidden=false;$('editView').hidden=true;$('straighten').textContent=backFor>=0?'确认选框，存成背面':mergeFor>=0?'确认选框并合成':'确认选框并拉正';
-  $('found').textContent=scanNeedsConfirm?'未确定相纸边框。请确认整张原图，或选择相纸并拖动四角':`建议相纸：${FORMATS[format].label} · 请确认四角贴齐`;
-  $('tip').textContent=format==='free'?'普通照片可以直接使用整张原图；相纸照片请框住四边':'白线是相纸底边，方向不对可点「转 90°」';
-  $('fullPhoto').hidden=backFor>=0||mergeFor>=0;$('scanConfirmNote').textContent=scanNeedsConfirm?'识别不确定，请确认后继续':'自动结果也可以手动调整';
+  $('found').textContent=scanNeedsConfirm?'没认出相纸边框。拖四角框住相纸，或直接用整张原图。':format==='free'?'按原比例拉正，确认四角贴齐就可以继续。':`认出了 ${FORMATS[format].label}，确认四角贴齐就可以拉正。`;
+  $('fullPhoto').hidden=backFor>=0||mergeFor>=0;
   renderFormats();renderTray();renderCamBtn();scheduleScanCheck();requestAnimationFrame(layoutDesk);
 }
 function renderFormats(){
+  $('formatCurrent').textContent=FORMATS[format].label;
   $('formats').innerHTML=Object.keys(FORMATS).map(k=>`<button class="chip ${k===format?'on':''}" data-f="${k}">${FORMATS[k].label}</button>`).join('');
 }
-$('formats').onclick=e=>{const f=e.target.dataset.f;if(f){if(f==='free')setFree(quad);format=f;renderFormats();$('found').textContent=`相纸：${FORMATS[f].label}`;scheduleScanCheck()}};
-$('rot').onclick=()=>{quad=rotQuad(quad,1);drawQuad();scheduleScanCheck()};
-$('fullPhoto').onclick=()=>{if(!src)return;quad=[[0,0],[src.width,0],[src.width,src.height],[0,src.height]];setFree(quad);format='free';autoFound=true;scanNeedsConfirm=false;showScan();$('found').textContent='使用整张原图，保留原始方向和比例';$('scanConfirmNote').textContent='整张原图已选好，可以继续';};
+$('formatToggle').onclick=()=>{$('formats').hidden=!$('formats').hidden;$('formatToggle').setAttribute('aria-expanded',String(!$('formats').hidden));requestAnimationFrame(layoutDesk)};
+$('scanMore').addEventListener('toggle',()=>{if(!$('scanView').hidden)requestAnimationFrame(layoutDesk)});
+$('formats').onclick=e=>{const f=e.target.dataset.f;if(f){if(f==='free')setFree(quad);format=f;renderFormats();$('formats').hidden=true;$('formatToggle').setAttribute('aria-expanded','false');$('found').textContent=`相纸：${FORMATS[f].label}`;scheduleScanCheck()}};
+$('rot').onclick=()=>{quad=rotQuad(quad,1);if(format==='free')setFree(quad);drawQuad();scheduleScanCheck()};
+$('fullPhoto').onclick=()=>{if(!src)return;quad=[[0,0],[src.width,0],[src.width,src.height],[0,src.height]];setFree(quad);format='free';autoFound=true;scanNeedsConfirm=false;showScan();$('found').textContent='用整张原图，保留原来的方向和比例。';};
 let drag=null;
 $('quadSvg').addEventListener('pointerdown',e=>{
   const r=$('desk').getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
@@ -955,7 +1134,7 @@ $('quadSvg').addEventListener('pointerdown',e=>{
   if(bi<0)return;drag=bi;clearTimeout(scanCheckTimer);scanHints=[];$('scanMarks').replaceChildren();$('scanCheckTitle').textContent='松开四角后重新检查';$('scanCheckLead').textContent='';$('scanCheckBody').replaceChildren();$('scanIgnore').hidden=true;$('quadSvg').setPointerCapture(e.pointerId);e.preventDefault();showLoupe(e)});
 $('quadSvg').addEventListener('pointermove',e=>{if(drag===null)return;const r=$('desk').getBoundingClientRect();
   quad[drag]=[Math.max(0,Math.min(src.width,(e.clientX-r.left-view.ox)/view.k)),Math.max(0,Math.min(src.height,(e.clientY-r.top-view.oy)/view.k))];drawQuad();showLoupe(e)});
-$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;if(drag!==null){drag=null;autoFound=true;$('found').textContent='好，按这个框拉正';scheduleScanCheck()}});
+$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;if(drag!==null){drag=null;autoFound=true;scanNeedsConfirm=false;if(format==='free')setFree(quad);$('found').textContent='好，按这个框拉正';scheduleScanCheck()}});
 $('quadSvg').addEventListener('pointercancel',()=>{$('loupe').hidden=true;drag=null;scheduleScanCheck()});
 // 拖角时在手指旁边放大 3 倍：手指会挡住角，看着放大镜把黄线贴到相纸边上
 function showLoupe(e){const L=$('loupe'),r=$('desk').getBoundingClientRect(),S=128,dpr=Math.min(2,devicePixelRatio||1),p=quad[drag];
@@ -976,7 +1155,7 @@ function renderTrayInto(t){
     b.appendChild(thumbOf(s));b.onclick=()=>openEdit(i);t.appendChild(b)});
   const add=document.createElement('button');add.className='add';add.textContent='+';add.setAttribute('aria-label','再扫一张');add.onclick=()=>{backFor=mergeFor=-1;$(DESK?'fileIn':'camIn').click()};t.appendChild(add);
   if(pendingFiles.length){const b=document.createElement('button');b.className='chip pending';b.textContent=`继续框选（${pendingFiles.length} 张）`;b.onclick=async()=>{if(importBusy)return;importBusy=true;try{await openPending()}catch(e){toast('这张图打不开，请重新导入')}finally{importBusy=false}};t.appendChild(b)}
-  const sm=document.createElement('small');sm.textContent=scans.length?`已扫 ${scans.length} 张，点小图接着调${scans.some(s=>!s.demo)?' · 自动存为草稿':''}`:(DESK?'可以一次拖进好几张':'扫过的会叠在这里');t.appendChild(sm);
+  const sm=document.createElement('small');sm.textContent=scans.length?`已扫 ${scans.length} 张 · 点小图接着调`:(DESK?'拖进来或 Ctrl+V 粘贴，一次可以放好几张':'扫过的会叠在这里');t.appendChild(sm);
 }
 
 /* ---------- 拉正 ---------- */
@@ -1021,7 +1200,7 @@ function buildScan(film,meta,open,idx){
   draftSoon();
   if(!open)return item;
   openEdit(same?at:scans.length-1);
-  if(glare&&!(idx>=0))toast('这张有反光。下面那条可以补拍一张把它去掉，小光斑也可以直接涂掉。',4600);
+  if(glare&&!(idx>=0))toast('这张可能有反光。可以补拍尝试合成，或手动修补小光斑；原片本来明亮时可以忽略。',4600);
   return item;
 }
 
@@ -1123,6 +1302,7 @@ function syncGlare(){const on=ed&&ed.glare,mb=ed&&ed.before;$('gbar').hidden=!on
   const n=(ed&&ed.st.spots||[]).length,cb=$('spotClr');if(cb){cb.hidden=!n;$('bSizeL').hidden=!brushing}}
 /* ---------- 调色界面 ---------- */
 function openEdit(i){
+  stopHomeMotion();
   backFor=mergeFor=-1;curScan=i;ed=scans[i];history=ed.hist;brushing=false;$('card').classList.remove('brush');showingBack=false;$('card').classList.remove('backside');syncFlip();
   if(!ed.demo)lastRealId=ed.id;
   $('homeView').hidden=true;$('scanView').hidden=true;$('editView').hidden=false;syncDraftStatus();
@@ -1148,14 +1328,14 @@ function buildSliders(){
   $('fixBtn').onclick=toggleBrush;$('mergeBtn').onclick=startMerge;$('spotClr').onclick=()=>{commit();ed.st.spots=[];syncGlare();renderCard()};
 }
 function buildFrames(){
-  const sw=(id,name,title)=>`<button class="sw" data-c="${id}" title="${title||name}"><canvas></canvas>${name}</button>`;
+  const sw=(id,name,title)=>`<button class="sw" data-c="${id}" title="${title||name}"><i><canvas></canvas></i>${name}</button>`;
   $('frames').innerHTML=`<div class="frtop"><b>边框</b><button class="chip" id="drawBtn">自己画</button><button class="chip" id="upBtn">上传边框</button></div>`+
     `<div class="fr" id="fr">${sw('orig','原框','扫描出来的原边框')}${sw('none','不要','只要照片，不要边框')}`+
     (customFrame||uploadFrame?`<span class="grp">我的</span>${customFrame?sw('draw','我画的'):''}${uploadFrame?sw('upload','我上传的'):''}`:'')+
     FRAME_SETS.map(([g,l])=>`<span class="grp">${g}</span>`+l.map(([id,name,en])=>sw(id,name,en?`${name} · ${en}`:name)).join('')).join('')+`</div>`;
   // 每个色块用这张照片的缩略图预览
   const tw=72,th=Math.round(tw*ed.F.H/ed.F.W),pc=document.createElement('canvas');pc.width=ed.photoS.width;pc.height=ed.photoS.height;pc.getContext('2d').putImageData(ed.photoS,0,0);
-  document.querySelectorAll('#fr .sw canvas').forEach(c=>{const f=c.parentNode.dataset.c;c.width=tw;c.height=th;const x=c.getContext('2d');
+  document.querySelectorAll('#fr .sw canvas').forEach(c=>{const f=c.closest('.sw').dataset.c;c.width=tw;c.height=th;const x=c.getContext('2d');
     if(f==='none'){const r=ed.rect;x.drawImage(pc,0,(th-tw*r[3]/r[2])/2,tw,tw*r[3]/r[2]);return}
     composite(x,tw,th,pc,{...ed.st,frame:f,date:null},false)});
   $('fr').addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.preventDefault();$('fr').scrollLeft+=e.deltaY}},{passive:false});  // 电脑上滚轮横着翻
@@ -1269,8 +1449,11 @@ function cardDims(){
   return bare?{w:ed.rect[2],h:ed.rect[3]}:{w:ed.W,h:ed.H};
 }
 function layoutCard(){
-  const stg=$('stage'),aw=stg.clientWidth*.72,ah=Math.min(stg.clientHeight-30,stg.clientHeight*.84),{w,h}=cardDims(),k=Math.min(aw/w,ah/h);
-  const card=$('card'),cw=w*k,ch=h*k;card.style.width=cw+'px';card.style.height=ch+'px';
+  // 只在上方为相机提示让位，把卡片放在剩下的区域中间，避免矮窗口重复扣除提示高度。
+  const stg=$('stage'),note=$('note'),style=getComputedStyle(stg),padTop=parseFloat(style.paddingTop)||0,padBottom=parseFloat(style.paddingBottom)||0;
+  const top=Math.max(padTop,note.offsetParent?note.offsetTop+note.offsetHeight+8:0),bottom=Math.max(14,padBottom);
+  const aw=stg.clientWidth*.72,ah=Math.max(1,Math.min(stg.clientHeight-top-bottom,stg.clientHeight*.84)),{w,h}=cardDims(),k=Math.min(aw/w,ah/h);
+  const card=$('card'),cw=w*k,ch=h*k;card.style.width=cw+'px';card.style.height=ch+'px';card.style.marginTop=(top-padTop)+'px';card.style.marginBottom=(bottom-padBottom)+'px';
   card.classList.toggle('bare',ed.st.frame==='none'&&!showingBack);
   const cap=$('cap'),F=ed.F;cap.hidden=ed.st.frame==='none'||ed.st.capOff;
   const imgBottom=(F.img[1]+F.img[3])/F.H*ch, ml=!!memoLine(ed.st), fs=Math.max(12,Math.min((ch-imgBottom)*(ml?.42:.62),cw*.09));
@@ -1553,7 +1736,8 @@ async function clearAll(){$('expPanel').hidden=true;clearTimeout(draftT);
    照片、四个角、所有调整自动存进这个浏览器的 IndexedDB，刷新或下次打开接着来。
    图片只存一次（翻拍原图 + 拉正后的整张），调整每次改都重写。示例照片不存 */
 const KV={p:null,db(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open('tiejin-drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}).catch(e=>{this.p=null;throw e}))},
-  async run(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction('kv',mode),q=fn(t.objectStore('kv'));t.oncomplete=()=>res(q&&q.result);t.onerror=t.onabort=()=>rej(t.error)})},
+  async run(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction('kv',mode);let q,callbackError;t.oncomplete=()=>res(q&&q.result);t.onerror=t.onabort=()=>rej(callbackError||t.error);
+    try{q=fn(t.objectStore('kv'))}catch(e){callbackError=e;try{t.abort()}catch(ignore){}rej(e)}})},
   get(k){return this.run('readonly',s=>s.get(k))},keys(){return this.run('readonly',s=>s.getAllKeys())}};
 let draftT=0,draftBusy=false,draftWarned=false,restoring=true,restoreFailed=false,persistAsked=false,draftRunning=null,draftEpoch=0,draftLocks=0,draftPending=false;
 let draftState='empty',draftSavedKey='',draftTargetKey='';
@@ -1564,7 +1748,7 @@ function draftKey(){return JSON.stringify([realFocus(),scans.filter(s=>!s.demo).
 function syncDraftStatus(){const el=$('draftStatus'),demo=ed?.demo,state=demo?'demo':draftState;
   el.dataset.state=state;$('draftText').textContent=({demo:'示例体验 · 不会保存到你的收藏',empty:'还没有需要保存的照片',pending:'有修改，等待保存到本机…',saving:'正在保存到本机…',saved:'已保存到本机 · 导出图片可另存到设备',error:'保存失败 · 修改尚未存好，请重试或导出图片'})[state];$('draftRetry').hidden=state!=='error';
 }
-function draftSoon(){if(restoring||restoreFailed)return;clearTimeout(draftT);const key=draftKey();
+function draftSoon(){if(restoring||restoreFailed||backupRestoring)return;clearTimeout(draftT);const key=draftKey();
   if(!draftBusy&&key===draftSavedKey){syncDraftStatus();return}
   if(draftState!=='error')draftState=draftBusy&&key===draftTargetKey?'saving':'pending';syncDraftStatus();
   if(draftLocks){draftPending=true;return}draftT=setTimeout(()=>saveDraft(),1200)}
@@ -1573,7 +1757,7 @@ $('draftRetry').onclick=()=>{clearTimeout(draftT);saveDraft()};
 async function mutateDraft(fn){draftEpoch++;draftLocks++;clearTimeout(draftT);
   try{if(draftRunning)await draftRunning;return await fn()}
   finally{draftLocks--;if(!draftLocks&&draftPending){draftPending=false;draftSoon()}}}
-async function saveDraft(force=false){if(restoring||restoreFailed)return false;if(draftLocks&&!force){draftPending=true;return}if(draftBusy){draftSoon();return draftRunning}draftBusy=true;const epoch=draftEpoch,key=draftKey();draftTargetKey=key;
+async function saveDraft(force=false){if(restoring||restoreFailed||backupRestoring)return false;if(draftLocks&&!force){draftPending=true;return}if(draftBusy){draftSoon();return draftRunning}draftBusy=true;const epoch=draftEpoch,key=draftKey();draftTargetKey=key;
   if(draftState!=='error')draftState='saving';syncDraftStatus();
   draftRunning=(async()=>{
   try{const list=scans.filter(s=>!s.demo),put=[];
@@ -1770,10 +1954,10 @@ function renderLibHead(){if(lib.col!=='all'&&!colOf(lib.col)){lib.col='all';lib.
   const cs=$('libCols');cs.innerHTML='';
   for(const k of [{id:'all',name:'全部',n:libAll().length,s:libAll().slice(-1)[0]},...cols.map(k=>({id:k.id,name:k.name,n:k.ids.filter(live).length,s:coverOf(k)}))]){
     const b=document.createElement('button');b.className='ac'+(k.id===lib.col?' on':'');b.dataset.col=k.id;b.appendChild(coverCv(k.s,144));b.insertAdjacentHTML('beforeend',`<b>${esc(k.name)}</b><small>${k.n} 张</small>`);cs.appendChild(b)}
-  cs.insertAdjacentHTML('beforeend','<input class="newcol" id="libNew" maxlength="12" placeholder="＋ 新相册，写名字回车" aria-label="新相册的名字">');
+  cs.insertAdjacentHTML('beforeend','<label class="ac newtile"><span aria-hidden="true">＋</span><input class="newcol" id="libNew" maxlength="12" placeholder="新相册" aria-label="新相册的名字，写好按回车"><small>写名字回车</small></label>');
   $('libBar').innerHTML=c?`<input id="colName" value="${esc(c.name)}" maxlength="12" aria-label="相册名字"><button class="chip${lib.pick?' on':''}" id="colPick">${lib.pick?'挑好了':'挑照片'}</button><button class="chip" id="colDel">删掉相册</button>`+
     `<p>${lib.pick?`点照片放进或拿出「${esc(c.name)}」。亮着的在相册里。`:'点「设为封面」换封面。删掉相册不会删照片。'}</p>`:'';
-  $('libAlbum').textContent=lib.pick?'挑好了':'用这些拼一页';$('libAlbum').hidden=!libAll().length}
+  $('libAlbum').hidden=lib.pick||!libAll().length}
 function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=libList(),cov=c&&coverOf(c);g.innerHTML='';
   if(!list.length){g.innerHTML=`<p class="empty">${lib.q?'没找到。换个词试试，比如年份「2025」、月份「2025.07」或者地点':c?'这个相册还是空的。点「挑照片」，或者在调色页的「回忆」里放进来':'还没有照片'}</p>`;return}
   let last=null;for(const s of list){const mk=dGroup(s.st.date),m=s.st.memo||{};
@@ -1781,7 +1965,7 @@ function renderLibGrid(){const g=$('libGrid'),t=++libTok,c=colOf(lib.col),list=l
     const f=document.createElement('figure');f.className='lc'+(lib.pick&&c?(c.ids.includes(s.id)?' sel':' unsel'):'');f.dataset.id=s.id;
     f.innerHTML=`<div class="flip" role="button" tabindex="0" aria-label="${s.back?'翻面':'打开'}"><canvas class="fc"></canvas>${s.back?'<canvas class="bk"></canvas>':''}</div>`+
       `<figcaption><span>${esc([dLabel(s.st.date),m.place].filter(Boolean).join(' · ')||'日期未知')}</span>${s.back?'<i>有背面</i>':''}${s.demo?'<i>示例</i>':''}</figcaption>`+
-      (lib.pick?'':`<div class="ops"><button data-op="open">打开</button>${s.back?'<button data-op="flip">翻面</button>':''}${c?`<button data-op="cover"${cov===s?' class="on"':''}>${cov===s?'是封面':'设为封面'}</button>`:''}</div>`);
+      (lib.pick||!(s.back||c)?'':`<div class="ops">${s.back?'<button data-op="open">打开</button><button data-op="flip">翻面</button>':''}${c?`<button data-op="cover"${cov===s?' class="on"':''}>${cov===s?'是封面':'设为封面'}</button>`:''}</div>`);
     g.appendChild(f);const fr=f.querySelector('.fc'),[w,h]=s.st.frame==='none'?[s.rect[2],s.rect[3]]:[s.W,s.H];fr.width=280;fr.height=Math.round(280*h/w);
     if(s.back){const b=f.querySelector('.bk');b.width=280;b.height=Math.round(280*s.back.height/s.back.width);b.getContext('2d').drawImage(s.back,0,0,b.width,b.height)}
     cardOf(s,false).then(cv=>{if(t!==libTok)return;fr.height=Math.round(280*cv.height/cv.width);const x=fr.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(cv,0,0,fr.width,fr.height)}).catch(()=>{})}}
@@ -1802,7 +1986,7 @@ $('libGrid').onclick=e=>{const f=e.target.closest('.lc');if(!f)return;const s=sc
   if(op==='cover'){c.cover=s.id;draftSoon();renderLib();return}
   if(op==='flip'||e.target.closest('.flip'))f.classList.toggle('turned')};
 $('libGrid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('flip')){e.preventDefault();e.target.click()}});
-$('libAlbum').onclick=()=>{if(lib.pick){lib.pick=false;renderLib();return}const c=colOf(lib.col),l=libList().reverse();if(!l.length){toast('这里还没有照片');return}
+$('libAlbum').onclick=()=>{const c=colOf(lib.col),l=libList().reverse();if(!l.length){toast('这里还没有照片');return}
   $('libPanel').hidden=true;openAlbum(l.map(s=>s.id),c?c.name:lib.q.trim())};
 
 /* ---------- 机型资料：只写官网查得到的（见 product-facts.md） ---------- */
@@ -1949,13 +2133,13 @@ function diagnose(m,cam){
   return out;
 }
 function updateNote(){
-  const n=$('note');if(!ed){n.hidden=true;return}
-  if(!camera){n.textContent='选一下你的相机，教你怎么拍 ›';n.hidden=false;return}
-  if(camera.hybrid){n.textContent='混合机可以直接导原图 ›';n.hidden=false;return}
-  ed.m=ed.m||analyze(ed.photoS);ed.diag=ed.diag||diagnose(ed.m,camera);
-  n.textContent=ed.diag.length?`这张${ed.diag[0].t.replace('照片','')} · 下次怎么拍 ›`:'拍得不错 · 这台还能怎么玩 ›';n.hidden=false;
+  let text='';
+  if(ed){if(!camera)text='选一下你的相机，教你怎么拍 ›';else if(camera.hybrid)text='混合机可以直接导原图 ›';
+    else{ed.m=ed.m||analyze(ed.photoS);ed.diag=ed.diag||diagnose(ed.m,camera);text=ed.diag.length?`这张${ed.diag[0].t.replace('照片','')} · 下次怎么拍 ›`:'拍得不错 · 这台还能怎么玩 ›'}}
+  // 手机上写在照片上方，电脑上写在右栏标题下面，不再漂在照片旁边
+  for(const n of [$('note'),$('noteSide')]){n.textContent=text;n.hidden=!text}
 }
-$('note').onclick=()=>{if(!camera)openCamPanel();else openGuide()};
+$('note').onclick=$('noteSide').onclick=()=>{if(!camera)openCamPanel();else openGuide()};
 $('guideClose').onclick=()=>{askCtl?.abort();$('guidePanel').hidden=true};
 
 let sampleFn=null,canImages=false,askCtl=null;
@@ -2484,7 +2668,7 @@ $('shoot').onclick=()=>$('camIn').click();
 $('pick').onclick=()=>$('fileIn').click();
 for(const id of ['camIn','fileIn']){$(id).onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
   $(id).addEventListener('cancel',()=>{backFor=mergeFor=-1})}   // 没选就关掉：下一张照常导入，不当成背面或补拍
-if(DESK){$('homeShoot').hidden=true;$('homeImport').classList.add('on');$('shoot').hidden=true;$('pick').textContent='上传照片';$('fileIn').setAttribute('aria-label','上传照片');
+if(DESK){$('homeShoot').hidden=true;$('shoot').hidden=true;$('pick').textContent='上传照片';$('fileIn').setAttribute('aria-label','上传照片');
   $('tdHint').textContent='拖动旋转 · 滚轮缩放 · 点击部件把它拆出来'}
 $('save').textContent='导出图片';
 /* 拖放和粘贴：电脑上最顺手的导入方式 */
@@ -2495,10 +2679,12 @@ addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('Files'))e
 addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('drop').hidden=true;closePanels();if(e.dataTransfer.files.length)loadFiles(e.dataTransfer.files)});
 const textEditing=()=>{const a=document.activeElement;return !!a&&(a.isContentEditable||a.matches('textarea, input:not([type="range"]):not([type="button"]):not([type="checkbox"]):not([type="radio"])'))};
 addEventListener('paste',e=>{if(textEditing())return;const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();closePanels();loadFiles(fs)}});
-function closePanels(){['camPanel','guidePanel','tdPanel','sheet','drawPanel','expPanel','albumPanel','libPanel'].forEach(id=>$(id).hidden=true);dr=null;if(td)td.running=false}
+function closePanels(force=false){if(backupBusy&&!force)return;['camPanel','guidePanel','tdPanel','sheet','drawPanel','expPanel','albumPanel','libPanel','backupPanel'].forEach(id=>$(id).hidden=true);for(const id of ['homeView','scanView','editView'])$(id).inert=false;dr=null;if(td)td.running=false}
 /* 快捷键：Ctrl/⌘+Z 撤销，Ctrl/⌘+S 保存，Esc 关面板 */
 addEventListener('keydown',e=>{
-  const mod=e.ctrlKey||e.metaKey,editing=!$('editView').hidden&&$('camPanel').hidden&&$('guidePanel').hidden&&$('tdPanel').hidden&&$('drawPanel').hidden&&$('expPanel').hidden&&$('albumPanel').hidden&&$('libPanel').hidden;
+  if(backupBusy){if(e.key==='Escape'||(e.ctrlKey||e.metaKey)&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return}
+  if(e.key==='Escape'&&!$('backupPanel').hidden){$('backupClose').click();return}
+  const mod=e.ctrlKey||e.metaKey,editing=!$('editView').hidden&&$('camPanel').hidden&&$('guidePanel').hidden&&$('tdPanel').hidden&&$('drawPanel').hidden&&$('expPanel').hidden&&$('albumPanel').hidden&&$('libPanel').hidden&&$('backupPanel').hidden;
   if(e.key==='Escape'){if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('expPanel').hidden)$('expPanel').hidden=true;else if(!$('albumPanel').hidden)$('albumPanel').hidden=true;else if(!$('libPanel').hidden)$('libPanel').hidden=true;else if(!$('drawPanel').hidden)$('drawCancel').click();else if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('tdPanel').hidden)$('tdClose').click();else if(!$('guidePanel').hidden)$('guideClose').click();else if(!$('camPanel').hidden)$('camPanel').hidden=true;return}
   if(!mod||!editing||textEditing()||e.isComposing)return;
   if(e.key.toLowerCase()==='z'){e.preventDefault();$('undo').click()}
@@ -2541,15 +2727,41 @@ async function startAmb(){const cv=$('amb');if(ambStarted||!navigator.gpu||!cv||
   cv.style.width='100%';cv.style.height='100%';
   try{const {createShader}=await import(AMB_URL),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
     await createShader(cv,{components:[
-      {type:'FlowingGradient',props:{colorA:'#121110',colorB:'#221210',colorC:'#26180F',colorD:'#161413',speed:still?0:.18,distortion:.35,seed:7}},
-      {type:'LightLeak',props:{position:{x:.97,y:.08},spread:.42,intensity:.05,streaks:.3,colorHot:'#FFE7B8',colorMid:'#E8742A',colorFringe:'#7A2E4A',flicker:.25,speed:still?0:.35,seed:3}},
-      {type:'Vignette',props:{color:'#0C0B0A',radius:.35,falloff:.75,intensity:.85}},
-      {type:'FilmGrain',props:{strength:.07,bias:2,animated:false}}]},
+      {type:'FlowingGradient',props:{colorA:'#E9E2D4',colorB:'#EFE8DB',colorC:'#E4D9C6',colorD:'#ECE5D7',speed:still?0:.18,distortion:.35,seed:7}},
+      {type:'LightLeak',props:{position:{x:.97,y:.08},spread:.42,intensity:.03,streaks:.2,colorHot:'#FFF7E6',colorMid:'#F1CC92',colorFringe:'#E2B3A2',flicker:.25,speed:still?0:.35,seed:3}},
+      {type:'Vignette',props:{color:'#BFAF94',radius:.45,falloff:.8,intensity:.35}},
+      {type:'FilmGrain',props:{strength:.05,bias:2,animated:false}}]},
       {disableTelemetry:true,onReady:()=>cv.classList.add('on'),onError:()=>cv.classList.remove('on')})}catch(e){cv.classList.remove('on')}}
 // 等首屏和照片都画好再加载，不跟它们抢网速
 addEventListener('load',()=>setTimeout(()=>(window.requestIdleCallback||setTimeout)(startAmb),1200));
+__BACKUP_JS__
+
+/* 完整备份：预览与确认分开；恢复只在一个事务中替换，失败时旧收藏仍在。 */
+function backupMessage(message,error=false){$('backupMessage').textContent=message;$('backupMessage').dataset.error=String(error)}
+function setBackupBusy(on){backupBusy=on;for(const id of ['backupClose','backupExport','backupChoose','backupApply','backupIn'])$(id).disabled=on;
+  if(!on)$('backupExport').disabled=restoring||restoreFailed||!scans.some(s=>!s.demo)&&!cols.length&&!pages.length;
+}
+function openBackup(){if(backupBusy||restoring)return;backupReturn=!$('libPanel').hidden?'library':!$('homeView').hidden?'home':'edit';closePanels();pendingBackup=null;$('backupSummary').hidden=$('backupApply').hidden=true;$('backupIn').value='';backupMessage('备份文件包含完整照片，请保存在你信任的位置。');$('backupPanel').hidden=false;
+  for(const id of ['homeView','scanView','editView'])$(id).inert=true;setBackupBusy(false);$('backupClose').focus();
+}
+$('backupOpen').onclick=$('libBackup').onclick=openBackup;
+$('backupClose').onclick=()=>{if(backupBusy)return;$('backupPanel').hidden=true;for(const id of ['homeView','scanView','editView'])$(id).inert=false;if(backupReturn==='library')$('libPanel').hidden=false};
+$('backupChoose').onclick=()=>$('backupIn').click();
+async function readBackupEntries(){const db=await KV.db();return new Promise((resolve,reject)=>{const tx=db.transaction('kv','readonly'),store=tx.objectStore('kv'),keys=store.getAllKeys(),values=store.getAll();tx.oncomplete=()=>resolve(keys.result.map((key,i)=>[key,values.result[i]]));tx.onerror=tx.onabort=()=>reject(tx.error)})}
+$('backupExport').onclick=async()=>{if(backupBusy)return;setBackupBusy(true);backupMessage('正在把照片和回忆收进备份…');
+  try{const entries=await mutateDraft(async()=>{if(!await saveDraft(true))throw new Error('Save failed');return readBackupEntries()});const blob=await AlbumBackup.create(entries),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`instant-album-${new Date().toISOString().slice(0,10)}.instant-album.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);backupMessage('完整备份已生成，请查看浏览器下载。以后在这里选择该文件即可恢复。')}
+  catch(e){backupMessage('备份未能完成。请确认草稿已保存、浏览器有足够空间，再重试。',true)}finally{setBackupBusy(false)}};
+$('backupIn').onchange=async e=>{if(backupBusy)return;const file=e.target.files[0];if(!file)return;pendingBackup=null;$('backupSummary').hidden=$('backupApply').hidden=true;setBackupBusy(true);backupMessage('正在检查备份的照片和内容…');
+  try{const entries=await AlbumBackup.parse(file),meta=entries.find(([key])=>key==='meta')?.[1],count=meta?.list?.length||0;pendingBackup=entries;
+    $('backupSummary').textContent=`${file.name}\n${count} 张照片 · ${meta?.cols?.length||0} 本相册 · ${meta?.pages?.length||0} 张拼页\n恢复将替换当前浏览器内的收藏，建议先下载当前收藏的完整备份。`;$('backupSummary').hidden=$('backupApply').hidden=false;backupMessage('备份检查完成。确认替换后才会写入本机收藏。')}
+  catch(e){backupMessage('这个文件不是可恢复的完整备份，或其中的内容已损坏。当前收藏没有改变，请重新选择。',true)}finally{e.target.value='';setBackupBusy(false)}};
+$('backupApply').onclick=async()=>{if(backupBusy||!pendingBackup)return;setBackupBusy(true);backupRestoring=true;clearTimeout(draftT);backupMessage('正在恢复收藏，请稍等…');
+  try{const entries=pendingBackup;await mutateDraft(async()=>{await KV.run('readwrite',store=>{store.clear();entries.forEach(([key,value])=>store.put(value,key))});draftPending=false});
+    pendingBackup=null;pendingFiles=[];pendingSource=null;cardCache.clear();homePreviewCache.clear();await loadHomeDrafts();toast(restoreFailed?'备份已写入，请在首页重试读取收藏':'收藏已恢复，可以继续编辑了',4200)}
+  catch(e){backupMessage('恢复没有完成，原有收藏仍保留。请确认浏览器有足够空间后重试。',true)}finally{backupRestoring=false;setBackupBusy(false);if(!$('backupPanel').hidden)draftSoon()}};
+
 // 打开时恢复数据，再由首页选择继续整理或导入新照片。
-async function loadHomeDrafts(){restoring=true;restoreFailed=false;clearTimeout(draftT);scans.length=0;cols=[];pages=[];ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;renderHome();
+async function loadHomeDrafts(){restoring=true;restoreFailed=false;clearTimeout(draftT);homePreviewCache.clear();scans.length=0;cols=[];pages=[];ed=null;curScan=-1;lastRealId=null;customFrame=uploadFrame=null;renderHome();
   let r=null;try{r=await restoreDrafts()}catch(e){restoreFailed=true}restoring=false;clearTimeout(draftT);
   if(r){curScan=r.cur;ed=scans[curScan];lastRealId=ed.id;history=ed.hist}
   draftSavedKey=restoreFailed?'':draftKey();draftState=restoreFailed?'error':scans.some(s=>!s.demo)||cols.length?'saved':'empty';syncDraftStatus();showHome();

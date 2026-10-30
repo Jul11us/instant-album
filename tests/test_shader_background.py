@@ -1,6 +1,7 @@
 """Regression for responsive, optional shader background (Playwright + Chromium)."""
 import base64
 import os
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -8,11 +9,9 @@ from playwright.sync_api import sync_playwright
 
 
 ROOT = Path(__file__).resolve().parents[1]
-source = (ROOT / "src/app.html").read_text(encoding="utf-8")
-sample = base64.b64encode((ROOT / "design-demos/assets/sample.jpg").read_bytes()).decode()
-html = ('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">'
-        '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-        '</head><body>' + source.replace('__IMG__', 'data:image/jpeg;base64,' + sample) + '</body></html>')
+sys.path.insert(0, str(ROOT))
+from build import render
+html = render(ROOT)
 
 with TemporaryDirectory() as temp, sync_playwright() as playwright:
     path = Path(temp) / "page.html"
