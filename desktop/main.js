@@ -1,4 +1,4 @@
-// 相角电脑版：一个窗口装着网页版的全部界面。
+// 相角电脑版（Windows 和 Mac）：一个窗口装着网页版的全部界面。
 // 页面从 app:// 读本地文件（字体、Three.js、Shaders 都在 app/ 里，不联网也能用）；
 // 草稿存在这台电脑的应用数据里，不会跟着浏览器一起被清掉；导出和备份用系统的「另存为」。
 const { app, BrowserWindow, Menu, dialog, ipcMain, protocol, session, shell } = require('electron');
@@ -28,7 +28,8 @@ protocol.registerSchemesAsPrivileged([{
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
-let win = null;
+const isMac = process.platform === 'darwin';
+let win = null, ready = false;
 const settingsFile = () => path.join(app.getPath('userData'), 'settings.json');
 let settings = {};
 async function loadSettings() {
@@ -105,7 +106,7 @@ ipcMain.handle('desktop:reveal', (_event, file) => {
 
 function createWindow() {
   const bounds = settings.bounds || {};
-  win = new BrowserWindow({
+  const w = win = new BrowserWindow({
     width: bounds.width || 1280, height: bounds.height || 860, x: bounds.x, y: bounds.y,
     minWidth: 380, minHeight: 560,
     title: '相角', backgroundColor: '#F2EFE8', show: false,
@@ -116,38 +117,79 @@ function createWindow() {
       backgroundThrottling: !TEST.hidden,
     },
   });
-  if (settings.maximized) win.maximize();
-  win.once('ready-to-show', () => { if (!TEST.hidden) win.show() });
+  if (settings.maximized) w.maximize();
+  w.once('ready-to-show', () => { if (!TEST.hidden) w.show() });
   const remember = () => {
-    if (win.isDestroyed()) return;
-    settings.maximized = win.isMaximized();
-    if (!settings.maximized && !win.isMinimized()) settings.bounds = win.getBounds();
+    if (w.isDestroyed()) return;
+    settings.maximized = w.isMaximized();
+    if (!settings.maximized && !w.isMinimized()) settings.bounds = w.getBounds();
     saveSettings();
   };
-  win.on('resize', remember); win.on('move', remember); win.on('close', remember);
+  w.on('resize', remember); w.on('move', remember); w.on('close', remember);
+  w.on('closed', () => { if (win === w) win = null });
 
   // 机型说明、教程这些外链交给系统浏览器；窗口本身永远停在相角里
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  w.webContents.setWindowOpenHandler(({ url }) => {
     if (isExternal(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
-  win.webContents.on('will-navigate', (e, url) => {
+  w.webContents.on('will-navigate', (e, url) => {
     if (url.startsWith('app://bundle/')) return;
     e.preventDefault();
     if (isExternal(url)) shell.openExternal(url);
   });
-  win.loadURL(HOME_URL);
+  w.loadURL(HOME_URL);
 }
 
-app.on('second-instance', () => {
-  if (!win) return;
+// Windows 上不要菜单栏。Mac 的菜单栏是系统的一部分，没有它 ⌘Q、⌘W、⌘H 和输入框里的 ⌘C / ⌘V 都不起作用
+function macMenu() {
+  const name = app.name;
+  return Menu.buildFromTemplate([
+    { label: name, submenu: [
+      { role: 'about', label: `关于${name}` },
+      { type: 'separator' },
+      { role: 'services', label: '服务' },
+      { type: 'separator' },
+      { role: 'hide', label: `隐藏${name}` },
+      { role: 'hideOthers', label: '隐藏其他' },
+      { role: 'unhide', label: '全部显示' },
+      { type: 'separator' },
+      { role: 'quit', label: `退出${name}` },
+    ] },
+    // 编辑照片时的 ⌘Z 由页面自己处理（撤销上一步调整），这里的撤销只管输入框里的文字
+    { label: '编辑', submenu: [
+      { role: 'undo', label: '撤销' },
+      { role: 'redo', label: '重做' },
+      { type: 'separator' },
+      { role: 'cut', label: '剪切' },
+      { role: 'copy', label: '拷贝' },
+      { role: 'paste', label: '粘贴' },
+      { role: 'selectAll', label: '全选' },
+    ] },
+    { label: '显示', submenu: [{ role: 'togglefullscreen', label: '进入 / 退出全屏幕' }] },
+    { label: '窗口', role: 'window', submenu: [
+      { role: 'minimize', label: '最小化' },
+      { role: 'zoom', label: '缩放' },
+      { role: 'close', label: '关闭窗口' },
+      { type: 'separator' },
+      { role: 'front', label: '前置全部窗口' },
+    ] },
+  ]);
+}
+
+// 再次打开相角（Windows 上又双击了图标，Mac 上点了程序坞）：把窗口拿到前面；Mac 上窗口关掉了就重新开一个
+function bringBack() {
+  if (!ready) return;
+  if (!win) { createWindow(); return }
   if (win.isMinimized()) win.restore();
   win.focus();
-});
+}
+app.on('second-instance', bringBack);
+app.on('activate', bringBack);
 
 app.whenReady().then(async () => {
   await loadSettings();
-  Menu.setApplicationMenu(null);
+  Menu.setApplicationMenu(isMac ? macMenu() : null);
   protocol.handle('app', serveApp);
   const ses = session.defaultSession;
   // 这个应用用不到摄像头、定位、通知这些权限
@@ -160,6 +202,8 @@ app.whenReady().then(async () => {
     ses.webRequest.onBeforeRequest((details, callback) => callback({ cancel: isExternal(details.url) }));
   }
   createWindow();
+  ready = true;
 });
 
-app.on('window-all-closed', () => app.quit());
+// Mac 的习惯：关掉窗口应用还留在程序坞里，⌘Q 才退出
+app.on('window-all-closed', () => { if (!isMac) app.quit() });

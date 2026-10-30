@@ -79,7 +79,8 @@
 | [`build.py`](build.py) | 将示例照片嵌入页面 |
 | [`product-facts.md`](product-facts.md) | 相机规格、拍摄建议与来源 |
 | [`design-demos/`](design-demos/) | 早期设计探索和示例素材 |
-| [`desktop/`](desktop/) | Windows 电脑版：Electron 外壳（`main.js`、`preload.js`）、离线资源准备脚本和冒烟检查 |
+| [`desktop/`](desktop/) | Windows 和 Mac 电脑版：Electron 外壳（`main.js`、`preload.js`）、离线资源准备脚本和冒烟检查 |
+| [`.github/workflows/mac.yml`](.github/workflows/mac.yml) | 在 GitHub 的 Mac 机器上打包并检查 Mac 版 |
 
 修改源码后，在项目目录运行：
 
@@ -108,6 +109,8 @@ npm run dist
 ```
 
 `npm start` 先构建网页版，再把字体（按 Google 的分片下载，缓存在 `desktop/.cache/`）、Three.js 和 Shaders 放进 `desktop/app/`，然后打开窗口；`npm run dist` 在 `desktop/dist/` 生成安装包和免安装版 zip；`npm run release` 再把它们连同校验值和安装说明收进 `desktop/release/<版本>/`；`npm run check` 断网启动应用，检查导入、导出、完整备份、3D 拆解和重启后草稿是否保留（加 `-- --packaged` 检查打包后的程序）。国内网络安装时可设置 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/` 和 `ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/`。
+
+Mac 版需要 macOS 13 或更新版本（[Electron 兼容性说明](https://www.electronjs.org/blog/electron-44-0#removed-macos-12-support)），只能在 Mac 上打包：dmg 和签名要用 macOS 自带的工具，electron-builder 在 Windows 上会直接拒绝。在 Mac 上运行 `npm run dist:mac`，会生成 Apple 芯片和 Intel 芯片两个 dmg。没有 Mac 的话，把改动推送到 GitHub，「Mac 版」工作流（[`mac.yml`](.github/workflows/mac.yml)）会在 GitHub 的 Mac 机器上打包；它像用户一样从 dmg 里拷出 `相角.app`，检查签名和芯片，再跑一遍冒烟检查（Intel 版借 Rosetta 运行）。dmg、校验值和截图都在这次运行的 Artifacts 里下载。发布时把两个 dmg 放进 `desktop/dist/`，`npm run release` 会把它们和 Windows 版一起收进下载包，并在安装说明里加上 Mac 的部分。Mac 版只有 ad-hoc 签名，没有 Apple 开发者证书和公证，所以第一次打开时要到「系统设置 → 隐私与安全性」里点「仍要打开」。
 
 ## English
 

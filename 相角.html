@@ -89,6 +89,7 @@ button:disabled{cursor:default}
 .home-actions .chip:hover{background:var(--surface2)}.home-actions .chip.on:hover{background:#48443B}
 .home-text{display:inline-block;margin-top:16px;font-size:12px;color:var(--muted);padding:4px 0;text-decoration:underline;text-decoration-color:#BDB6A8;text-underline-offset:5px;transition:color .18s}
 .home-text:hover{color:var(--text);text-decoration-color:currentColor}
+.home-text+.home-text{margin-left:18px}
 .home-shelf{border-top:1px solid var(--line);padding-top:24px;display:grid;gap:14px}
 .home-shelf-head{display:flex;justify-content:space-between;align-items:center;gap:16px}.home-shelf-head h2{font-family:var(--serif);font-size:20px;font-weight:500;margin:0}.home-shelf-head span{font-size:12px;color:var(--muted)}
 .home-shelf-head .chip{padding:8px 0 8px 12px;background:transparent;font-size:12px}
@@ -450,6 +451,18 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .tddetail td{padding:3px 0;border-top:1px solid #E3E6F2;vertical-align:top}
 .tddetail td:first-child{color:#4A5080;width:30%;padding-right:8px}
 .tddetail .gen{font-size:12px;color:#4A5080;margin-top:6px}
+.tdparts .chip.tdpmore{display:none}
+@media (max-width:899px){
+  .tddetail{flex:0 0 auto;max-height:132px}
+  .tddetail.compact{padding:8px 12px}
+  .tddetail.compact p{font-size:12.5px;margin:2px 0 0}
+  .tdparts .chip{padding:6px 9px;font-size:12px}
+  .tdparts .chip.more{display:none}
+  .tdparts.open .chip.more{display:inline-block}
+  .tdparts .chip.tdpmore{display:inline-block}
+  .tdparts.open .chip.tdpmore{display:none}
+  .tdhint{font-size:11.5px;padding:5px 10px}
+}
 /* 电脑：拖放、粘贴、宽屏两栏 */
 #tray2{display:none}
 @media (min-width:900px){
@@ -505,7 +518,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
       <div class="home-hero"><div class="home-copy"><h1 id="homeTitle">给拍立得，
 做一本电子相册。</h1><p id="homeIntro">拉正翻拍的照片，把正反面、那天的日期和故事，一起好好收藏。</p>
         <div class="home-actions"><button class="chip on" id="homeContinue" hidden>继续整理</button><button class="chip on" id="homeShoot" disabled>拍一张</button><button class="chip" id="homeImport" disabled>导入照片</button></div>
-        <button class="home-text" id="homeDemo" disabled>先看看示例</button>
+        <button class="home-text" id="homeDemo" disabled>先看看示例</button><button class="home-text" id="home3d">相机 3D 拆解 ›</button>
       </div><div class="home-visual" id="homeStack" role="button" tabindex="0" aria-label="换一张照片"><figure class="home-print rear left" aria-hidden="true"><img id="homeSecond" alt=""></figure><figure class="home-print rear right" aria-hidden="true"><img id="homeThird" alt=""></figure><figure class="home-print"><img id="homeSample" alt="匹兹堡河边的拍立得翻拍"></figure></div></div>
       <div class="home-shelf"><div class="home-shelf-head"><h2>我的照片</h2><button class="chip" id="homeLibrary" disabled>我的相册 ›</button></div>
         <div class="home-gallery" id="homeGallery" hidden aria-label="最近的照片"></div>
@@ -573,7 +586,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   </section>
   <section class="panel" id="camPanel" hidden aria-label="选相机">
     <div class="top"><button class="chip ghost" id="camClose">‹ 返回</button><span></span></div>
-    <div class="body"><h2>你用的是哪台？</h2><p class="sub">选好后，扫描会按这台的相纸尺寸来拉正，拍摄建议也按这台的功能来给。</p><div id="camList"></div></div>
+    <div class="body"><h2>你用的是哪台？</h2><p class="sub">选好后，扫描会按这台的相纸尺寸来拉正，拍摄建议也按这台的功能来给。</p><div id="camList"></div><p class="sub"><button class="home-text" id="cam3d">先看看相机的 3D 拆解 ›</button></p></div>
   </section>
   <section class="panel" id="guidePanel" hidden aria-label="拍摄建议">
     <div class="top"><button class="chip ghost" id="guideClose">‹ 回去调色</button><button class="chip line" id="guideCam"></button></div>
@@ -618,6 +631,7 @@ const CARD_TILT=0;  // 卡片的倾斜角度（度），要和 CSS 里 .card 的
 const $ = id => document.getElementById(id);
 // 有鼠标、能悬停的当电脑：改文案、开拖放和快捷键；宽屏布局另由 CSS 宽度决定
 const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const PASTE_KEY=/Mac|iPhone|iPad/.test(navigator.platform)?'⌘V':'Ctrl+V';   // Mac（包括 Mac 电脑版）上提示 ⌘V
 const DESKTOP=window.desktop||null;   // 电脑版（desktop/ 里的 Electron 外壳）：草稿存在这台电脑上，保存时弹系统的「另存为」
 document.documentElement.dataset.device=DESK?'desktop':'touch';
 const SAVE_T='保存图片';
@@ -1253,7 +1267,7 @@ function renderTrayInto(t){
     b.appendChild(thumbOf(s));b.onclick=()=>openEdit(i);t.appendChild(b)});
   const add=document.createElement('button');add.className='add';add.textContent='+';add.setAttribute('aria-label','再扫一张');add.onclick=()=>{backFor=mergeFor=-1;$(DESK?'fileIn':'camIn').click()};t.appendChild(add);
   if(pendingFiles.length){const b=document.createElement('button');b.className='chip pending';b.textContent=`继续框选（${pendingFiles.length} 张）`;b.onclick=async()=>{if(importBusy)return;importBusy=true;try{await openPending()}catch(e){toast('这张图打不开，请重新导入')}finally{importBusy=false}};t.appendChild(b)}
-  const sm=document.createElement('small');sm.textContent=scans.length?`已扫 ${scans.length} 张 · 点小图接着调`:(DESK?'拖进来或 Ctrl+V 粘贴，一次可以放好几张':'扫过的会叠在这里');t.appendChild(sm);
+  const sm=document.createElement('small');sm.textContent=scans.length?`已扫 ${scans.length} 张 · 点小图接着调`:(DESK?`拖进来或 ${PASTE_KEY} 粘贴，一次可以放好几张`:'扫过的会叠在这里');t.appendChild(sm);
 }
 
 /* ---------- 拉正 ---------- */
@@ -2216,9 +2230,9 @@ const CAMERAS=[
     tips:['按打印拨杆才出片，平时按快门只拍不浪费相纸','镜头效果和胶片效果两个拨盘各 10 档，组合出 100 种画面，先在屏幕上看到满意再印','支持 microSD 存原图，比扫描清楚'],
     rec:[['晴天户外', '白平衡选 FINE（晴天）；闪光用 AUTO FLASH 就行'], ['阴天 / 树荫', '白平衡选 SHADE（阴影）'], ['室内灯光', '白炽灯、暖黄灯选 INCANDESCENT；白色日光灯选 FLUORESCENT 1/2/3（按灯管颜色试）'], ['暗处', '闪光 AUTO FLASH 或 FORCED FLASH，人站在 0.5–1.5 米 之内'], ['逆光 / 明暗差大', 'EXPOSURE 往 + 调（−2.0 到 +2.0 EV，每格 1/3），或者用 FORCED FLASH 给人补光'], ['太亮 / 太暗', 'EXPOSURE 往 − 压暗，往 + 提亮'], ['近拍', 'MACRO 选 ON'], ['合影', '自拍 10 秒；只是怕手抖用 2 秒']],recSrc:'instax mini Evo 说明书（https://www.instax.com/mini_evo/en/support/manuals/）',
     td:{kind:'hybrid',film:'mini',dims:[87,122.9,36],w:285,r:14,color:'#232426',cname:'BLACK',acc:'#C9C9C4',ring:'#C9C9C4',lensR:20,lensL:12,lensX:9,lensY:2,flash:[-26,42],mirror:1,dials:2,lever:1,sd:1,lcd:[46,61],lcdPos:[2,13.5],lcdTxt:'3.0 英寸，竖装（官网）',trim:1,lens:'f = 28 mm，1:2.0，最近 0.1 m（官网）',shut:'电子快门，程序自动 / 手动曝光（官网）',batt:'内置锂电池，USB-C 充电，约 100 张/充（官网）'}},
-  {brand:'instax',id:'evo2',name:'instax mini Evo 2',sub:'混合机 · 新款',film:'mini',hybrid:true,
+  {brand:'instax',id:'evo2',name:'instax mini Evo 2',sub:'混合机 · 新款',film:'mini',hybrid:true,flash:'约 0.5–1.5 米（官网）',close:'约 10 cm–∞（官网）',
     tips:['instax Expanded View 开着时画面更宽（官网说明书）','镜头和胶片效果各 10 种，能录短视频','也有日期印章，位置在 SCREEN ORIENTATION 里选'],
-    rec:[['晴天户外', '白平衡选 FINE（晴天）；闪光用 AUTO FLASH 就行'], ['阴天 / 树荫', '白平衡选 SHADE（阴影）'], ['室内灯光', '白炽灯、暖黄灯选 INCANDESCENT；白色日光灯选 FLUORESCENT LIGHT'], ['暗处', '闪光 AUTO FLASH 或 FORCED FLASH，人站在 0.5–1.5 米 之内'], ['逆光 / 明暗差大', 'EXPOSURE 往 + 调（−2.0 到 +2.0 EV，每格 1/3），或者用 FORCED FLASH 给人补光'], ['太亮 / 太暗', 'EXPOSURE 往 − 压暗，往 + 提亮'], ['近拍', 'MACRO 选 ON'], ['合影', '自拍 10 秒；只是怕手抖用 2 秒']],recSrc:'instax mini Evo 2 说明书（https://www.instax.com/mini_evo_2/en/support/manuals/）'},
+    rec:[['晴天户外', '白平衡选 FINE（晴天）；闪光用 AUTO FLASH 就行'], ['阴天 / 树荫', '白平衡选 SHADE（阴影）'], ['室内灯光', '白炽灯、暖黄灯选 INCANDESCENT；白色日光灯选 FLUORESCENT LIGHT'], ['暗处', '闪光 AUTO FLASH 或 FORCED FLASH，人站在 0.5–1.5 米 之内'], ['逆光 / 明暗差大', 'EXPOSURE 往 + 调（−2.0 到 +2.0 EV，每格 1/3），或者用 FORCED FLASH 给人补光'], ['太亮 / 太暗', 'EXPOSURE 往 − 压暗，往 + 提亮'], ['近拍', 'MACRO 选 ON'], ['合影', '自拍 10 秒；只是怕手抖用 2 秒']],recSrc:'instax mini Evo 2 说明书（https://www.instax.com/mini_evo_2/en/support/manuals/）',td:{kind:'hybrid',film:'mini',cmos:[['传感器','1/2.77 英寸 CMOS（官网）'],['记录像素','普通模式 2144 × 2860（官网）'],['高分辨率','3100 × 4128（使用存储卡，且开启广角效果或关闭 Expanded View；官网）']],printTime:'约 14 秒（官网）',dims:[87.5,125.3,43.7],w:330,r:14,color:'#232426',cname:'BLACK',acc:'#C9C9C4',ring:'#C9C9C4',lensR:20,lensL:12,lensX:9,lensY:2,flash:[-26,42],mirror:1,dials:2,lever:1,sd:1,bt:1,lcd:[64,86],lcdPanel:[70,94],lcdPos:[0,4],lcdTxt:'4.46 英寸触摸屏，竖装（官网）',trim:1,lens:'f = 21 mm（35mm 等效），1:2.0，最近 10 cm（官网）',shut:'电子快门 1/4–1/8000 s（无闪光）/ 1/15–1/8000 s（闪光）（官网）',batt:'内置锂电池，USB-C 充电，约 90 张/充（官网）'}},
   {brand:'instax',id:'evocinema',name:'instax mini Evo Cinema',sub:'混合机 · 竖拍电影机',film:'mini',hybrid:true,
     tips:['竖着拿的「电影机」造型，能录 3 秒短视频再挑一帧打印','Eras 拨盘有 10 个年代效果，从 1930s 到 2020s','1.54 英寸小屏取景，构图尽量简单、主体清楚'],
     rec:[['晴天户外', '白平衡选 FINE（晴天）；闪光用 AUTO FLASH 就行'], ['阴天 / 树荫', '白平衡选 SHADE（阴影）'], ['室内灯光', '白炽灯、暖黄灯选 INCANDESCENT；白色日光灯选 FLUORESCENT LIGHT'], ['暗处', '闪光 AUTO FLASH 或 FORCED FLASH，人站在 0.5–1.5 米 之内'], ['逆光 / 明暗差大', 'EXPOSURE 往 + 调（−2.0 到 +2.0 EV，每格 1/3），或者用 FORCED FLASH 给人补光'], ['太亮 / 太暗', 'EXPOSURE 往 − 压暗，往 + 提亮'], ['合影', '自拍 10 秒；只是怕手抖用 2 秒']],recSrc:'instax mini Evo Cinema 说明书（https://www.instax.com/mini_evo_cinema/en/support/manuals/）',
@@ -2411,6 +2425,8 @@ async function openTeardown(id){
 $('td3d').onclick=()=>openTeardown(camera?.id);
 $('tdClose').onclick=()=>{$('tdPanel').hidden=true;if(td)td.running=false};
 $('tdCams').onclick=e=>{const id=e.target.dataset.id;if(id&&td)loadModel(id)};
+$('home3d').onclick=()=>openTeardown(camera?.id);
+$('cam3d').onclick=()=>{$('camPanel').hidden=true;openTeardown(camera?.id)};
 
 function initTD(){
   const T=THREE,cv=$('tdCv'),R=new T.WebGLRenderer({canvas:cv,antialias:true});
@@ -2584,13 +2600,13 @@ function buildModel(id){
     add('lens','镜头组','混合机的镜头把画面拍成数码照片，之后再由打印机构还原到相纸上。',[['镜头',LENS_TXT[id]],['对焦',cam.close||'自动对焦']],lens,[S.lensX,S.lensY,D/2+2-Lh/2],[0,0,68]);
     add('shutter','快门与光圈','电子快门，按一下先拍成数码图，再决定怎么打印。',[['快门',SHUT_TXT[id]]],G(at(cyl(S.lensR*.8,3,dark()),0,0,0),at(cyl(S.lensR*.3,3.2,M(0x3A3D44,{m:.6,r:.3})),0,0,0)),[S.lensX,S.lensY,D/2-Lh-.5],[0,0,54]);
     add('flash','闪光灯','小补光闪光，室内拍脸用。',[['闪光',cam.flash||'约 0.3–1.5 m']],G(at(rbox(fw2,fh2,6,2,M(0x2B2D33)),0,0,0),at(rbox(fw2-4,fh2-4,1,1.5,flashM()),0,0,3.1)),[S.flash[0],S.flash[1],D/2-4],[0,26,32]);
-    add('cmos','图像传感器','1/5 英寸 CMOS（2560 × 1920），把镜头的光变成数字图像，这是混合机和纯胶片机最大的不同。',[['传感器','1/5 英寸 CMOS（官网）'],['有效像素','约 490 万']],G(at(box(S.lensR*1.5,S.lensR*1.5,2.2,M(0x1E2A3A,{r:.25,m:.5})),0,0,0),at(box(S.lensR*1.2,S.lensR*1.2,.4,M(0x3E5C7A,{e:0x1E3B5C,ei:.35})),0,0,1.3)),[S.lensX,S.lensY,D/2-Lh-4],[-56,8,6],true);
+    add('cmos','图像传感器','把镜头的光变成数字图像，这是混合机和纯胶片机最大的不同。',S.cmos||[['传感器','1/5 英寸 CMOS（官网）'],['有效像素','约 490 万']],G(at(box(S.lensR*1.5,S.lensR*1.5,2.2,M(0x1E2A3A,{r:.25,m:.5})),0,0,0),at(box(S.lensR*1.2,S.lensR*1.2,.4,M(0x3E5C7A,{e:0x1E3B5C,ei:.35})),0,0,1.3)),[S.lensX,S.lensY,D/2-Lh-4],[-56,8,6],true);
     add('pcb','主板','图像处理、打印时序、蓝牙、App 连接都在这块板上。',[['作用','拍照 → 处理 → 打印 → 出片']],G(at(box(W*.5,H*.3,1.6,pcbM()),0,0,0),at(box(12,10,2,chip()),-W*.1,0,1.4),at(box(7,5,2,chip()),W*.12,-H*.06,1.4)),[0,-H*.06,-D*.08],[0,0,-30],true);
-    add('print','打印机构 / 曝光头','把屏幕上的图像逐行曝光到相纸上，再交给滚轴显影。混合机不用扫描仪，靠它出片。',[['打印方式','OLED 曝光到相纸（示意）'],['打印时间','约 13 秒（官网）']],rotF(G(at(rbox(FW[0]*.9,8,6,2,M(0x2A2A2E)),0,0,0),at(box(FW[0]*.8,2,.6,M(0xE8F4FF,{e:0xBFE9FF,ei:.5})),0,4.4,3.2))),[0,H*.18,-D*.02],[0,20,32],true);
+    add('print','打印机构 / 曝光头','把屏幕上的图像逐行曝光到相纸上，再交给滚轴显影。混合机不用扫描仪，靠它出片。',[['打印方式','OLED 曝光到相纸（示意）'],['打印时间',S.printTime||'约 13 秒（官网）']],rotF(G(at(rbox(FW[0]*.9,8,6,2,M(0x2A2A2E)),0,0,0),at(box(FW[0]*.8,2,.6,M(0xE8F4FF,{e:0xBFE9FF,ei:.5})),0,4.4,3.2))),[0,H*.18,-D*.02],[0,20,32],true);
     add('film','相纸盒','混合机用的还是 instax 相纸，一盒 10 张，竖着塞进机身中部。',[['相纸',FILM_TXT[S.film]]],G(at(S.filmRot?box(18,FW[1],FW[0],M(0x1F2124,{r:.6})):box(FW[0],FW[1],18,M(0x1F2124,{r:.6})),0,0,0),at(S.filmRot?box(14,FW[1]-12,.8,M(0xF2F2EE)):box(FW[0]-12,FW[1]-12,.8,M(0xF2F2EE)),0,0,S.filmRot?FW[0]/2-.4:9.4)),[0,-H*.06,-D*.1],[0,-34,-26]);
     add('rollers','显影滚轴','把相纸送出来时压破药包、把显影药摊匀。',[['显影','约 90 秒（mini / WIDE 相纸）']],rotF(G(at(cyl(3,FW[0]+6,metal(),'x'),0,2,0),at(cyl(3,FW[0]+6,metal(),'x'),0,-2,0))),[0,-H/2+34,S.filmRot?0:D*.24],[0,16,26],true);
     add('motor','出片马达与齿轮','拍完带动滚轴，把印好的照片送出机身。',[['出片','自动']],G(at(cyl(5,12,M(0xB8BCC2,{m:.8,r:.3}),'x'),0,0,0),at(cyl(8,2,M(0xE9E9E4),'x'),8,0,0)),[W/2-12,-H/2+30,-8],[42,0,0],true);
-    add('battery','锂电池','内置锂电，USB-C 充电，充满大约能印 100 张（官网）。',[['电池',BATT_TXT[id]]],G(at(box(Math.max(7,Math.min(16,W/2-FW[0]/2-4)),Math.min(H*.4,50),Math.min(20,D-16),M(0x2A2D33)),0,0,0)),[W/2-Math.max(7,Math.min(16,W/2-FW[0]/2-4))/2-3,-H*.02,-D*.16],[52,0,0]);
+    add('battery','锂电池','内置锂电池，为拍摄、屏幕和打印机构供电。',[['电池',BATT_TXT[id]]],G(at(box(Math.max(7,Math.min(16,W/2-FW[0]/2-4)),Math.min(H*.4,50),Math.min(20,D-16),M(0x2A2D33)),0,0,0)),[W/2-Math.max(7,Math.min(16,W/2-FW[0]/2-4))/2-3,-H*.02,-D*.16],[52,0,0]);
     if(S.sd)add('sd','microSD 卡槽','存照片和视频的卡槽，随机不附卡。',[['存储','microSD（另购，官网）']],G(at(box(9,1.2,13,M(0x2C2C30,{r:.6})),0,0,0),at(box(7,.6,2,M(0xC9A227,{r:.5,m:.6})),0,0,5)),[-W/2+10,H*.12,-D*.24],[-38,8,0],true);
     // 屏幕朝背面（−z）。lcdPanel 是屏外那块黑面板 / 黑玻璃，没有就只做一圈窄边框
     const lcdG=()=>{const [lw,lh]=S.lcd,pn=S.lcdPanel,[pw,ph]=pn||[lw+4,lh+4];
@@ -2773,11 +2789,15 @@ function loadModel(id){
   document.querySelectorAll('#tdCams .chip').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
   document.querySelector(`#tdCams .chip[data-id="${id}"]`)?.scrollIntoView({inline:'center',block:'nearest'});
   $('tdInfo').innerHTML=`<b>${m.cam.name}</b>${W} × ${H} × ${D} mm${m.S.w?` · ${m.S.w} g`:''}<br>${FILM_TXT[m.S.film].split('，')[0]} · ${m.parts.length} 个部件`;
-  $('tdParts').innerHTML=m.parts.map(p=>`<button class="chip" data-p="${p.id}">${p.name}</button>`).join('');
+  // 「更多部件」宽屏时由 CSS 藏起来；总是放上，窗口拉窄以后后面的部件也点得到
+  const mainN=8;
+  $('tdParts').classList.remove('open');
+  const moreChip=m.parts.length>mainN?`<button class="chip tdpmore" data-more="1">更多部件 ›</button>`:'';
+  $('tdParts').innerHTML=moreChip+m.parts.map((p,i)=>`<button class="chip${i>=mainN?' more':''}" data-p="${p.id}">${p.name}</button>`).join('');
   $('tdLabels').innerHTML=m.parts.map(p=>`<div class="tdtag" data-p="${p.id}" hidden>${p.name}<small>${(p.params[0]||['',''])[1].split('，')[0]}</small></div>`).join('');
   showDetail(null);
 }
-$('tdParts').onclick=e=>{const id=e.target.dataset.p;if(!id)return;const p=td.parts.find(x=>x.id===id);select(p,true)};
+$('tdParts').onclick=e=>{if(e.target.dataset.more){$('tdParts').classList.add('open');return}const id=e.target.dataset.p;if(!id)return;const p=td.parts.find(x=>x.id===id);select(p,true)};
 function pick(x,y){const r=$('tdCv').getBoundingClientRect(),v=new td.T.Vector2((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);
   td.ray.setFromCamera(v,td.C);const hit=td.ray.intersectObjects(td.model.grp.children,true).find(h=>h.object.userData.pid);
   if(!hit){select(null);return}const p=td.parts.find(x=>x.id===hit.object.userData.pid);
@@ -2785,12 +2805,15 @@ function pick(x,y){const r=$('tdCv').getBoundingClientRect(),v=new td.T.Vector2(
 function select(p,fromList){
   td.sel=p;if(p){p.target=1}
   document.querySelectorAll('#tdParts .chip').forEach(b=>b.classList.toggle('on',p&&b.dataset.p===p.id));
-  if(p&&fromList===false)document.querySelector(`#tdParts .chip[data-p="${p.id}"]`)?.scrollIntoView({inline:'center',block:'nearest'});
+  const chip=p&&document.querySelector(`#tdParts .chip[data-p="${p.id}"]`);
+  if(chip?.classList.contains('more'))$('tdParts').classList.add('open');   // 点中的是收起来的部件：整排展开，让它的按钮露出来
+  if(fromList===false)chip?.scrollIntoView({inline:'center',block:'nearest'});
   showDetail(p);
 }
 function showDetail(p){
   const m=td.model;
-  if(!p){$('tdDetail').innerHTML=`<b>点一个部件看看</b><p>点机身先把外壳拆开，再点里面的零件。下面一排也可以直接点。拖「拆解」滑块能一次全部展开。</p><table>${[['相机',m.cam.name],['尺寸',`${m.S.dims.join(' × ')} mm（官网）`],['相纸',FILM_TXT[m.S.film]]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;return}
+  if(!p){const narrow=matchMedia('(max-width:899px)').matches;$('tdDetail').classList.toggle('compact',narrow);$('tdDetail').innerHTML=narrow?'<b>点一个部件看看</b><p>先点外壳拆开，再点里面的零件；下面一排也能直接点。</p>':`<b>点一个部件看看</b><p>点机身先把外壳拆开，再点里面的零件。下面一排也可以直接点。拖「拆解」滑块能一次全部展开。</p><table>${[['相机',m.cam.name],['尺寸',`${m.S.dims.join(' × ')} mm（官网）`],['相纸',FILM_TXT[m.S.film]]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;return}
+  $('tdDetail').classList.remove('compact');
   $('tdDetail').innerHTML=`<b>${p.name}</b><p>${p.desc}</p><table>${p.params.filter(r=>r[1]).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${p.gen?`<div class="gen">${GEN}</div>`:''}`;
 }
 const tdV=new Map(),tagMeta=new Map();

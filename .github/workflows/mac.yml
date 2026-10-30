@@ -1,0 +1,90 @@
+# Mac 版：在 GitHub 的 Mac 机器上打 Apple 芯片和 Intel 芯片两个 dmg，像用户一样从 dmg 里拷出 相角.app，
+# 检查签名和芯片，再真的打开跑一遍冒烟检查（Intel 版靠 Rosetta）。dmg、校验值和截图放在这次运行的 Artifacts 里。
+# 放在这里打包是因为 Windows 上的 electron-builder 不能打 Mac 包：dmg 和签名要用 macOS 自带的工具。
+name: Mac 版
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'build.py'
+      - 'design-demos/**'
+      - 'README.md'
+      - 'desktop/**'
+      - 'tests/fixtures/real-prints/**'
+      - '.github/workflows/mac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: 字体缓存
+        uses: actions/cache@v6
+        with:
+          path: desktop/.cache/fonts
+          key: fonts-${{ hashFiles('src/app.html') }}
+          restore-keys: fonts-
+      - name: 安装依赖
+        run: |
+          npm ci
+          python -m pip install playwright==1.64.1
+      - name: 原生保存与窗口回归
+        run: node --test scripts/native.test.cjs
+      - name: 打包
+        run: npm run dist:mac
+      - name: 从 dmg 装出来检查
+        run: |
+          sudo softwareupdate --install-rosetta --agree-to-license
+          version=$(node -p "require('./package.json').version")
+          for arch in arm64 x64; do
+            mnt="$RUNNER_TEMP/dmg-$arch" app="$RUNNER_TEMP/$arch/相角.app"
+            mkdir -p "$mnt" "$RUNNER_TEMP/$arch"
+            hdiutil attach -nobrowse -readonly -mountpoint "$mnt" "dist/XiangJiao-$version-mac-$arch.dmg"
+            ditto "$mnt/相角.app" "$app"
+            hdiutil detach "$mnt"
+            codesign --verify --deep --strict --verbose=2 "$app"
+            if [ "$arch" = x64 ]; then want=x86_64; else want=arm64; fi
+            test "$(lipo -archs "$app/Contents/MacOS/相角")" = "$want"
+            python scripts/smoke_test.py --app "$app" --show --shots "$RUNNER_TEMP/shots/$arch"
+          done
+      - name: 校验值
+        working-directory: desktop/dist
+        run: shasum -a 256 *.dmg | tee SHA256SUMS-mac.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: XiangJiao-mac
+          path: |
+            desktop/dist/*.dmg
+            desktop/dist/SHA256SUMS-mac.txt
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: screenshots-mac
+          path: ${{ runner.temp }}/shots
+          if-no-files-found: ignore
+          retention-days: 30

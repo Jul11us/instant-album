@@ -2,13 +2,14 @@
   "name": "xiangjiao-desktop",
   "productName": "相角",
   "version": "0.1.2",
-  "description": "相角 Windows 电脑版：把拍立得收进电子相册",
+  "description": "相角电脑版（Windows 和 Mac）：把拍立得收进电子相册",
   "private": true,
   "main": "main.js",
   "scripts": {
     "prepare-web": "python ../build.py .. && node scripts/prepare-web.mjs",
     "start": "npm run prepare-web && electron .",
     "dist": "npm run prepare-web && electron-builder --win --x64",
+    "dist:mac": "npm run prepare-web && electron-builder --mac --publish never",
     "check": "node --test scripts/native.test.cjs && python scripts/smoke_test.py",
     "release": "npm run dist && node scripts/collect-release.mjs"
   },
@@ -41,6 +42,27 @@
       "allowToChangeInstallationDirectory": true,
       "shortcutName": "相角",
       "artifactName": "XiangJiao-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "minimumSystemVersion": "13.0",
+      "executableName": "相角",
+      "icon": "build/icon.icns",
+      "category": "public.app-category.photography",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "identity": "-",
+      "hardenedRuntime": false,
+      "artifactName": "XiangJiao-${version}-mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "writeUpdateInfo": false
     }
   },
   "devDependencies": {
