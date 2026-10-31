@@ -21,6 +21,9 @@ def render(root):
         uri = 'data:image/jpeg;base64,' + base64.b64encode((root / 'design-demos/assets' / name).read_bytes()).decode()
         src = src.replace(marker, uri)
     src = src.replace('__BACKUP_JS__', (root / 'src/backup.js').read_text(encoding='utf-8'))
+    if src.count('__I18N_JS__') != 1:
+        raise ValueError('Expected one i18n placeholder')
+    src = src.replace('__I18N_JS__', (root / 'src/i18n.js').read_text(encoding='utf-8'))
     return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>' + src + '</body></html>'
 
 

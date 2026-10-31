@@ -121,6 +121,7 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.on('console', lambda message: console_errors.append(message.text) if message.type == 'error' else None)
         page.wait_for_function('() => typeof restoring !== "undefined" && !restoring')
+        page.evaluate("localStorage.setItem('tiejin.tipsSeen','1')")
         assert page.evaluate('!!window.desktop && typeof window.desktop.saveFile === "function"')
         assert page.evaluate('typeof require === "undefined" && typeof process === "undefined"'), 'Node 不能暴露给页面'
         assert '电脑' in page.locator('#homeFootNote').inner_text()

@@ -1,7 +1,7 @@
 {
   "name": "xiangjiao-desktop",
   "productName": "相角",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "相角电脑版（Windows 和 Mac）：把拍立得收进电子相册",
   "private": true,
   "main": "main.js",

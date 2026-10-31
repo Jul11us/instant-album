@@ -128,6 +128,7 @@ button:disabled{cursor:default}
 .big{margin:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));min-height:48px;height:48px;border-radius:7px;font-weight:600;font-size:14px;letter-spacing:.02em}
 .big.yellow{background:var(--accent);color:var(--accent-ink)}
 .big.yellow:hover{filter:brightness(1.06)}
+.big:disabled{opacity:.5;cursor:default;filter:none}
 
 /* 扫描 */
 .desk{flex:1;min-height:0;margin:12px max(12px,env(safe-area-inset-left,0px)) 0;border-radius:8px;background:#E5E0D6;position:relative;overflow:hidden;touch-action:none;box-shadow:inset 0 0 0 1px #D4CEC1}
@@ -310,6 +311,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
 .album .tpl{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px}
 .album .ttl{background:var(--surface2);color:var(--text);border:0;border-radius:8px;padding:9px 12px;font:500 13px var(--ui)}
 .album .sub{margin:0}.album .sub b{color:var(--text)}
+.album-note,.album-pickline{display:block}.album-pickline{margin-top:4px}
 .album .picks{display:flex;gap:10px;overflow-x:auto;padding:4px;scrollbar-width:thin}
 .album .picks button{flex:0 0 auto;line-height:0;opacity:.4;transition:opacity .15s}
 .album .picks button.on{opacity:1}
@@ -508,6 +510,45 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
   #editView>.side{max-height:none;overflow-y:auto;border-top:0}
   #editView .side>.savebar{margin:auto 0 0;padding:12px 16px;background:var(--surface)}
 }
+/* 拍摄前提示：第一次导入前把最常见的四个失败原因讲清楚 */
+.tips-body{max-width:560px}
+.tips-list{list-style:none;margin:18px 0 10px;padding:0;display:grid;gap:10px;counter-reset:tip}
+.tips-list li{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:14px 16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);border-radius:9px}
+.tips-list li:before{counter-increment:tip;content:counter(tip);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:600 12px/1 var(--ui)}
+.tips-list b{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
+.tips-list span{display:block;font-size:12.5px;line-height:1.65;color:var(--muted)}
+.tips-remember{display:flex;align-items:center;gap:8px;margin:14px 0 2px;font-size:12px;color:var(--muted)}
+.tips-remember input{width:16px;height:16px;accent-color:var(--accent)}
+/* 没认出相纸：把可以马上做的事摆在选框下面 */
+.recover{margin-top:12px;padding:14px 16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line),inset 3px 0 0 var(--accent);border-radius:8px}
+.rec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.rec-head b{font-size:14px}
+.rec-head .home-text{margin:0;font-size:12px;white-space:nowrap}
+.recover p{margin:6px 0 0;font-size:12.5px;line-height:1.65;color:var(--muted);text-wrap:pretty}
+.rec-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.rec-actions .chip{font-size:12px;padding:7px 11px}
+#quadSvg.nudge .handle{animation:handlePulse 1.1s ease-in-out infinite}
+@keyframes handlePulse{0%,100%{r:13;filter:drop-shadow(0 1px 2px #2E2C2733)}50%{r:16;filter:drop-shadow(0 0 6px #2E2C2766)}}
+/* 批量套用 */
+.batch-body{max-width:760px}
+.batch-link{font-size:12px;margin:7px 0 0;color:var(--muted)}
+.batch-hint{font-size:13px;color:var(--muted);line-height:1.7;margin:14px 0 0}
+.batch-opts{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 4px}
+.batch-opts .chip{font-size:12px;padding:7px 11px}
+.batch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:12px;margin:16px 0}
+.batch-grid .bit{padding:4px;border-radius:5px;line-height:0;background:transparent;transition:background .15s}
+.batch-grid .bit:hover{background:var(--surface2)}
+.batch-grid .bit canvas{display:block;width:100%;height:auto;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
+.batch-grid .bit.on{background:#E4DED2;box-shadow:inset 0 0 0 2px var(--accent)}
+.batch-grid .bit small{display:block;font-size:11px;color:var(--muted);line-height:1.3;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.batch-grid .bit.on small{color:var(--text)}
+.batch-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 0}
+.batch-actions .chip{font-size:12px;padding:6px 10px}
+.batch-actions span{font-size:12px;color:var(--muted);margin-left:auto}
+.batch-empty{grid-column:1/-1;color:var(--muted);font-size:13px;line-height:1.7;margin:8px 0}
+.batch-body .big{width:100%;margin:18px 0 0}
+.home-foot #langBtn{margin-left:0}
+@media(min-width:700px){.recover{margin-top:14px}.batch-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -529,7 +570,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
           <div class="slot-wrap"><i class="slot" style="--w:108;--h:86"></i><small>instax wide</small></div>
           <div class="slot-wrap"><i class="slot" style="--w:88;--h:107"></i><small>Polaroid</small></div>
         </div><figcaption>还没有照片</figcaption></figure><button class="chip on" id="homeRestoreRetry" hidden>重试读取本机收藏</button><button class="chip" id="homePending" hidden>继续框选</button>
-      </div><div class="home-foot"><span id="homeFootNote">照片仅保存在当前浏览器，记得定期备份。</span><button id="backupOpen" disabled>备份与恢复</button><small class="home-credit">首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）</small></div>
+      </div><div class="home-foot"><span id="homeFootNote">照片仅保存在当前浏览器，记得定期备份。</span><button id="backupOpen" disabled>备份与恢复</button><button id="langBtn" aria-label="Switch to English" data-no-i18n>English</button><small class="home-credit">首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）</small></div>
     </div>
   </section>
   <!-- 扫描 -->
@@ -541,6 +582,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
       <span class="bubble" id="tip">白线是底边，方向不对点「转 90°」</span></div>
     <div class="pad scan-format"><div class="tool-heading"><h2>先把相纸摆正</h2></div><p class="scan-status" id="found" role="status"></p>
       <div class="scan-choice"><button class="format-toggle" id="formatToggle" aria-expanded="false" aria-controls="formats"><span>相纸</span><b id="formatCurrent">原比例</b><span>更换⌄</span></button><button class="chip line" id="fullPhoto">使用整张原图</button></div><div class="formats" id="formats" hidden></div></div>
+    <div class="pad recover" id="scanRecover" hidden>
+      <div class="rec-head"><b>没认出边框，可以这样继续</b><button class="home-text" id="recTips">拍之前看四点 ›</button></div>
+      <p>相纸四边都在画面里的话，拖四角最快；四边被裁掉或手指挡住了，就重拍一张。</p>
+      <div class="rec-actions"><button class="chip on" id="recRetake">重拍这张</button><button class="chip" id="recPick">换一张</button><button class="chip" id="recManual">手动拖四角</button></div>
+    </div>
     <div class="pad scancheck" id="scanCheckWrap" hidden><details id="scanCheck"><summary id="scanCheckTitle">扫描检查</summary><div id="scanCheckBody"></div><button class="chip" id="scanIgnore">忽略本张提醒</button></details><p id="scanCheckLead" role="status" aria-live="polite"></p></div>
     <details class="pad scan-more" id="scanMore"><summary>拍摄帮助与相机</summary><div class="camrow"><span>我的相机</span><button class="chip" id="camBtn">选一下，教你怎么拍</button><button class="chip" id="td3d">3D 拆开看</button></div></details>
     <div class="pad tray" id="tray"></div>
@@ -563,7 +609,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
     </div>
     <div class="side">
     <div class="pad"><div class="tool-heading edit-heading"><h2>整理这一张</h2><button class="note-side" id="noteSide" hidden></button></div><div class="tabs" id="tabs" role="tablist">
-      <button role="tab" data-t="fl">滤镜</button><button role="tab" data-t="sliders">调整</button><button role="tab" data-t="frames">边框</button><button role="tab" data-t="fontrow">文字</button><button role="tab" data-t="daterow">日期</button><button role="tab" data-t="memo">回忆</button></div></div>
+      <button role="tab" data-t="fl">滤镜</button><button role="tab" data-t="sliders">调整</button><button role="tab" data-t="frames">边框</button><button role="tab" data-t="fontrow">文字</button><button role="tab" data-t="daterow">日期</button><button role="tab" data-t="memo">回忆</button></div>
+      <button class="home-text batch-link" id="batchOpen">把这张的样式套用到其他照片 ›</button></div>
     <div class="fl tp" id="fl"></div>
     <div class="pad sliders tp" id="sliders"></div>
     <div class="pad frames tp" id="frames"></div>
@@ -622,6 +669,31 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radiu
     <section class="backup-section"><h2>从备份恢复</h2><p id="backupRestoreNote">先选择备份查看内容，确认后才会替换当前浏览器内的收藏。</p><button class="chip" id="backupChoose">选择备份文件</button><input class="vh" id="backupIn" type="file" accept=".json,application/json"><div id="backupSummary" hidden></div><button class="chip on" id="backupApply" hidden>替换本机收藏并恢复</button></section>
     <p id="backupMessage" role="status" aria-live="polite"></p>
   </div></section>
+  <section class="panel" id="tipsPanel" hidden aria-label="拍摄前的检查">
+    <div class="top"><button class="chip ghost" id="tipsClose">‹ 返回</button><span></span></div>
+    <div class="body tips-body">
+      <h2>拍之前，先看这四件事</h2>
+      <p class="sub">大部分认不出相纸，都是这四件事之一。</p>
+      <ol class="tips-list">
+        <li><div><b>平着拍</b><span>手机和相纸平行，别斜着拍。斜着拍会让白边变窄，认不出型号。</span></div></li>
+        <li><div><b>四边留空</b><span>相纸完整放进画面，四周留一点背景，别裁到底边。</span></div></li>
+        <li><div><b>避开反光</b><span>关掉闪光灯，别站在顶灯正下方，稍微侧一点拍。</span></div></li>
+        <li><div><b>手指别挡角</b><span>捏相纸边缘，别让手指压住任何一个角。</span></div></li>
+      </ol>
+      <label class="tips-remember"><input type="checkbox" id="tipsNever">以后不再提示</label>
+      <button class="big yellow" id="tipsGo">知道了，开始拍</button>
+    </div>
+  </section>
+  <section class="panel" id="batchPanel" hidden aria-label="套用到其他照片">
+    <div class="top"><button class="chip ghost" id="batchClose">‹ 返回</button><b>套用到其他照片</b></div>
+    <div class="body batch-body">
+      <p class="sub batch-hint">把这张的滤镜、调整、边框、字体和日期样式套用到选中的照片。文字、故事和日期本身不动。</p>
+      <div class="batch-opts" id="batchOpts"></div>
+      <div class="batch-grid" id="batchGrid"></div>
+      <div class="batch-actions"><button class="chip" id="batchAll">全选</button><button class="chip" id="batchNone">全不选</button><span id="batchCount"></span></div>
+      <button class="big yellow" id="batchGo">套用</button>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -1052,10 +1124,29 @@ function renderHome(){
 }
 function showHome(){editLoadToken++;closePanels(backupRestoring);backFor=mergeFor=-1;$('homeView').hidden=false;$('scanView').hidden=$('editView').hidden=true;renderHome()}
 function chooseHomePhoto(cameraInput){backFor=mergeFor=-1;$(cameraInput?'camIn':'fileIn').click()}
-$('homeShoot').onclick=()=>chooseHomePhoto(true);$('homeImport').onclick=()=>chooseHomePhoto(false);
+/* 第一次导入前先看四件事：大多数「认不出相纸」都能在这里避免。 */
+const TIPS_KEY='tiejin.tipsSeen';
+let tipsMode='file';
+const tipsSeen=()=>{try{return localStorage.getItem(TIPS_KEY)==='1'}catch(e){return false}};
+function openTips(mode){
+  tipsMode=mode;
+  $('tipsNever').hidden=mode==='help';$('tipsNever').checked=false;
+  $('tipsGo').textContent=tr(mode==='help'?'知道了':mode==='cam'?'知道了，开始拍':'知道了，选照片');
+  $('tipsPanel').hidden=false;
+}
+function requestImport(cameraInput){if(tipsSeen())chooseHomePhoto(cameraInput);else openTips(cameraInput?'cam':'file')}
+$('tipsClose').onclick=()=>{$('tipsPanel').hidden=true};
+$('tipsGo').onclick=()=>{
+  if(tipsMode==='help'){$('tipsPanel').hidden=true;return}
+  if($('tipsNever').checked){try{localStorage.setItem(TIPS_KEY,'1')}catch(e){}}
+  $('tipsPanel').hidden=true;chooseHomePhoto(tipsMode==='cam');
+};
+$('recTips').onclick=()=>openTips('help');
+$('homeShoot').onclick=()=>requestImport(true);$('homeImport').onclick=()=>requestImport(false);
 $('homeLibrary').onclick=()=>openLib();$('editHome').onclick=$('scanHome').onclick=showHome;
 $('homePending').onclick=async()=>{if(importBusy)return;importBusy=true;try{await openPending()}finally{importBusy=false}};
 $('homeDemo').onclick=()=>{const i=scans.findIndex(s=>s.demo);if(i>=0)openEdit(i);else demo()};
+$('langBtn').onclick=()=>setLang(LANG==='en'?'zh':'en');
 
 /* ---------- 载入图片 ---------- */
 async function decodeFile(file){
@@ -1224,6 +1315,7 @@ function drawQuad(){
 function showScan(){
   stopHomeMotion();
   $('homeView').hidden=true;$('scanView').hidden=false;$('editView').hidden=true;$('straighten').textContent=backFor>=0?'确认选框，存成背面':mergeFor>=0?'确认选框并合成':'确认选框并拉正';
+  $('scanRecover').hidden=autoFound||backFor>=0||mergeFor>=0;$('quadSvg').classList.remove('nudge');
   $('found').textContent=!autoFound?'没认出相纸边框。拖四角框住相纸，或直接用整张原图。'
     :scanNeedsConfirm?(scanRivals?'照片里不止一张相纸，先框了最清楚的一张。要另一张就把四角拖过去。':format==='free'?'认不出是哪种相纸，先按原比例框了画面。确认四角贴齐再拉正。':`框出了 ${FORMATS[format].label}，不太有把握：确认四角贴齐再拉正。`)
     :format==='free'?'按原比例拉正，确认四角贴齐就可以继续。':`认出了 ${FORMATS[format].label}，确认四角贴齐就可以拉正。`;
@@ -1239,6 +1331,10 @@ $('scanMore').addEventListener('toggle',()=>{if(!$('scanView').hidden)requestAni
 $('formats').onclick=e=>{const f=e.target.dataset.f;if(f){if(f==='free')setFree(quad);format=f;renderFormats();$('formats').hidden=true;$('formatToggle').setAttribute('aria-expanded','false');$('found').textContent=`相纸：${FORMATS[f].label}`;scheduleScanCheck()}};
 $('rot').onclick=()=>{quad=rotQuad(quad,1);if(format==='free')setFree(quad);drawQuad();scheduleScanCheck()};
 $('fullPhoto').onclick=()=>{if(!src)return;quad=[[0,0],[src.width,0],[src.width,src.height],[0,src.height]];setFree(quad);format='free';autoFound=true;scanNeedsConfirm=false;showScan();$('found').textContent='用整张原图，保留原来的方向和比例。';};
+/* 没认出来时：三条最快的出路，不用自己去猜 UI */
+$('recRetake').onclick=()=>{backFor=mergeFor=-1;chooseHomePhoto(true)};
+$('recPick').onclick=()=>{backFor=mergeFor=-1;chooseHomePhoto(false)};
+$('recManual').onclick=()=>{$('quadSvg').classList.add('nudge');$('found').textContent='拖动四个白点，让框贴住相纸四角；贴好后会自动检查。';$('desk').scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>$('quadSvg').classList.remove('nudge'),2600)};
 let drag=null;
 $('quadSvg').addEventListener('pointerdown',e=>{
   const r=$('desk').getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
@@ -1246,7 +1342,7 @@ $('quadSvg').addEventListener('pointerdown',e=>{
   if(bi<0)return;drag=bi;clearTimeout(scanCheckTimer);scanHints=[];$('scanMarks').replaceChildren();$('scanCheckTitle').textContent='松开四角后重新检查';$('scanCheckLead').textContent='';$('scanCheckBody').replaceChildren();$('scanIgnore').hidden=true;$('quadSvg').setPointerCapture(e.pointerId);e.preventDefault();showLoupe(e)});
 $('quadSvg').addEventListener('pointermove',e=>{if(drag===null)return;const r=$('desk').getBoundingClientRect();
   quad[drag]=[Math.max(0,Math.min(src.width,(e.clientX-r.left-view.ox)/view.k)),Math.max(0,Math.min(src.height,(e.clientY-r.top-view.oy)/view.k))];drawQuad();showLoupe(e)});
-$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;if(drag!==null){drag=null;autoFound=true;scanNeedsConfirm=false;if(format==='free')setFree(quad);$('found').textContent='好，按这个框拉正';scheduleScanCheck()}});
+$('quadSvg').addEventListener('pointerup',()=>{$('loupe').hidden=true;$('quadSvg').classList.remove('nudge');$('scanRecover').hidden=true;if(drag!==null){drag=null;autoFound=true;scanNeedsConfirm=false;if(format==='free')setFree(quad);$('found').textContent='好，按这个框拉正';scheduleScanCheck()}});
 $('quadSvg').addEventListener('pointercancel',()=>{$('loupe').hidden=true;drag=null;scheduleScanCheck()});
 // 拖角时在手指旁边放大 3 倍：手指会挡住角，看着放大镜把黄线贴到相纸边上
 function showLoupe(e){const L=$('loupe'),r=$('desk').getBoundingClientRect(),S=128,dpr=Math.min(2,devicePixelRatio||1),p=quad[drag];
@@ -1451,7 +1547,7 @@ function buildSliders(){
 function buildFrames(){
   const sw=(id,name,title)=>`<button class="sw" data-c="${id}" title="${title||name}"><i><canvas></canvas></i>${name}</button>`;
   $('frames').innerHTML=`<div class="frtop"><b>边框</b><button class="chip" id="drawBtn">自己画</button><button class="chip" id="upBtn">上传边框</button></div>`+
-    `<div class="fr" id="fr">${sw('orig','原框','扫描出来的原边框')}${sw('none','不要','只要照片，不要边框')}`+
+    `<div class="fr" id="fr">${sw('orig','原框','扫描出来的原边框')}${sw('none','无边框','只要照片，不要边框')}`+
     (customFrame||uploadFrame?`<span class="grp">我的</span>${customFrame?sw('draw','我画的'):''}${uploadFrame?sw('upload','我上传的'):''}`:'')+
     FRAME_SETS.map(([g,l])=>`<span class="grp">${g}</span>`+l.map(([id,name,en])=>sw(id,name,en?`${name} · ${en}`:name)).join('')).join('')+`</div>`;
   // 每个色块用这张照片的缩略图预览
@@ -1492,10 +1588,10 @@ function dKey(dt){const p=dPrec(dt),d=dt&&dt.d||'';if(p==='none'||!d)return'';co
   return p==='day'?d:p==='month'?d.slice(0,7):p==='season'?`${y}-${SEASONS[dt.s||'summer'][1]}-s`:y}
 const cmpD=(a,b)=>{a=dKey(a.st.date);b=dKey(b.st.date);return a<b?-1:a>b?1:0};
 function dLabel(dt){const p=dPrec(dt),d=dt&&dt.d||'',[y,m]=d.split('-');if(p==='none'||!d)return'';
-  return p==='day'?dShort(d):p==='month'?`${y}.${m}`:p==='season'?`${y} ${SEASONS[dt.s||'summer'][0]}`:p==='about'?`约 ${y}`:y}
+  return tr(p==='day'?dShort(d):p==='month'?`${y}.${m}`:p==='season'?`${y} ${SEASONS[dt.s||'summer'][0]}`:p==='about'?`约 ${y}`:y)}
 // 相册里按这个分组
-function dGroup(dt){const p=dPrec(dt),d=dt&&dt.d||'',[y,m]=d.split('-');if(p==='none'||!d)return'日期未知';
-  return p==='day'||p==='month'?`${y} 年 ${+m} 月`:p==='season'?`${y} 年${SEASONS[dt.s||'summer'][0]}`:p==='about'?`大约 ${y} 年`:`${y} 年`}
+function dGroup(dt){const p=dPrec(dt),d=dt&&dt.d||'',[y,m]=d.split('-');if(p==='none'||!d)return tr('日期未知');
+  return tr(p==='day'||p==='month'?`${y} 年 ${+m} 月`:p==='season'?`${y} 年${SEASONS[dt.s||'summer'][0]}`:p==='about'?`大约 ${y} 年`:`${y} 年`)}
 const DATE_LOOKS={led:'橙色数码',white:'白字',ink:'跟字同色'},DATE_POS={photo:'印在画面上',frame:'写在白边上'};
 const nextKey=(o,k)=>{const ks=Object.keys(o);return ks[(ks.indexOf(k)+1)%ks.length]};
 $('daterow').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!ed)return;const dt=ed.st.date;commit();
@@ -1511,7 +1607,7 @@ const memoLine=st=>{const m=st.memo;return m&&m.print?m.print.map(k=>(m[k]||'').
 const esc=t=>String(t).replace(/[&<>"]/g,c=>`&#${c.charCodeAt(0)};`);
 function dateField(dt){const p=dPrec(dt),[y,mo]=(dt.d||'').split('-'),yr=`<input type="number" id="mYear" min="1900" max="2100" inputmode="numeric" value="${y||''}" aria-label="年份">`,
     opt=(v,l,on)=>`<option value="${v}"${on?' selected':''}>${l}</option>`;
-  return p==='day'?`<input type="date" id="mDate" value="${dt.d}">`:p==='none'?'<input value="日期未知" disabled>':
+  return p==='day'?`<input type="date" id="mDate" value="${dt.d}">`:p==='none'?`<input value="${tr('日期未知')}" disabled>`:
     p==='month'?`<span class="dsel">${yr}<select id="mMon" aria-label="月份">${Array.from({length:12},(_,i)=>opt(i+1,`${i+1} 月`,+mo===i+1)).join('')}</select></span>`:
     p==='season'?`<span class="dsel">${yr}<select id="mSea" aria-label="季节">${Object.entries(SEASONS).map(([k,v])=>opt(k,v[0],(dt.s||'summer')===k)).join('')}</select></span>`:yr}
 function buildMemo(){const st=ed.st,m=st.memo,dt=st.date,p=dPrec(dt);
@@ -1558,6 +1654,46 @@ $('sliders').addEventListener('keydown',()=>commit());
 $('sliders').addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;ed.st[k]=+e.target.value;$('o-'+k).textContent=ed.st[k];schedule()});
 $('frames').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;setFrame(b.dataset.c)});
 function setFrame(c){commit();ed.st.frame=c;syncControls();layoutCard();renderCard()}
+
+/* 批量套用：把当前这张的调色、边框、文字和日期样式复制到选中的其他照片。
+   只复制「怎么调」，不碰每张自己的文字、故事和具体日期。 */
+const BATCH_OPTS=[['look','滤镜与调整'],['frame','边框'],['type','字体与文字'],['date','日期印章样式'],['sticker','贴纸']];
+let batchSel=new Set(),batchOpt={look:true,frame:true,type:true,date:true,sticker:true};
+const batchCandidates=()=>scans.filter(s=>s!==ed&&!s.demo);
+function openBatch(){if(!ed)return;batchSel.clear();renderBatch();$('batchPanel').hidden=false}
+function renderBatch(){
+  $('batchOpts').innerHTML=BATCH_OPTS.map(([k,l])=>`<button class="chip${batchOpt[k]?' on':''}" data-bopt="${k}" aria-pressed="${batchOpt[k]}">${l}</button>`).join('');
+  const g=$('batchGrid');g.replaceChildren();const list=batchCandidates();
+  if(!list.length){const p=document.createElement('p');p.className='batch-empty';p.textContent='还没有别的照片可以套用。再导入几张，就能一起调。';g.append(p)}
+  for(const s of list){const b=document.createElement('button');b.className='bit'+(batchSel.has(s.id)?' on':'');b.dataset.id=s.id;
+    b.setAttribute('aria-pressed',String(batchSel.has(s.id)));b.setAttribute('aria-label',`${dLabel(s.st.date)||'某一天'} · ${s.st.memo?.place||s.st.caption||'照片'}`);
+    b.append(thumbOf(s));const sm=document.createElement('small');sm.textContent=dLabel(s.st.date)||s.st.memo?.place||'某一天';b.append(sm);g.append(b)}
+  updateBatchCount();
+}
+function updateBatchCount(){const n=batchSel.size;$('batchCount').textContent=`已选 ${n} 张`;$('batchGo').textContent=n?`套用到 ${n} 张`:'套用';$('batchGo').disabled=!n}
+function applyBatch(){
+  if(!ed||!batchSel.size)return;
+  const src=ed.st;let n=0;
+  for(const s of scans){
+    if(s===ed||!batchSel.has(s.id))continue;
+    s.hist=Array.isArray(s.hist)?s.hist:[];s.hist.push(JSON.stringify(s.st));if(s.hist.length>60)s.hist.shift();
+    if(batchOpt.look)for(const k of ['filter','bright','contrast','warm','grain'])s.st[k]=src[k];
+    if(batchOpt.frame)s.st.frame=src.frame;
+    if(batchOpt.type){s.st.font=src.font;s.st.capOff=src.capOff}
+    if(batchOpt.date)s.st.date={...s.st.date,on:src.date.on,fmt:src.date.fmt,look:src.date.look,pos:src.date.pos};
+    if(batchOpt.sticker){s.st.sticker=src.sticker;s.st.sx=src.sx;s.st.sy=src.sy}
+    n++;
+  }
+  cardCache.clear();homePreviewCache.clear();
+  $('batchPanel').hidden=true;batchSel.clear();draftSoon();renderTray();
+  toast(`已套用到 ${n} 张`);
+}
+$('batchOpen').onclick=openBatch;$('batchClose').onclick=()=>$('batchPanel').hidden=true;
+$('batchOpts').onclick=e=>{const b=e.target.closest('[data-bopt]');if(!b)return;const k=b.dataset.bopt;batchOpt[k]=!batchOpt[k];renderBatch()};
+$('batchGrid').onclick=e=>{const b=e.target.closest('.bit');if(!b)return;const id=b.dataset.id;if(batchSel.has(id))batchSel.delete(id);else batchSel.add(id);b.classList.toggle('on',batchSel.has(id));b.setAttribute('aria-pressed',String(batchSel.has(id)));updateBatchCount()};
+$('batchAll').onclick=()=>{for(const s of batchCandidates())batchSel.add(s.id);renderBatch()};
+$('batchNone').onclick=()=>{batchSel.clear();renderBatch()};
+$('batchGo').onclick=applyBatch;
 
 function commit(stay){if(showingBack&&!stay)setSide(false);history.push(JSON.stringify(ed.st));if(history.length>60)history.shift();$('undo').disabled=false}
 $('undo').onclick=()=>{if(!history.length)return;ed.st=JSON.parse(history.pop());syncGlare();$('cap').textContent=ed.st.caption;syncControls();layoutCard();renderCard()};
@@ -1790,8 +1926,8 @@ function zipStore(files){const enc=new TextEncoder(),parts=[],cen=[],d=new Date(
   const cs=cen.reduce((a,v)=>a+v.byteLength,0);
   return new Blob([...parts,...cen,put(22,[[0,0x06054b50,4],[4,0],[6,0],[8,files.length],[10,files.length],[12,cs,4],[16,off,4],[20,0]])],{type:'application/zip'})}
 function memoTxt(list,names){if(!list.some(s=>{const m=s.st.memo||{};return m.place||m.people||m.story}))return null;
-  return '\uFEFF'+list.map((s,i)=>{const m=s.st.memo||{},dt=s.st.date||{};return [names[i],`照片里的日期：${dPrec(dt)==='none'?'不记得':dLabel(dt)||'—'}${dt.guess?'（按翻拍日期猜的）':''}`,`翻拍日期：${s.scanDate||'—'}`,
-    m.place&&`地点：${m.place}`,m.people&&`人物：${m.people}`,m.story&&`故事：${m.story}`].filter(Boolean).join('\r\n')}).join('\r\n\r\n')+'\r\n'}
+  return '\uFEFF'+list.map((s,i)=>{const m=s.st.memo||{},dt=s.st.date||{};return [names[i],`${tr('照片里的日期：')}${dPrec(dt)==='none'?tr('不记得'):dLabel(dt)||'—'}${dt.guess?tr('（按翻拍日期猜的）'):''}`,`${tr('翻拍日期：')}${s.scanDate||'—'}`,
+    m.place&&`${tr('地点：')}${m.place}`,m.people&&`${tr('人物：')}${m.people}`,m.story&&`${tr('故事：')}${m.story}`].filter(Boolean).join('\r\n')}).join('\r\n\r\n')+'\r\n'}
 const stamp=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`};
 let downloads=null;
 (async()=>{try{downloads=DESKTOP?desktopSaver():await window.claude?.use?.('downloads')}catch(e){downloads=null}})();
@@ -1854,7 +1990,7 @@ async function doExport(share){const btn=$('expGo'),label=btn.textContent,list=e
     if(share){try{await navigator.share({files});$('expPanel').hidden=true}catch(e){if(e&&e.name==='NotAllowedError')toast('做好了，再点一次「分享」');else if(!e||e.name!=='AbortError')toast('这里分享不了，点「保存」吧')}return}
     let out=files[0];
     if(files.length>1){const ents=await Promise.all(files.map(async f=>({name:f.name,data:new Uint8Array(await f.arrayBuffer())}))),txt=memoTxt(list,expCache.fronts);
-      if(txt)ents.push({name:'回忆.txt',data:new TextEncoder().encode(txt)});out=new File([zipStore(ents)],`instant-${stamp()}.zip`,{type:'application/zip'})}
+      if(txt)ents.push({name:LANG==='en'?'memories.txt':'回忆.txt',data:new TextEncoder().encode(txt)});out=new File([zipStore(ents)],`instant-${stamp()}.zip`,{type:'application/zip'})}
     $('expPanel').hidden=true;await deliver(out)}
   catch(e){toast('导出没成功，再试一次')}
   finally{btn.disabled=false;btn.textContent=label}}
@@ -2069,7 +2205,7 @@ const ALBUM_DRAW={
     let y=top;items.forEach((it,i)=>{const b=blocks[i];
       x.fillStyle='#E0A030';x.beginPath();x.arc(200,y+34,13,0,7);x.fill();x.strokeStyle=o.bg;x.lineWidth=5;x.stroke();
       dropCard(x,cards[i],260+cw/2,y+b.ch/2,cw,(i%2?1:-1)*.02*o.tilt);
-      x.fillStyle=ink;x.font=`700 44px ${SANS}`;x.fillText(dLabel(it.st.date)||'某一天',tx,y+50);
+      x.fillStyle=ink;x.font=`700 44px ${SANS}`;x.fillText(dLabel(it.st.date)||tr('某一天'),tx,y+50);
       const sub=[b.m.place,b.m.people].filter(Boolean).join(' · ');let ty=y+110;if(sub){x.fillStyle='#8A6D3B';x.font=`500 28px ${SANS}`;x.fillText(sub,tx,ty-8);ty+=56}
       x.fillStyle=o.dark?'#DDD5C8':'#3A3226';x.font=`400 38px ${HANDF}`;b.lines.forEach((l,k)=>x.fillText(l,tx,ty+k*56));y+=b.h});
     return c}};
@@ -2094,10 +2230,10 @@ function renderAlbumUI(){const tl=alb.tpl==='timeline',bg=alb.bg||TPL_BG[alb.tpl
     (alb.tpl!=='contact'?`<div>摆放${TILT_L.map(([v,l])=>ch('tilt',v,l)).join('')}${alb.tpl==='wall'&&alb.tilt?'<button class="chip" id="albShuffle">换个摆法</button>':''}</div>`:'');
   $('albTpl').innerHTML=Object.entries(ALBUMS).map(([k,[l]])=>`<button class="chip${k===alb.tpl?' on':''}" data-tpl="${k}">${l}</button>`).join('');
   const p=$('albPicks');p.innerHTML='';scans.forEach((s,i)=>{const b=document.createElement('button');b.className=alb.pick.includes(s.id)?'on':'';b.dataset.id=s.id;b.setAttribute('aria-label',`第 ${i+1} 张`);b.appendChild(thumbOf(s));p.appendChild(b)});
-  $('albNote').innerHTML=`${ALBUM_NOTES[alb.tpl]}点小图选照片，这个样式最多 <b>${ALBUMS[alb.tpl][1]}</b> 张，现在选了 <b>${alb.pick.length}</b> 张。`}
+  $('albNote').innerHTML=`<span class="album-note">${ALBUM_NOTES[alb.tpl]}</span><span class="album-pickline">点小图选照片，这个样式最多 <b>${ALBUMS[alb.tpl][1]}</b> 张，现在选了 <b>${alb.pick.length}</b> 张。</span>`}
 let albTok=0;
 async function drawAlbum(){const t=++albTok,cv=$('albCv');
-  if(!alb.pick.length){cv.width=1600;cv.height=900;const x=cv.getContext('2d');x.fillStyle='#232220';x.fillRect(0,0,1600,900);x.fillStyle='#A29C92';x.font=`500 44px ${SANS}`;x.textAlign='center';x.fillText('点上面的小图选几张',800,450);return}
+  if(!alb.pick.length){cv.width=1600;cv.height=900;const x=cv.getContext('2d');x.fillStyle='#232220';x.fillRect(0,0,1600,900);x.fillStyle='#A29C92';x.font=`500 44px ${SANS}`;x.textAlign='center';x.fillText(tr('点上面的小图选几张'),800,450);return}
   const c=await albumCanvas();if(t!==albTok)return;cv.width=c.width;cv.height=c.height;cv.getContext('2d').drawImage(c,0,0)}
 $('album').onclick=()=>openAlbum();
 // 存成相册页以后，改什么都自动存进草稿；下次在「我的相册页」里点开接着改
@@ -2143,7 +2279,8 @@ function newCol(name,first){name=(name||'').trim().slice(0,12);if(!name)return n
 const coverOf=c=>{const l=c.ids.map(id=>scans.find(s=>s.id===id)).filter(Boolean);return l.find(s=>s.id===c.cover)||l[0]||null};
 // 搜的范围：照片里的日期（几种写法）、翻拍日期、地点、人物、故事、白边上的字、所在相册
 function hay(s){const st=s.st,m=st.memo||{},dt=st.date,p=dPrec(dt),d=dt.d||'',[y,mo,dd]=d.split('-'),ym=`${y}.${mo} ${y}-${mo} ${y}年${+mo}月 ${y}年${mo}月`;
-  return [!d||p==='none'?'日期未知 不记得':p==='day'?`${d} ${dShort(d)} ${ym} ${y}年${+mo}月${+dd}日 ${+mo}月${+dd}日`:p==='month'?ym:p==='season'?`${y} ${y}年${SEASONS[dt.s||'summer'][0]} ${SEASONS[dt.s||'summer'][0]}`:`${y} ${y}年 ${p==='about'?'大约 约':''}`,s.scanDate,m.place,m.people,m.story,st.caption,...cols.filter(c=>c.ids.includes(s.id)).map(c=>c.name)].filter(Boolean).join(' ').toLowerCase()}
+  const enMonth=y&&mo?MONTHS[+mo-1]||'':'',enSeason=p==='season'?({spring:'spring',summer:'summer',autumn:'autumn',winter:'winter'})[dt.s||'summer']:'';
+  return [!d||p==='none'?'日期未知 不记得':p==='day'?`${d} ${dShort(d)} ${ym} ${y}年${+mo}月${+dd}日 ${+mo}月${+dd}日`:p==='month'?ym:p==='season'?`${y} ${y}年${SEASONS[dt.s||'summer'][0]} ${SEASONS[dt.s||'summer'][0]}`:`${y} ${y}年 ${p==='about'?'大约 约':''}`,s.scanDate,m.place,m.people,m.story,st.caption,...cols.filter(c=>c.ids.includes(s.id)).map(c=>c.name),enMonth,enSeason].filter(Boolean).join(' ').toLowerCase()}
 // 有自己的照片时不放示例
 const libAll=()=>{const l=scans.filter(s=>!s.demo);return l.length||libFromHome?l:scans.slice()};
 function libList(){const ts=lib.q.trim().toLowerCase().replace(/\//g,'.').split(/\s+/).filter(Boolean),c=colOf(lib.col);
@@ -2353,7 +2490,7 @@ function openGuide(){
   const cam=camera;ed.m=ed.m||analyze(ed.photoS);ed.diag=ed.diag||diagnose(ed.m,cam);const m=ed.m,dg=ed.diag;
   $('guideCam').textContent=cam.name+' · 换';
   const li=a=>a.map(x=>`<li>${x}</li>`).join('');
-  let h=`<h2>这张怎么拍更好</h2><p class="sub">根据扫描出来的这张照片估的。手机扫描本身也会影响亮度和颜色，当作参考就好。</p>
+  let h=`<h2>这张怎么拍更好</h2><p class="sub">根据扫描出来的这张照片估的。手机扫描本身也会影响亮度和颜色，当作参考就好。</p>${LANG==='en'?'<p class="src">Camera-specific recommendations and tips below are currently in Chinese.</p>':''}
   <div class="meters"><div>亮度<b>${Math.round(m.mean)}</b></div><div>对比<b>${Math.round(m.std)}</b></div><div>冷暖<b>${m.rb>0?'+':''}${Math.round(m.rb)}</b></div><div>白掉<b>${Math.round(m.hi*100)}%</b></div></div><h3>这张照片</h3>`;
   if(cam.hybrid)h+=`<div class="dx good"><b>混合机不用扫描也行</b><ul>${li(cam.tips)}</ul></div>`;
   else if(!dg.length)h+=`<div class="dx good"><b>曝光和颜色都在正常范围</b><div class="why">没看出明显的问题，下面是这台相机还能玩的东西。</div></div>`;
@@ -2815,7 +2952,8 @@ function showDetail(p){
   const m=td.model;
   if(!p){const narrow=matchMedia('(max-width:899px)').matches;$('tdDetail').classList.toggle('compact',narrow);$('tdDetail').innerHTML=narrow?'<b>点一个部件看看</b><p>先点外壳拆开，再点里面的零件；下面一排也能直接点。</p>':`<b>点一个部件看看</b><p>点机身先把外壳拆开，再点里面的零件。下面一排也可以直接点。拖「拆解」滑块能一次全部展开。</p><table>${[['相机',m.cam.name],['尺寸',`${m.S.dims.join(' × ')} mm（官网）`],['相纸',FILM_TXT[m.S.film]]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`;return}
   $('tdDetail').classList.remove('compact');
-  $('tdDetail').innerHTML=`<b>${p.name}</b><p>${p.desc}</p><table>${p.params.filter(r=>r[1]).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${p.gen?`<div class="gen">${GEN}</div>`:''}`;
+  const langNote=LANG==='en'?'<p class="src">Part descriptions are currently in Chinese.</p>':'';
+  $('tdDetail').innerHTML=`<b>${p.name}</b>${langNote}<p>${p.desc}</p><table>${p.params.filter(r=>r[1]).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${p.gen?`<div class="gen">${GEN}</div>`:''}`;
 }
 const tdV=new Map(),tagMeta=new Map();
 function tdLoop(){
@@ -2876,8 +3014,8 @@ function tdLoop(){
 }
 
 /* ---------- 输入 ---------- */
-$('shoot').onclick=()=>$('camIn').click();
-$('pick').onclick=()=>$('fileIn').click();
+$('shoot').onclick=()=>requestImport(true);
+$('pick').onclick=()=>requestImport(false);
 for(const id of ['camIn','fileIn']){$(id).onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
   $(id).addEventListener('cancel',()=>{backFor=mergeFor=-1})}   // 没选就关掉：下一张照常导入，不当成背面或补拍
 if(DESKTOP){$('homeFootNote').textContent='照片保存在这台电脑上，记得定期备份。';$('backupExport').textContent='保存完整备份…';
@@ -2893,13 +3031,13 @@ addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('Files'))e
 addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('drop').hidden=true;closePanels();if(e.dataTransfer.files.length)loadFiles(e.dataTransfer.files)});
 const textEditing=()=>{const a=document.activeElement;return !!a&&(a.isContentEditable||a.matches('textarea, input:not([type="range"]):not([type="button"]):not([type="checkbox"]):not([type="radio"])'))};
 addEventListener('paste',e=>{if(textEditing())return;const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();closePanels();loadFiles(fs)}});
-function closePanels(force=false){if(backupBusy&&!force)return;['camPanel','guidePanel','tdPanel','sheet','drawPanel','expPanel','albumPanel','libPanel','backupPanel'].forEach(id=>$(id).hidden=true);for(const id of ['homeView','scanView','editView'])$(id).inert=false;dr=null;if(td)td.running=false}
+function closePanels(force=false){if(backupBusy&&!force)return;['camPanel','guidePanel','tdPanel','sheet','drawPanel','expPanel','albumPanel','libPanel','backupPanel','tipsPanel','batchPanel'].forEach(id=>$(id).hidden=true);for(const id of ['homeView','scanView','editView'])$(id).inert=false;dr=null;if(td)td.running=false}
 /* 快捷键：Ctrl/⌘+Z 撤销，Ctrl/⌘+S 保存，Esc 关面板 */
 addEventListener('keydown',e=>{
   if(backupBusy){if(e.key==='Escape'||(e.ctrlKey||e.metaKey)&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return}
   if(e.key==='Escape'&&!$('backupPanel').hidden){$('backupClose').click();return}
-  const mod=e.ctrlKey||e.metaKey,editing=!$('editView').hidden&&$('camPanel').hidden&&$('guidePanel').hidden&&$('tdPanel').hidden&&$('drawPanel').hidden&&$('expPanel').hidden&&$('albumPanel').hidden&&$('libPanel').hidden&&$('backupPanel').hidden;
-  if(e.key==='Escape'){if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('expPanel').hidden)$('expPanel').hidden=true;else if(!$('albumPanel').hidden)$('albumPanel').hidden=true;else if(!$('libPanel').hidden)$('libPanel').hidden=true;else if(!$('drawPanel').hidden)$('drawCancel').click();else if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('tdPanel').hidden)$('tdClose').click();else if(!$('guidePanel').hidden)$('guideClose').click();else if(!$('camPanel').hidden)$('camPanel').hidden=true;return}
+  const mod=e.ctrlKey||e.metaKey,editing=!$('editView').hidden&&$('camPanel').hidden&&$('guidePanel').hidden&&$('tdPanel').hidden&&$('drawPanel').hidden&&$('expPanel').hidden&&$('albumPanel').hidden&&$('libPanel').hidden&&$('backupPanel').hidden&&$('tipsPanel').hidden&&$('batchPanel').hidden;
+  if(e.key==='Escape'){if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('expPanel').hidden)$('expPanel').hidden=true;else if(!$('albumPanel').hidden)$('albumPanel').hidden=true;else if(!$('libPanel').hidden)$('libPanel').hidden=true;else if(!$('drawPanel').hidden)$('drawCancel').click();else if(!$('tipsPanel').hidden)$('tipsClose').click();else if(!$('batchPanel').hidden)$('batchClose').click();else if(!$('sheet').hidden)$('sheet').hidden=true;else if(!$('tdPanel').hidden)$('tdClose').click();else if(!$('guidePanel').hidden)$('guideClose').click();else if(!$('camPanel').hidden)$('camPanel').hidden=true;return}
   if(!mod||!editing||textEditing()||e.isComposing)return;
   if(e.key.toLowerCase()==='z'){e.preventDefault();$('undo').click()}
   else if(e.key.toLowerCase()==='s'){e.preventDefault();if(!$('save').disabled)$('save').click()}
@@ -2948,6 +3086,896 @@ async function startAmb(){const cv=$('amb');if(ambStarted||!navigator.gpu||!cv||
       {disableTelemetry:true,onReady:()=>cv.classList.add('on'),onError:()=>cv.classList.remove('on')})}catch(e){cv.classList.remove('on')}}
 // 等首屏和照片都画好再加载，不跟它们抢网速
 addEventListener('load',()=>setTimeout(()=>(window.requestIdleCallback||setTimeout)(startAmb),1200));
+/* ---------- English interface / 英文界面 ----------
+   默认中文。切到英文时不是重写模板，而是按词条替换已经渲染出来的文字；之后渲染的新文字
+   由 MutationObserver 补上。源码里仍然只有一份中文，导出、草稿和备份都不受语言影响。
+   这里只覆盖界面和主要流程；相机教程、3D 零件说明等长文仍是中文（页面上有说明）。 */
+const LANG_KEY = 'tiejin.lang';
+let LANG = 'zh';
+try { if (localStorage.getItem(LANG_KEY) === 'en') LANG = 'en'; } catch (e) {}
+
+const EN = {
+  /* 品牌与首页 */
+  '相角': 'Photo Corners',
+  '给拍立得，\n做一本电子相册。': 'A digital album\nfor your instant prints.',
+  '接着整理\n你的相册。': 'Pick up where\nyou left off.',
+  '拉正翻拍的照片，把正反面、那天的日期和故事，一起好好收藏。': 'Straighten a scan, then keep both sides, the date and the story together.',
+  '继续整理': 'Keep editing',
+  '拍一张': 'Take a photo',
+  '导入照片': 'Import photos',
+  '先看看示例': 'See the demo',
+  '相机 3D 拆解 ›': 'Camera 3D teardown ›',
+  '换一张照片': 'Show another photo',
+  '当前收藏的照片': 'A photo from your collection',
+  '我的照片': 'My photos',
+  '我的相册 ›': 'My albums ›',
+  '正在读取本机收藏…': 'Reading saved photos…',
+  '还没有照片': 'No photos yet',
+  '重试读取本机收藏': 'Retry reading saved photos',
+  '继续框选': 'Continue framing',
+  '照片仅保存在当前浏览器，记得定期备份。': 'Photos stay in this browser. Back them up regularly.',
+  '照片保存在这台电脑上，记得定期备份。': 'Photos are saved on this computer. Back them up regularly.',
+  '备份与恢复': 'Back up & restore',
+  '本机收藏暂时无法完整读取。旧数据仍保留，重试读取成功后可以继续整理。': 'Saved photos could not be read completely. Your old data is still here; retry the read to continue.',
+  '首页照片：Peter Pawlowski、Moki8、Matthew Bellemare，来自 Wikimedia Commons（CC BY 2.0 / CC BY-SA）': 'Home photos: Peter Pawlowski, Moki8, Matthew Bellemare, via Wikimedia Commons (CC BY 2.0 / CC BY-SA)',
+  '匹兹堡河边的拍立得翻拍': 'An instant print of a Pittsburgh bridge',
+  '人像拍立得翻拍': 'A portrait instant print',
+  '河边风景的拍立得翻拍': 'A riverside instant print',
+  '收藏照片': 'saved photo',
+  '未写下名字的照片': 'Untitled photo',
+  '某一天': 'Some day',
+  '打开': 'Open',
+  '换一张照片': 'Show another photo',
+  '继续框选 · ': 'Continue framing · ',
+  '打开收藏照片': 'Open a saved photo',
+
+  /* 扫描 */
+  '‹ 首页': '‹ Home',
+  '‹ 返回': '‹ Back',
+  '‹ 编辑': '‹ Edit',
+  '‹ 回去调色': '‹ Back to editing',
+  '相册选': 'Choose from library',
+  '上传照片': 'Upload photos',
+  '拖进来或 Ctrl+V 粘贴，一次可以放好几张': 'Drop files here or press Ctrl+V. You can add several at once.',
+  '拖进来或 ⌘V 粘贴，一次可以放好几张': 'Drop files here or press ⌘V. You can add several at once.',
+  '转 90°': 'Rotate 90°',
+  '白线是底边，方向不对点「转 90°」': 'The white line is the bottom edge. Wrong way up? Tap Rotate 90°.',
+  '先把相纸摆正': 'Straighten the print',
+  '相纸': 'Paper',
+  '原比例': 'Original ratio',
+  '更换⌄': 'Change ⌄',
+  '使用整张原图': 'Use the whole image',
+  '扫描检查': 'Scan check',
+  '正在检查选框…': 'Checking the frame…',
+  '松开四角后重新检查': 'Release a corner to check again',
+  '未发现明显扫描问题': 'No obvious scan problems',
+  '已忽略本张提醒': 'Checks ignored for this photo',
+  '忽略本张提醒': 'Ignore this check',
+  '重新检查本张': 'Check this photo again',
+  '确认选框并拉正': 'Confirm frame & straighten',
+  '确认选框，存成背面': 'Confirm frame & save back',
+  '确认选框并合成': 'Confirm frame & merge',
+  '拍摄帮助与相机': 'Shooting help & cameras',
+  '我的相机': 'My camera',
+  '选一下，教你怎么拍': 'Choose one for shooting tips',
+  '选一下，教你怎么拍 ›': 'Choose one for shooting tips ›',
+  '3D 拆开看': 'View in 3D',
+  '没认出相纸边框。拖四角框住相纸，或直接用整张原图。': 'Could not find the print. Drag the four corners around it, or use the whole image.',
+  '用整张原图，保留原来的方向和比例。': 'Using the whole image, keeping its orientation and proportions.',
+  '好，按这个框拉正': 'Good — straighten with this frame',
+  '先把四角依次放回照片四角，再拉正': 'Place the four corners back around the print, then straighten.',
+  '提示仅供参考，不影响继续拉正。防反光：关闪光灯、避开顶灯，试试侧面的自然光。': 'These are hints only; you can still straighten. To avoid glare: turn off the flash, move away from ceiling lights, and try side light.',
+  '按当前选框继续拉正，或展开重新检查。': 'Straighten with this frame, or expand to check again.',
+  '确认四角贴齐相纸边缘，就可以拉正。': 'When the corners sit on the print edges, you can straighten.',
+  '扫描提醒 · ': 'Scan check · ',
+  '（共 ': ' (',
+  ' 条）': ' in total)',
+  '正在搭模型…': 'Building the model…',
+  '3D 库没加载出来，检查一下网络再打开一次。': 'The 3D library did not load. Check your connection and try again.',
+  '3D 模型没能显示，关闭后重试，或换个设备打开。': 'The 3D model could not be shown. Close it and retry, or use another device.',
+
+  /* 没认出相纸时的兜底 */
+  '没认出相纸边框': 'Could not find the print',
+  '没认出边框，可以这样继续': 'No border found — continue this way',
+  '相纸四边都在画面里的话，拖四角最快；四边被裁掉或手指挡住了，就重拍一张。': 'If all four edges are in frame, dragging the corners is fastest. If an edge is cropped or a finger is in the way, retake the photo.',
+  '先看相纸四边是否都在画面里、有没有被手指挡住。也可以直接拖四角框住它。': 'Check that all four edges are in frame and not covered by a finger. You can also drag the corners around the print.',
+  '重拍这张': 'Retake this one',
+  '换一张': 'Try another photo',
+  '手动拖四角': 'Drag the corners',
+  '拍之前看四点 ›': 'Four tips before shooting ›',
+
+  /* 拍摄前提示 */
+  '拍之前，先看这四件事': 'Four checks before you shoot',
+  '大部分认不出相纸，都是这四件事之一。': 'Most failed detections come down to one of these four.',
+  '平着拍': 'Shoot straight on',
+  '手机和相纸平行，别斜着拍。斜着拍会让白边变窄，认不出型号。': 'Keep the phone parallel to the print. An angled shot narrows the border and hides the format.',
+  '四边留空': 'Leave all four edges in frame',
+  '相纸完整放进画面，四周留一点背景，别裁到底边。': 'Fit the whole print in frame with a little background around it. Do not crop the bottom border.',
+  '避开反光': 'Avoid glare',
+  '关掉闪光灯，别站在顶灯正下方，稍微侧一点拍。': 'Turn off the flash, step away from ceiling lights, and shoot slightly from the side.',
+  '手指别挡角': 'Keep fingers off the corners',
+  '捏相纸边缘，别让手指压住任何一个角。': 'Hold the print by its edge and keep fingers off every corner.',
+  '知道了，开始拍': 'Got it — take the photo',
+  '知道了，选照片': 'Got it — choose photos',
+  '这次跳过，直接选照片': 'Skip this time and choose photos',
+  '这次跳过，直接拍': 'Skip this time and take the photo',
+  '看这四点 ›': 'See the four tips ›',
+
+  /* 调色 */
+  '重扫': 'Rescan',
+  '相册': 'Albums',
+  '翻面': 'Flip',
+  '看正面': 'See front',
+  '撤销': 'Undo',
+  '按住看原图': 'Hold for original',
+  '原图': 'Original',
+  '可能有反光': 'Possible glare',
+  '看看在哪': 'Show where',
+  '补拍一张去掉': 'Retake to remove',
+  '涂掉光斑': 'Brush it out',
+  '先不管': 'Not now',
+  '合成好了': 'Merged',
+  '按住看合成前': 'Hold for before',
+  '保留': 'Keep',
+  '不要了': 'Discard',
+  '整理这一张': 'Edit this photo',
+  '滤镜': 'Filters',
+  '调整': 'Adjust',
+  '边框': 'Frame',
+  '文字': 'Text',
+  '日期': 'Date',
+  '回忆': 'Memory',
+  '套用': 'Apply to others',
+  '套用到其他照片': 'Apply to other photos',
+  '还没有需要保存的照片': 'No photo to save yet',
+  '有修改，等待保存到本机…': 'Changes waiting to be saved…',
+  '正在保存到本机…': 'Saving to this device…',
+  '已保存到本机 · 导出图片可另存到设备': 'Saved on this device · export to save a file',
+  '保存失败 · 修改尚未存好，请重试或导出图片': 'Save failed · changes are not saved yet. Retry or export.',
+  '示例体验 · 不会保存到你的收藏': 'Demo · not saved to your collection',
+  '重试保存': 'Retry saving',
+  '导出图片': 'Export image',
+  '保存图片': 'Save image',
+  '拼一页': 'Make a page',
+  '大图': 'Large view',
+  '白边的字': 'Caption',
+  '没有字 · 点这里加回来': 'No caption · tap to add',
+  '有字 · 点这里去掉': 'Caption on · tap to remove',
+  '贴纸 · 换一个': 'Sticker · next one',
+  '加个贴纸': 'Add a sticker',
+  '日期印章': 'Date stamp',
+  '开': 'On',
+  '关': 'Off',
+  '照片里的日期': 'Date of the photo',
+  '翻拍日期': 'Date scanned',
+  '记得到': 'How well do you remember?',
+  '哪一天': 'Exact day',
+  '哪个月': 'Month',
+  '哪个季节': 'Season',
+  '哪一年': 'Year',
+  '大约哪年': 'Around a year',
+  '不记得': 'Do not remember',
+  '春天': 'Spring',
+  '夏天': 'Summer',
+  '秋天': 'Autumn',
+  '冬天': 'Winter',
+  '地点': 'Place',
+  '人物': 'People',
+  '一句故事': 'The story',
+  '印在白边上': 'Print on the border',
+  '放进相册': 'Add to album',
+  '背面': 'Back',
+  '翻过来看': 'Flip it over',
+  '重拍背面': 'Rescan the back',
+  '删掉背面': 'Delete the back',
+  '加背面照片': 'Add a photo of the back',
+  '新相册': 'New album',
+  '＋ 新相册': '＋ New album',
+  '先在上面填': 'Fill in the field above first',
+
+  /* 滤镜、边框、字体里的名称 */
+  '旧夏': 'Late summer',
+  '海盐': 'Sea salt',
+  '柯达金': 'Kodak gold',
+  '雾': 'Mist',
+  '褪色': 'Faded',
+  '夜蓝': 'Night blue',
+  '墨': 'Ink',
+  '原片': 'Original',
+  '亮度': 'Brightness',
+  '对比': 'Contrast',
+  '色温': 'Warmth',
+  '颗粒': 'Grain',
+  '只要照片，不要边框': 'Photo only, no frame',
+  '原框': 'Scanned frame',
+  '扫描出来的原边框': 'The border from your scan',
+  '不要': 'None',
+  '无边框': 'No frame',
+  '自己画': 'Draw your own',
+  '上传边框': 'Upload a frame',
+  '我画的': 'Mine',
+  '我上传的': 'Uploaded',
+  '我的': 'Mine',
+  'instax 相纸': 'instax film',
+  '宝丽来相纸': 'Polaroid film',
+  '季节': 'Season',
+  '笔': 'Brush',
+  '清掉涂抹': 'Clear brush',
+  '换个角度拍一张，把反光补掉': 'Shoot again from another angle to remove glare',
+  '补拍一张去反光': 'Retake to remove glare',
+  '橙': 'Orange',
+  '白字': 'White',
+  '跟字同色': 'Match caption',
+  '印在画面上': 'On the picture',
+  '写在白边上': 'On the border',
+
+  /* 吸附、提示、长按 */
+  '原片 · 原图': 'Original · unfiltered',
+  '拖进来或 粘贴，一次可以放好几张': 'Drop files here or paste. You can add several at once.',
+  '扫过的会叠在这里': 'Scanned photos stack up here',
+  '已扫 ': 'Scanned ',
+  ' 张 · 点小图接着调': ' · tap a thumbnail to edit',
+  '拖进来或 ': 'Drop files here or ',
+  ' 粘贴，一次可以放好几张': ' to add several at once',
+
+  /* 导出 */
+  '导出这一张': 'Export this photo',
+  '整张相纸': 'Whole print',
+  '只要照片': 'Picture only',
+  '格式': 'Format',
+  '尺寸': 'Size',
+  '小 · 1080': 'Small · 1080',
+  '标准 · 1600': 'Standard · 1600',
+  '高清': 'High resolution',
+  '背面': 'Back',
+  '正反面并排': 'Front and back side by side',
+  '另存一张': 'Save as a second file',
+  '不要': 'Do not include',
+  '几张': 'How many',
+  '这一张': 'This one',
+  '取消': 'Cancel',
+  '分享': 'Share',
+  '打包保存': 'Save as ZIP',
+  '下载文件': 'Download file',
+  '好了': 'Done',
+  '长按图片，选「存储到照片」': 'Press and hold the image, then choose Save to Photos',
+  '照片和调整会自动存成草稿，下次打开接着来。': 'Photos and edits are saved as a draft automatically. Pick up next time.',
+  '草稿存在这台电脑上，换电脑前记得做个完整备份。': 'Drafts stay on this computer. Make a full backup before switching.',
+  '草稿只在这个浏览器里，清理浏览器数据就没了，调好的记得导出。': 'Drafts live only in this browser. Clearing browser data removes them, so export finished work.',
+  '删掉这一张': 'Delete this photo',
+  '清空全部草稿': 'Clear all drafts',
+  '确定删掉这一张？': 'Delete this photo?',
+  '确定清空？照片会全部删掉': 'Clear everything? All photos will be deleted.',
+  '在做…': 'Rendering…',
+  '打包好了，去下载文件夹解压': 'ZIP saved. Unzip it from your Downloads folder.',
+  '保存好了，去下载文件夹看看。': 'Saved. Look in your Downloads folder.',
+  '存好了。手机上如果弹出分享菜单，选「存储图像」就进相册了。': 'Saved. If a share sheet opens on your phone, choose Save Image to add it to Photos.',
+  '这次没存。': 'Not saved this time.',
+  '上一个保存窗口还开着，先处理它。': 'The previous save window is still open. Finish that first.',
+  '点「下载」把压缩包存下来，解压后就是全部照片': 'Tap Download to save the ZIP, then unzip it to get every photo.',
+  '点「下载文件」，或者右键图片选「图片另存为」': 'Tap Download file, or right-click the image and choose Save image as.',
+  '长按图片选「存储到照片」，或者点「下载文件」': 'Press and hold the image and choose Save to Photos, or tap Download file.',
+  '右键图片可以另存，也可以直接拖到别的地方': 'Right-click the image to save it, or drag it somewhere else.',
+  '长按图片可以存，也可以截图发给朋友': 'Press and hold to save, or take a screenshot to share.',
+  '导出没成功，再试一次': 'Export did not work. Try again.',
+  '在做 ': 'Rendering ',
+  '/': '/',
+  '…': '…',
+  '高清 · ': 'High resolution · ',
+
+  /* 拼一页 */
+  '手账贴纸墙': 'Scrapbook wall',
+  '胶片接触印': 'Contact sheet',
+  '旅行明信片': 'Travel postcard',
+  '回忆时间线': 'Memory timeline',
+  '我的相册页': 'My pages',
+  '＋ 新的一页': '＋ New page',
+  '存成相册页': 'Save as a page',
+  '删掉这一页': 'Delete this page',
+  '底色': 'Paper',
+  '胶带': 'Tape',
+  '摆放': 'Placement',
+  '摆正': 'Straight',
+  '有点歪': 'Slightly tilted',
+  '很随意': 'Loose',
+  '彩色': 'Color',
+  '牛皮': 'Kraft',
+  '透明': 'Clear',
+  '换个摆法': 'Shuffle',
+  '顺序': 'Order',
+  '时间线按「照片里的日期」排，改日期就能换顺序': 'The timeline follows the photo date. Change a date to reorder.',
+  '顺序 · 按住小图拖动换位置': 'Order · press and drag a thumbnail to move it',
+  '先选几张照片': 'Choose a few photos first',
+  '示例照片不会保存到草稿，先换成自己的照片再存相册页': 'Demo photos are not saved. Use your own photos before saving a page.',
+  '示例照片不会保存到草稿，不能加入已保存的相册页': 'Demo photos are not saved and cannot be added to a saved page.',
+  '存好了。之后改的都会自动存，在「拼一页」最上面能找回来接着改': 'Saved. Later changes save automatically; find it at the top of Make a page.',
+  '这一页删掉了，照片还在': 'Page deleted. The photos are still here.',
+  '这个样式最多 ': 'This layout holds up to ',
+  '先放了前 ': 'Using the first ',
+  '写个标题，比如：2026 夏天': 'Add a title, e.g. Summer 2026',
+  '点上面的小图选几张': 'Tap the photos above to choose a few',
+  '点小图选照片，这个样式最多 ': 'Tap photos to choose. This layout holds up to ',
+  ' 张，现在选了 ': ' photos; selected: ',
+
+  /* 我的相册 */
+  '我的相册': 'My albums',
+  '＋ 导入': '＋ Import',
+  '用这些拼一页': 'Make a page from these',
+  '搜索日期、地点、人物或故事': 'Search date, place, people or story',
+  '全部': 'All',
+  '张': 'photos',
+  '挑照片': 'Choose photos',
+  '挑好了': 'Done choosing',
+  '删掉相册': 'Delete album',
+  '设为封面': 'Set as cover',
+  '是封面': 'Cover',
+  '打开': 'Open',
+  '翻面': 'Flip',
+  '有背面': 'Has back',
+  '示例': 'Demo',
+  '还没有照片': 'No photos yet',
+  '这个相册还是空的。点「挑照片」，或者在调色页的「回忆」里放进来': 'This album is empty. Tap Choose photos, or add photos from Memory while editing.',
+  '没找到。换个词试试，比如年份「2025」、月份「2025.07」或者地点': 'Nothing found. Try a year like 2025, a month like 2025.07, or a place.',
+  '写名字回车': 'Type a name, press Enter',
+  '新相册的名字，写好按回车': 'New album name; press Enter when done',
+  '相册名字': 'Album name',
+  '点「设为封面」换封面。删掉相册不会删照片。': 'Tap Set as cover to change it. Deleting an album keeps its photos.',
+  '点照片放进或拿出「': 'Tap photos to add or remove them from ',
+  '」。亮着的在相册里。': '”. Highlighted photos are in the album.',
+  '这里还没有照片': 'No photos here yet',
+  '日期未知': 'Date unknown',
+  '日期未知 不记得': 'Date unknown / not remembered',
+  '大约': 'around',
+  '约 ': 'around ',
+
+  /* 备份 */
+  '带走你的收藏': 'Take your collection with you',
+  '照片的正反面、写下的故事和调好的样子，都收在同一个备份里。': 'Both sides, the stories and all edits are kept in one backup file.',
+  '保存完整备份': 'Save a full backup',
+  '包含原图、编辑参数、相册和拼页。换设备或浏览器后，可以恢复并继续编辑。': 'Includes originals, edits, albums and pages. Restore on another device or browser and keep editing.',
+  '包含原图、编辑参数、相册和拼页。换电脑后，可以恢复并继续编辑。': 'Includes originals, edits, albums and pages. Restore on another computer and keep editing.',
+  '下载完整备份': 'Download full backup',
+  '保存完整备份…': 'Save full backup…',
+  '从备份恢复': 'Restore from backup',
+  '先选择备份查看内容，确认后才会替换当前浏览器内的收藏。': 'Choose a backup to preview it first. Your current collection is replaced only after you confirm.',
+  '先选择备份查看内容，确认后才会替换这台电脑上的收藏。': 'Choose a backup to preview it first. Your current collection is replaced only after you confirm.',
+  '选择备份文件': 'Choose backup file',
+  '替换本机收藏并恢复': 'Replace my collection and restore',
+  '备份文件包含完整照片，请保存在你信任的位置。': 'The backup contains full photos. Keep it somewhere you trust.',
+  '正在把照片和回忆收进备份…': 'Packing photos and memories into the backup…',
+  '正在检查备份的照片和内容…': 'Checking the photos and contents of this backup…',
+  '正在恢复收藏，请稍等…': 'Restoring your collection…',
+  '完整备份已生成，请查看浏览器下载。以后在这里选择该文件即可恢复。': 'Backup created. Check your browser downloads; choose that file here to restore later.',
+  '备份检查完成。确认替换后才会写入本机收藏。': 'Backup checked. Nothing is written until you confirm.',
+  '这个文件不是可恢复的完整备份，或其中的内容已损坏。当前收藏没有改变，请重新选择。': 'This is not a restorable full backup, or it is damaged. Your collection is unchanged; choose another file.',
+  '备份未能完成。请确认草稿已保存、': 'The backup could not be completed. Check that drafts are saved and that ',
+  '有足够空间，再重试。': ' has enough space, then retry.',
+  '恢复没有完成，原有收藏仍保留。请确认': 'Restore did not finish. Your collection is unchanged. Check that ',
+  '备份已写入，请在首页重试读取收藏': 'Backup written. Retry reading your collection from the home screen.',
+  '收藏已恢复，可以继续编辑了': 'Collection restored. You can keep editing.',
+
+  /* 相机面板与教程（标题与按钮；长文保留中文） */
+  '你用的是哪台？': 'Which camera do you use?',
+  '选好后，扫描会按这台的相纸尺寸来拉正，拍摄建议也按这台的功能来给。': 'Once chosen, scans use this camera’s film size and shooting tips follow its features.',
+  '先看看相机的 3D 拆解 ›': 'See the camera in 3D first ›',
+  '富士 instax': 'Fujifilm instax',
+  '宝丽来 Polaroid': 'Polaroid',
+  '这张怎么拍更好': 'How to shoot this better next time',
+  '根据扫描出来的这张照片估的。手机扫描本身也会影响亮度和颜色，当作参考就好。': 'Estimated from this scanned photo. Scanning itself affects brightness and colour, so treat this as a guide.',
+  '这张照片': 'This photo',
+  '这张好看': 'This one looks good',
+  '换': 'Change',
+  '推荐参数': 'Recommended settings',
+  '对焦：': 'Focus: ',
+  '闪光有效距离：': 'Flash range: ',
+  '相纸通用': 'film in general',
+  '3D 拆开看看 ': 'Open in 3D: ',
+  '标注 开': 'Labels on',
+  '标注 关': 'Labels off',
+  '复位': 'Reset',
+  '米色摄影棚': 'Beige studio',
+  '浅蓝科技': 'Blue tech',
+  '拆解': 'Explode',
+  '光照': 'Light',
+  '全部拆开': 'Explode all',
+  '全部合上': 'Close all',
+  '拖动旋转 · 双指或滚轮缩放 · 点一个部件把它拆出来': 'Drag to rotate · pinch or scroll to zoom · tap a part to pull it out',
+  '拖动旋转 · 滚轮缩放 · 点击部件把它拆出来': 'Drag to rotate · scroll to zoom · click a part to pull it out',
+
+  /* 其它 */
+  '只能放图片文件': 'Only image files can be added.',
+  '这张图打不开，换一张试试': 'This image cannot be opened. Try another.',
+  '这些图都打不开': 'None of these images could be opened.',
+  '正在载入照片，请稍等再添加': 'Photos are loading. Please wait before adding more.',
+  '正在处理备份，请稍等': 'A backup is in progress. Please wait.',
+  '请先在首页重试读取本机收藏，避免覆盖旧数据': 'Retry reading your saved photos on the home screen first, so old data is not overwritten.',
+  '正在读取本机收藏，请稍等': 'Your saved photos are loading. Please wait.',
+  '这张照片没读出来，再点一次试试': 'This photo could not be read. Tap it again.',
+  '原图没读出来，再试一次': 'The original could not be read. Try again.',
+  '这张照片没读出来，再试一次': 'This photo could not be read. Try again.',
+  '下一张打不开，请重新导入': 'The next photo cannot be opened. Import it again.',
+  '这张图打不开，请重新导入': 'This image cannot be opened. Import it again.',
+  '背面存好了。点上面的「翻面」来回看': 'Back saved. Tap Flip above to switch sides.',
+  '留下合成后的这张': 'Kept the merged photo.',
+  '换回合成前的那张': 'Back to the photo before merging.',
+  '背面删掉了': 'Back deleted.',
+  '画好的边框放在「我的」里，换下一张照片也能用': 'Your frame is under Mine and works on other photos too.',
+  '边框图铺满整张相纸，照片盖在中间。和相纸一样比例的图效果最好': 'The uploaded frame fills the print and the photo sits in the middle. A frame with the same proportions works best.',
+  '年份写四位数，比如 2023': 'Write the year as four digits, e.g. 2023.',
+  '这一张删掉了': 'Photo deleted.',
+  '草稿清空了': 'All drafts cleared.',
+  '本机收藏暂时读取失败，旧数据仍保留，请重试读取': 'Saved photos could not be read. Old data is kept; please retry.',
+  '这是示例体验，不会存进你的收藏。点「首页」即可导入自己的照片。': 'This is the demo; it is not saved. Tap Home to import your own photos.',
+  '示例暂时打不开，可以直接导入自己的照片': 'The demo cannot be opened right now. Import your own photos instead.',
+  '清空草稿失败，照片仍保留，可以稍后重试': 'Clearing drafts failed. Photos are kept; try again later.',
+  '已从当前页面移除，但草稿删除失败；请刷新后重新删除': 'Removed from this page, but draft deletion failed. Refresh and delete again.',
+  '相册删掉了，照片还在': 'Album deleted. The photos are still here.',
+  '建好了「': 'Created “',
+  '」，点照片把它们放进来': '”. Tap photos to add them.',
+  '放进了「': 'Added to “',
+  '」。点上面的「相册」能按相册翻看': '”. Tap Albums above to browse by album.',
+  '这里用不了 Claude，上面的建议照样有用。': 'Claude is unavailable here. The tips above still apply.',
+  '这里不能发图片，再点一次只发数据。': 'Images cannot be sent here. Tap again to send data only.',
+  '问得太频繁或额度用完了，过一会再试。': 'Too many requests or quota reached. Try again later.',
+  '需要重新登录 Claude。': 'Please sign in to Claude again.',
+  'Claude 没回答这个问题。': 'Claude did not answer this question.',
+  '没连上，等一下再点一次。': 'Could not connect. Try again in a moment.',
+  '在看…': 'Looking…',
+  '（没说完，再问一次试试）': ' (cut off — ask again)',
+  '问问 Claude': 'Ask Claude',
+  '停': 'Stop',
+  '已调，回去看看': 'Applied — go take a look',
+  '让 Claude 看看这张': 'Ask Claude about this photo',
+  '它里面长什么样': 'What is inside',
+  '这是即时成像相机的通用结构，位置和形状是示意，不是这台的官方拆解图。': 'This is a generic instant camera structure. Positions and shapes are illustrative, not an official teardown.',
+  '相纸盒': 'Film pack',
+  '前壳': 'Front shell',
+  '后盖': 'Back cover',
+  '后盖 / 相纸仓门': 'Back cover / film door',
+  '镜头组': 'Lens assembly',
+  '快门与光圈': 'Shutter & aperture',
+  '闪光灯': 'Flash',
+  '闪光电容': 'Flash capacitor',
+  '主板': 'Main board',
+  '电池': 'Battery',
+  '显影滚轴': 'Developing rollers',
+  '出片马达与齿轮': 'Eject motor & gears',
+  '取景器': 'Viewfinder',
+  '图像传感器': 'Image sensor',
+  '打印机构 / 曝光头': 'Print head',
+  '锂电池': 'Lithium battery',
+  '液晶屏': 'LCD screen',
+  'microSD 卡槽': 'microSD slot',
+  '镜头效果 / 胶片效果拨盘': 'Lens / film effect dials',
+  '打印拨杆': 'Print lever',
+  '快门键': 'Shutter button',
+  'Eras 拨盘': 'Eras dial',
+  '上壳': 'Top shell',
+  '亮度旋钮 / 色彩效果旋钮': 'Brightness / colour dials',
+  '氛围滤镜': 'Mood filter',
+  '色彩效果 LED': 'Colour effect LEDs',
+  '自拍拨杆': 'Self-timer lever',
+  '相纸': 'Film',
+  '尺寸': 'Size',
+  '重量': 'Weight',
+  '镜头': 'Lens',
+  '对焦': 'Focus',
+  '快门': 'Shutter',
+  '测光': 'Metering',
+  '作用': 'Role',
+  '显影': 'Development',
+  '出片': 'Eject',
+  '闪光': 'Flash',
+  '回电时间': 'Recycle time',
+  '工作方式': 'Mode',
+  '位置': 'Position',
+  '档位': 'Positions',
+  '效果': 'Effects',
+  '年代': 'Eras',
+  '屏幕': 'Screen',
+  '存储': 'Storage',
+  '打印': 'Print',
+  '打印方式': 'Print method',
+  '打印时间': 'Print time',
+  '打印': 'Printing',
+  '自拍': 'Self-timer',
+  '电池': 'Battery',
+  '相纸': 'Film',
+
+  /* 批量套用 */
+  '把这张的样式套用到其他照片 ›': 'Apply this style to other photos ›',
+  '把这张的滤镜、调整、边框、字体和日期样式套用到选中的照片。文字、故事和日期本身不动。': 'Apply this photo’s filters, adjustments, frame, type and date style to the photos you select. Their own captions, stories and dates stay unchanged.',
+  '滤镜与调整': 'Filters & adjustments',
+  '字体与文字': 'Type & caption',
+  '日期印章样式': 'Date stamp style',
+  '贴纸': 'Sticker',
+  '全选': 'Select all',
+  '全不选': 'Select none',
+  '套用': 'Apply',
+  '已选 ': 'Selected: ',
+  '还没有别的照片可以套用。再导入几张，就能一起调。': 'There are no other photos yet. Import a few more to edit them together.',
+  '照片': 'photo',
+  '以后不再提示': 'Do not show this again',
+  '知道了': 'Got it',
+
+  /* 字体与边框名称 */
+  '龙藏手写': 'Long Cang hand',
+  '毛笔': 'Brush',
+  '行书': 'Running script',
+  '草书': 'Cursive',
+  '快乐体': 'Playful',
+  '黄油体': 'Butter',
+  '小薇': 'Xiaowei',
+  '圆体': 'Rounded',
+  '宋体': 'Song serif',
+  '黑体': 'Sans',
+  'English 手写': 'English hand',
+  '打字机（英文）': 'Typewriter (English)',
+  '粉柠檬': 'Pink lemonade',
+  '黑': 'Black',
+  '彩虹': 'Rainbow',
+  '马卡龙': 'Macaron',
+  '美人鱼': 'Mermaid',
+  '彩纸屑': 'Confetti',
+  '胶片条': 'Film strip',
+  '爱心手绘': 'Hand-drawn hearts',
+  '粉彩星空': 'Pastel stars',
+  '柔光闪': 'Soft sparkle',
+  '薰衣草': 'Lavender',
+  '喷漆': 'Spray paint',
+  '糖粒': 'Sugar grains',
+  '幻灯片': 'Slide',
+  '星光': 'Starlight',
+  '金属拉丝': 'Brushed metal',
+  '黑框': 'Black frame',
+  '彩框·黄': 'Colour frame · yellow',
+  '彩框·红': 'Colour frame · red',
+  '彩框·橙': 'Colour frame · orange',
+  '彩框·蓝': 'Colour frame · blue',
+  '彩框·绿': 'Colour frame · green',
+  '圆框': 'Round frame',
+  '金框': 'Gold frame',
+  '渐变框': 'Gradient frame',
+  '纯色': 'Solid',
+  '白': 'White',
+  '黄': 'Yellow',
+  '粉': 'Pink',
+  '藏青': 'Navy',
+  '橙色数码': 'Orange LED',
+  '选一下你的相机，教你怎么拍 ›': 'Choose your camera for shooting tips ›',
+  '照片里的日期现在是按翻拍那天猜的（来自导入那天），拍立得当天可能更早，可以改。日期印章印的是「照片里的日期」。': 'The photo date is currently guessed from when you scanned it (the import date). The actual moment may be earlier; you can change it. The date stamp uses the photo date.',
+  '日期因换月或换年自动调整过，请核对具体哪一天。': 'The date was adjusted to stay valid; please check the exact day.',
+  '记不清就别硬编一天，时间线和相册会照这样排。': 'If you do not remember the day, do not invent one. The timeline and albums follow this precision.',
+  '很多人会在相纸背面写日期或一句话。拍下背面和正面存在一起，随时翻面看': 'Many people write a date or a line on the back. Scan the back and keep it with the front, then flip whenever you like.',
+  '背面写的字也是回忆。翻过来看，照着抄进下面的故事里': 'The writing on the back is part of the memory. Flip it over and copy it into the story below.',
+  '现在没有边框，印不上': 'There is no border to print on right now.',
+  '比如：帕兰加的海边': 'e.g. the beach at Palanga',
+  '比如：我和小雨': 'e.g. me and Xiaoyu',
+  '那天发生了什么。不印在照片上，会写进打包导出的「回忆.txt」和相册页': 'What happened that day. It is not printed on the photo; it goes into the exported memories file and album pages.',
+  '默认是翻拍那天': 'Defaults to the scan date',
+  '日期已自动调整，请核对': 'Date adjusted automatically; please check',
+  '日期不记得，不印': 'Date unknown; nothing is stamped',
+  '印「': 'Stamps “',
+  '」。在「回忆」里改': '”. Change it in Memory.',
+  '先在上面填地点': 'Fill in the place above first',
+  '先在上面填人物': 'Fill in the people above first',
+  '照片里的日期：': 'Photo date: ',
+  '翻拍日期：': 'Scanned: ',
+  '地点：': 'Place: ',
+  '人物：': 'People: ',
+  '故事：': 'Story: ',
+  '（按翻拍日期猜的）': ' (guessed from the scan date)',
+  '填过「回忆」的会附一份回忆.txt。': ' Photos with a story also get a memories.txt file.',
+  '全部导出时，高清按每张原图里实际有的像素来，不够的按标准尺寸。': 'When exporting all, high resolution follows each original’s actual pixels; smaller ones use the standard size.',
+  '这张补拍合成过，合成只在标准尺寸上做，所以没有高清。': 'This photo was merged from a retake, which only happens at standard size, so high resolution is unavailable.',
+
+  /* 导出与拼页补充 */
+  '内容': 'Content',
+  'JPEG · 文件小': 'JPEG · smaller file',
+  'PNG · 无损': 'PNG · lossless',
+  '照片和调整会自动存成草稿，下次打开接着来。草稿只在这个浏览器里，清理浏览器数据就没了，调好的记得导出。': 'Photos and edits are saved as a draft automatically for next time. Drafts live only in this browser; clearing its data removes them, so export finished work.',
+  '照片和调整会自动存成草稿，下次打开接着来。草稿存在这台电脑上，换电脑前记得做个完整备份。': 'Photos and edits are saved as a draft automatically for next time. Drafts stay on this computer; make a full backup before switching.',
+  '牛皮纸上随手贴：歪一点，贴上纸胶带，下面写日期和地点。': 'Stick them onto kraft paper: a little crooked, a strip of tape, date and place underneath.',
+  '像冲洗店给的接触印样：黑底胶片条，按顺序编号，只放照片不带边框。': 'Like a lab contact sheet: black film strips, numbered in order, pictures only with no frames.',
+  '一两张照片配一段话。第一张在「回忆」里写的故事会写在右边。': 'One or two photos with a few lines. The story from Memory on the first photo appears on the right.',
+  '按「照片里的日期」排好，旁边写地点、人物和故事。': 'Ordered by the photo date, with place, people and story beside each.',
+  '点小图选照片，这个样式最多': 'Tap photos to choose. This layout holds up to',
+  '张，现在选了': 'photos; selected:',
+  '张。': 'photos.',
+
+  /* 相机面板 */
+  'instax mini（竖长）相纸': 'instax mini (portrait) film',
+  'instax SQUARE（方形）相纸': 'instax SQUARE (square) film',
+  'instax WIDE（横宽）相纸': 'instax WIDE (landscape) film',
+  '宝丽来 i-Type/600（方形）相纸': 'Polaroid i-Type/600 (square) film',
+  '宝丽来 Go（小方形）相纸': 'Polaroid Go (small square) film',
+  '混合机 · 先拍数码再打印': 'Hybrid · shoot digital, then print',
+  '混合机 · 新款': 'Hybrid · new model',
+  '混合机 · 竖拍电影机': 'Hybrid · vertical cinema',
+  '混合机 · WIDE 宽幅': 'Hybrid · WIDE format',
+  '混合机 · 小方块': 'Hybrid · small square',
+  '混合机 · 新款小方块': 'Hybrid · new small square',
+  '没有 instax Pal 2：它是纯数码相机，不用相纸，拍出来就是数码照片，用不着扫描，也不在 3D 拆解里。': 'instax Pal 2 is not included: it is a digital-only camera that takes no film, so there is nothing to scan and it has no 3D teardown.',
+  'Polaroid Now 第三代': 'Polaroid Now (3rd gen)',
+  'Polaroid Now+ 第三代': 'Polaroid Now+ (3rd gen)',
+  'Polaroid Go 第三代': 'Polaroid Go (3rd gen)',
+  '冷暖': 'Warmth',
+  '白掉': 'Clipped',
+  '偏蓝、偏冷': 'Too blue / cool',
+  '偏黄、偏红': 'Too yellow / warm',
+  '有点偏绿': 'Slightly green',
+  '发灰、对比低': 'Flat, low contrast',
+  '偏暗': 'looks dark',
+  '偏亮、发白': 'looks bright',
+  '逆光': 'looks backlit',
+  '偏绿': 'looks green',
+  '有点糊': 'may be soft',
+  '糊': 'soft',
+  '照片偏暗': 'Photo looks dark',
+  '照片偏亮、发白': 'Photo looks bright / washed out',
+  '像是逆光': 'Looks backlit',
+  '人亮、背景黑': 'Bright subject, dark background',
+  '可能有点糊': 'May be slightly soft',
+  '拍得不错 · 这台还能怎么玩 ›': 'Looks good · more to try with this camera ›',
+  '混合机可以直接导原图 ›': 'Hybrid cameras can import originals ›',
+  '这张': 'This photo',
+  '在这里暖一点': 'Warm it up here',
+  '在这里加点对比': 'Add contrast here',
+  '对焦：': 'Focus: ',
+  '闪光有效距离：': 'Flash range: ',
+  '机型资料来自富士 instax 和宝丽来官网的产品规格、说明书和支持文章（2026 年 10 月核对）。': 'Camera details come from Fujifilm instax and Polaroid specifications, manuals and support articles, checked in October 2026.',
+  '相机能用的温度是 5–40 °C；相纸从很冷或很热的地方拿出来，先放到常温再拍': 'Cameras work from 5–40 °C. Let film come to room temperature before shooting if it was stored somewhere very cold or hot.',
+  '显影大约 90 秒，天冷会更久': 'Development takes about 90 seconds, longer in the cold.',
+  '握机时别用手指挡住闪光灯、测光窗和镜头；横拍时闪光灯朝上': 'Keep fingers off the flash, meter window and lens; when shooting landscape, keep the flash on top.',
+  '相纸在 13–28 °C 表现最好：低于 13 °C 容易发白、偏青偏绿；高于 28 °C 容易偏黄偏红、对比变低': 'Film performs best at 13–28 °C. Below 13 °C it can look washed out or cyan; above 28 °C it can turn yellow-red with lower contrast.',
+  '照片吐出来后还会感光：先让挡光片盖着，之后正面朝下放或塞进口袋，等 10–15 分钟显影完': 'Prints keep reacting to light after ejecting: let the dark slide cover them, then place face down or in a pocket for the 10–15 minute development.',
+  '室内用闪光，让人站在墙或背景前、离相机 1–2.5 米；身后是空荡荡的大房间会拍成一片黑': 'Use flash indoors, with the subject 1–2.5 m away and standing near a wall or background; a big empty room behind them goes black.',
+  '相纸放冰箱冷藏（别冷冻），拍之前拿出来回温至少 1 小时；生产日期后 12 个月内用完': 'Store film in the fridge (never freeze), warm it for at least an hour before shooting, and use it within 12 months of production.',
+
+  /* 3D 部件 */
+  '点一个部件看看': 'Tap a part to inspect it',
+  '相机': 'Camera',
+  '点一个部件看看': 'Tap a part to inspect it',
+  '先点外壳拆开，再点里面的零件；下面一排也能直接点。': 'Start with the shell to open it, then tap the parts inside; the row below works too.',
+  '点机身先把外壳拆开，再点里面的零件。下面一排也可以直接点。拖「拆解」滑块能一次全部展开。': 'Tap the body to open the shell, then tap the parts inside. The row below works too. Drag Explode to open everything at once.',
+  '这是即时成像相机的通用结构，位置和形状是示意，不是这台的官方拆解图。': 'This is a generic instant camera structure. Positions and shapes are illustrative, not an official teardown of this model.',
+  'instax mini 相纸，一盒 10 张，显影约 90 秒': 'instax mini film, 10 shots per pack, about 90 seconds to develop',
+  'instax SQUARE 相纸，一盒 10 张，显影约 90 秒': 'instax SQUARE film, 10 shots per pack, about 90 seconds to develop',
+  'instax WIDE 相纸，一盒 10 张，显影约 90 秒': 'instax WIDE film, 10 shots per pack, about 90 seconds to develop',
+  'i-Type / 600 相纸，整张 107 × 88 mm，画面 79 × 77 mm，显影 10–15 分钟': 'i-Type / 600 film, 107 × 88 mm, image 79 × 77 mm, 10–15 minutes to develop',
+  'Go 相纸，整张 66.6 × 53.9 mm，画面 47 × 46 mm，显影 10–15 分钟': 'Go film, 66.6 × 53.9 mm, image 47 × 46 mm, 10–15 minutes to develop',
+
+  /* 相纸型号 */
+  'instax mini · 竖长': 'instax mini · portrait',
+  'instax SQUARE · 方形': 'instax SQUARE · square',
+  'instax WIDE · 横宽': 'instax WIDE · landscape',
+  '宝丽来 i-Type/600 · 方形': 'Polaroid i-Type/600 · square',
+  '宝丽来 Go · 小方形': 'Polaroid Go · small square',
+  '原比例 · 不按相纸': 'Original ratio · no film preset',
+
+  /* 没认出时的状态与扫描提醒 */
+  '请确认背面的四角，再点下面': 'Check the four corners of the back, then continue below.',
+  '请确认补拍照片的四角，再点下面合成': 'Check the four corners of the second shot, then merge below.',
+  '待确认 ': '',
+  '拖动四个白点，让框贴住相纸四角；贴好后会自动检查。': 'Drag the four white dots onto the print corners; the check runs when you let go.',
+  '正在检查选框…': 'Checking the frame…',
+  '先把四角贴到相纸边缘': 'Put the four corners on the print edges',
+  '还没认出边框。拖动四个角框住整张相纸，松手后再检查。': 'The border was not found. Drag the four corners around the whole print, then check again.',
+  '四角交叉或靠得太近': 'Corners cross or are too close',
+  '把四个角依次放回相纸四角，再检查一次。': 'Put the four corners back on the print, then check again.',
+  '这个选框暂时无法检查': 'This frame cannot be checked right now',
+  '把四角贴齐相纸边缘后再试。': 'Align the corners with the print edges and try again.',
+  '照片占画面偏小': 'The print is small in frame',
+  '靠近一点，让相纸占据更多画面，同时保留完整四边。': 'Move closer so the print fills more of the frame, keeping all four edges visible.',
+  '图片的可用像素较少': 'Few usable pixels',
+  '优先导入原图；如果是在翻拍，可以靠近并重新对焦，单纯放大不会增加细节。': 'Import the original if you can. When reshooting, move closer and refocus; zooming in adds no detail.',
+  '暂时无法检查这张照片': 'This photo cannot be checked right now',
+  '可以手动确认四角、反光和清晰度，再继续拉正。': 'Check the corners, glare and sharpness yourself, then straighten.',
+  '画面细节偏少，检查是否对焦': 'Little detail — check focus',
+  '擦净镜头，点一下相纸画面对焦并拿稳再拍；原片本身柔和时可以忽略。': 'Clean the lens, tap the print to focus, hold steady and shoot again. Ignore this if the print itself is soft.',
+  '左边缘贴近画面边界': 'Close to the left edge',
+  '右边缘贴近画面边界': 'Close to the right edge',
+  '上边缘贴近画面边界': 'Close to the top edge',
+  '下边缘贴近画面边界': 'Close to the bottom edge',
+  '左、右边缘贴近画面边界': 'Close to the left and right edges',
+  '上、下边缘贴近画面边界': 'Close to the top and bottom edges',
+  '左、上边缘贴近画面边界': 'Close to the left and top edges',
+  '左、下边缘贴近画面边界': 'Close to the left and bottom edges',
+  '右、上边缘贴近画面边界': 'Close to the right and top edges',
+  '右、下边缘贴近画面边界': 'Close to the right and bottom edges',
+  '相纸可能没拍全。稍退后一点，让四边都留出空隙；也可以先确认选框是否贴准。': 'The print may be cut off. Step back a little so there is space around all four edges, or check that the frame is accurate.'
+};
+
+/* 带数字或名字的句子：按整句替换，避免只翻掉一半。 */
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const DIR_EN = { '左': 'left', '右': 'right', '上': 'top', '下': 'bottom' };
+const plural = (n, one, many) => `${n} ${n === '1' ? one : many}`;
+const EN_RULES = [
+  [/^已经收藏了 (\d+) 张照片。$/, m => `You have ${m[1]} photo${m[1] === '1' ? '' : 's'} saved.`],
+  [/^继续框选 · (\d+) 张$/, m => `Continue framing · ${m[1]}`],
+  [/^已扫 (\d+) 张 · 点小图接着调$/, m => `Scanned ${m[1]} · tap a thumbnail to edit`],
+  [/^待确认 (\d+) 张 · 检查选框或使用整张原图，再继续下一张$/, m => `${m[1]} waiting · check the frame or use the whole image, then continue`],
+  [/^第 (\d+) 张$/, m => `Photo ${m[1]}`],
+  [/^第 (\d+) 个位置，左右方向键移动$/, m => `Position ${m[1]} · use left and right arrows to move`],
+  [/^继续框选（(\d+) 张）$/, m => `Continue framing (${m[1]})`],
+  [/^正在处理 (\d+) 张…$/, m => `Processing ${m[1]} photos…`],
+  [/^(\d+) 张已自动拉正(，(\d+) 张打不开)?，(\d+) 张需要确认选框。确认后会自动继续下一张。$/, m => `${m[1]} straightened automatically${m[3] ? `, ${m[3]} could not be opened` : ''}. ${m[4]} need frame confirmation; the next one opens automatically after you confirm.`],
+  [/^(\d+) 张都拉正了(，(\d+) 张打不开)?，(.*)$/, m => `${m[1]} straightened${m[3] ? `, ${m[3]} could not be opened` : ''}. ${m[4]}`],
+  [/^已套用到 (\d+) 张$/, m => `Applied to ${m[1]} photo${m[1] === '1' ? '' : 's'}.`],
+  [/^已套用到 (\d+) 张照片$/, m => `Applied to ${m[1]} photos.`],
+  [/^框出了 (.*)，不太有把握：确认四角贴齐再拉正。$/, m => `Found ${enFor(m[1]) || m[1]} — not fully sure. Check the corners, then straighten.`],
+  [/^认出了 (.*)，确认四角贴齐就可以拉正。$/, m => `Found ${enFor(m[1]) || m[1]}. Check the corners, then straighten.`],
+  [/^相纸：(.*)$/, m => `Paper: ${enFor(m[1]) || m[1]}`],
+  [/^照片里不止一张相纸，先框了最清楚的一张。要另一张就把四角拖过去。$/, () => 'There is more than one print. The clearest one is framed; drag the corners to switch.'],
+  [/^认不出是哪种相纸，先按原比例框了画面。确认四角贴齐再拉正。$/, () => 'The film type is unclear, so the picture was framed at its original ratio. Align the corners, then straighten.'],
+  [/^按原比例拉正，确认四角贴齐就可以继续。$/, () => 'Straightening at the original ratio. Align the corners to continue.'],
+  [/^(\d+) 年 (\d+) 月$/, m => `${MONTHS[+m[2] - 1] || m[2]} ${m[1]}`],
+  [/^(\d+) 年(春天|夏天|秋天|冬天)$/, m => `${({ '春天': 'Spring', '夏天': 'Summer', '秋天': 'Autumn', '冬天': 'Winter' })[m[2]]} ${m[1]}`],
+  [/^大约 (\d+) 年$/, m => `Around ${m[1]}`],
+  [/^约 (\d{4})$/, m => `Around ${m[1]}`],
+  [/^(\d{4})\.(\d{2})$/, m => `${MONTHS[+m[2] - 1] || m[2]} ${m[1]}`],
+  [/^(\d{4})\.(\d{2})\.(\d{2})$/, m => `${m[1]}.${m[2]}.${m[3]}`],
+  [/^约 (\d+)$/, m => `Around ${m[1]}`],
+  [/^第 (\d+) 张照片$/, m => `Photo ${m[1]}`],
+  [/^这个样式最多 (\d+) 张$/, m => `This layout holds up to ${m[1]} photos.`],
+  [/^(\d+) 张照片 · (\d+) 本相册 · (\d+) 张拼页$/, m => `${m[1]} photos · ${m[2]} albums · ${m[3]} pages`],
+  [/^恢复将替换(这台电脑上|当前浏览器内)的收藏，建议先下载当前收藏的完整备份。$/, () => 'Restoring replaces your current collection. Download a backup of it first.'],
+  [/^现在占用约 (\d+) MB。$/, m => ` Using about ${m[1]} MB.`],
+  [/^在做 (\d+)\/(\d+)…$/, m => `Rendering ${m[1]}/${m[2]}…`],
+  [/^已扫 (\d+) 张$/, m => `Scanned ${m[1]}`],
+  [/^继续框选（(\d+) 张）$/, m => `Continue framing (${m[1]})`],
+  [/^(\d+) 张$/, m => `${plural(m[1], 'photo', 'photos')}`],
+  [/^(\d+) 本相册$/, m => `${plural(m[1], 'album', 'albums')}`],
+  [/^(\d+) 张拼页$/, m => `${plural(m[1], 'page', 'pages')}`],
+  [/^已选 (\d+) 张$/, m => `Selected: ${m[1]}`],
+  [/^套用到 (\d+) 张$/, m => `Apply to ${m[1]} photo${m[1] === '1' ? '' : 's'}`],
+  [/^扫描提醒 · (.*?)（共 (\d+) 条）$/, m => `Scan check · ${enFor(m[1]) || m[1]} (${m[2]} total)`],
+  [/^扫描提醒 · (.*)$/, m => `Scan check · ${enFor(m[1]) || m[1]}`],
+  [/^这张(.*) · 下次怎么拍 ›$/, m => `This photo ${enFor(m[1]) || m[1]} · How to shoot better ›`],
+  [/^(左上|右上|左下|右下|上|下|左|右|中间)有一块亮斑，可能反光$/, m => `Possible glare at the ${({ '左上': 'top left', '右上': 'top right', '左下': 'bottom left', '右下': 'bottom right', '上': 'top', '下': 'bottom', '左': 'left', '右': 'right', '中间': 'centre' })[m[1]]}`],
+  [/^导出全部 (\d+) 张$/, m => `Export all ${m[1]} photos`],
+  [/^全部 (\d+) 张 · 打包 zip$/, m => `All ${m[1]} · save as ZIP`],
+  [/^翻拍原图里这张相纸只有约 (\d+) 像素，再放大也不会更清楚，所以没有高清。$/, m => `This print has only about ${m[1]} pixels in the original shot. Enlarging adds no detail, so high resolution is unavailable.`],
+  [/^高清按翻拍原图里这张相纸实际有的像素来，最大 (\d+)。$/, m => `High resolution follows the pixels actually available for this print in the original shot, up to ${m[1]}.`],
+  [/^(.+) 推荐参数$/, m => `${m[1]} recommended settings`],
+  [/^(.+) 怎么拍好看$/, m => `How to shoot well with the ${m[1]}`],
+  [/^出处：(.*)，(\d{4}-\d{2}-\d{2}) 核对$/, m => `Source: ${m[1]}, checked ${m[2]}`],
+  [/^3D 拆开看看 (.+)$/, m => `Open ${m[1]} in 3D`],
+  [/^(.*) · 换$/, m => `${m[1]} · Change`],
+  [/^蓝色比红色多了 (\d+)。海和天空多的照片本来就偏蓝，可以不管。$/, m => `Blue is ${m[1]} above red. Photos with lots of sea and sky naturally lean blue; you can leave it.`],
+  [/^明暗差别小（(\d+)），照片看起来雾蒙蒙。$/, m => `Light and dark are close (${m[1]}), so the photo looks hazy.`],
+  [/^(.+)边缘贴近画面边界$/, m => `Close to the ${m[1].split('、').map(d => DIR_EN[d] || d).join(' and ')} edge`],
+  [/^关掉闪光灯，稍换角度或避开顶灯再拍；如果这里本来就是白色，可以忽略。$/, () => 'Turn off the flash, change the angle slightly or move away from ceiling lights and shoot again. Ignore this if the area is genuinely white.'],
+  [/^印「(.*)」。在「回忆」里改$/, m => `Stamps “${m[1]}”. Change it in Memory.`],
+  [/^存好了：(.*)$/, m => `Saved: ${m[1]}`],
+  [/^完整备份已保存到 (.*)。以后在这里选择该文件即可恢复。$/, m => `Full backup saved to ${m[1]}. Choose that file here to restore later.`],
+  [/^备份未能完成。请确认草稿已保存、(电脑|浏览器)有足够空间，再重试。$/, m => `The backup could not be completed. Check that drafts are saved and that the ${m[1] === '电脑' ? 'computer' : 'browser'} has enough space, then retry.`],
+  [/^恢复没有完成，原有收藏仍保留。请确认(电脑|浏览器)有足够空间后重试。$/, m => `Restore did not finish. Your collection is unchanged. Check that the ${m[1] === '电脑' ? 'computer' : 'browser'} has enough space and retry.`],
+  [/^(存储空间|浏览器存储)满了，草稿没存上。调好的先导出吧$/, () => 'Storage is full, so the draft was not saved. Export your finished work first.'],
+  [/^这个浏览器存不了草稿，刷新就没了，调好的记得导出$/, () => 'This browser cannot store drafts; they disappear on refresh, so export finished work.'],
+  [/^(.*?)现在占用约 (\d+) MB。$/, m => `${m[1]}Using about ${m[2]} MB.`],
+  [/^([\s\S]*?)\n(\d+) 张照片 · (\d+) 本相册 · (\d+) 张拼页\n恢复将替换(这台电脑上|当前浏览器内)的收藏，建议先下载当前收藏的完整备份。$/, m => `${m[1]}\n${plural(m[2], 'photo', 'photos')} · ${plural(m[3], 'album', 'albums')} · ${plural(m[4], 'page', 'pages')}\nRestoring replaces your current collection. Download a backup of it first.`],
+  [/^(.*?) 填过「回忆」的会附一份回忆\.txt。$/, m => `${enFor(m[1]) || m[1]} Photos with a story also get a memories.txt file.`]
+];
+
+function enFor(text) {
+  if (!text || !/[\u4e00-\u9fff]/.test(text)) return null;
+  if (Object.prototype.hasOwnProperty.call(EN_NORM, text)) return EN_NORM[text];
+  for (const [re, to] of EN_RULES) {
+    const m = text.match(re);
+    if (m) return typeof to === 'function' ? to(m) : text.replace(re, to);
+  }
+  return null;
+}
+const EN_NORM = {};
+for (const k in EN) EN_NORM[k.trim()] = EN[k];
+
+const I18N_ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
+let i18nObserver = null, i18nQueued = false;
+const tr = s => LANG === 'en' ? (enFor(s) || s) : s;
+
+function inCode(node) {
+  const p = node.parentElement;
+  return !!p && (/^(SCRIPT|STYLE|NOSCRIPT)$/.test(p.tagName) || !!p.closest('[contenteditable="true"],[data-no-i18n]'));
+}
+
+function translateTextNode(node) {
+  if (node.nodeType !== 3 || inCode(node)) return;
+  const raw = node.nodeValue;
+  if (raw == null) return;
+  const m = raw.match(/^(\s*)([\s\S]*?)(\s*)$/);
+  const body = m[2];
+  if (!body) return;
+  const out = enFor(body);
+  if (out == null) return;
+  node._i18nZh = raw;
+  node._i18nEn = m[1] + out + m[3];
+  node.nodeValue = node._i18nEn;
+}
+
+function translateElement(el) {
+  if (el.nodeType !== 1) return;
+  if (el.closest && el.closest('[data-no-i18n], .no-i18n')) return;
+  let store = el._i18nAttrs;
+  for (const attr of I18N_ATTRS) {
+    const v = el.getAttribute && el.getAttribute(attr);
+    if (!v) continue;
+    const out = enFor(v);
+    if (out == null) continue;
+    store = store || (el._i18nAttrs = {});
+    store[attr] = store[attr] || { zh: v, en: out };
+    if (attr === 'aria-label' || attr === 'alt') el.setAttribute(attr, out);
+    else el.setAttribute(attr, out);
+  }
+}
+
+function walkI18n(root) {
+  if (!root) return;
+  if (root.nodeType === 3) { translateTextNode(root); return; }
+  if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
+  if (root.nodeType === 1) translateElement(root);
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  let n = tw.nextNode();
+  while (n) {
+    if (n.nodeType === 3) translateTextNode(n);
+    else translateElement(n);
+    n = tw.nextNode();
+  }
+}
+
+function restoreI18n() {
+  const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  let n = tw.nextNode();
+  while (n) {
+    if (n.nodeType === 3 && n._i18nZh != null) { n.nodeValue = n._i18nZh; delete n._i18nZh; delete n._i18nEn; }
+    else if (n.nodeType === 1 && n._i18nAttrs) {
+      for (const attr in n._i18nAttrs) n.setAttribute(attr, n._i18nAttrs[attr].zh);
+      delete n._i18nAttrs;
+    }
+    n = tw.nextNode();
+  }
+}
+
+function applyLang() {
+  const en = LANG === 'en';
+  document.documentElement.lang = en ? 'en' : 'zh-CN';
+  document.title = en ? 'Photo Corners · instant photo album' : '相角';
+  const btn = document.getElementById('langBtn');
+  if (btn) { btn.textContent = en ? '中文' : 'English'; btn.setAttribute('aria-label', en ? 'Switch to Chinese' : 'Switch to English'); }
+  if (en) walkI18n(document.body); else restoreI18n();
+}
+
+function setLang(lang) {
+  const next = lang === 'en' ? 'en' : 'zh';
+  if (next === LANG) { applyLang(); return; }
+  if (next === 'zh') restoreI18n();
+  LANG = next;
+  try { localStorage.setItem(LANG_KEY, LANG); } catch (e) {}
+  applyLang();
+  // 画面上的中文（拼页成品、相册页）重画一次，日期分组也按语言显示。
+  try {
+    if (typeof alb !== 'undefined' && alb && typeof drawAlbum === 'function' && !document.getElementById('albumPanel').hidden) drawAlbum();
+    if (typeof ed !== 'undefined' && ed && typeof updateNote === 'function') updateNote();
+  } catch (e) {}
+}
+
+function startI18n() {
+  applyLang();
+  if (i18nObserver) return;
+  i18nObserver = new MutationObserver(records => {
+    if (LANG !== 'en' || i18nQueued) return;
+    i18nQueued = true;
+    queueMicrotask(() => {
+      i18nQueued = false;
+      if (LANG !== 'en') return;
+      walkI18n(document.getElementById('app') || document.body);
+    });
+  });
+  i18nObserver.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: I18N_ATTRS });
+}
+
+startI18n();
+
 /* Portable editable album backups. Parsing only returns data; it never writes storage. */
 (() => {
   'use strict';

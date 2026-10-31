@@ -34,6 +34,7 @@ with sync_playwright() as playwright:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(PAGE.as_uri())
+        page.evaluate("localStorage.setItem('tiejin.tipsSeen','1')")
         page.wait_for_function("() => !restoring")
         with page.expect_file_chooser() as chooser:
             page.locator("#homeImport").click()

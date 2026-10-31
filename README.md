@@ -19,9 +19,9 @@
 | | |
 |:--|:--|
 | **开始 / 首页** | 首页叠着三张真实的拍立得翻拍，最前面一张用相角固定；鼠标移到照片上会自动轮换：前面那张抽出塞到后面，相角松开再贴住新的一张，移开就停；同时照片微微摊开、轻微倾斜。手机上轻触、键盘上按回车或空格也可以换一张。还没有照片时，下面是一页空相册，按 instax mini、square、wide 和 Polaroid 的真实比例留出位置。已有照片时显示自己的照片和最近整理的几张。可以直接拍摄或导入，从「继续整理」回到上次的照片，或打开「我的相册」。示例只在选择「先看看示例」后载入，不会保存到个人收藏。 |
-| **01 / 扫描与拉正** | 自动找出照片里的相纸：认画面四周那一圈白边，按白边比例分出型号和方向（底边最厚），再校正透视；批量导入时有把握的直接拉正，没把握的框好等确认；单张导入先检查选框，认不出时显示整张原图。支持 instax mini、SQUARE、WIDE 与 Polaroid i-Type/600、Go，认不出型号的相纸按原比例框画面。也可以手动调整四角或选择相纸，拖角时手指旁会出现放大镜。框选界面会提示可能的反光位置、裁边、可用像素不足或细节偏少，给出补拍建议；可展开查看、忽略本张提醒，或直接拉正。普通照片可按原比例处理。 |
+| **01 / 扫描与拉正** | 自动找出照片里的相纸：认画面四周那一圈白边，按白边比例分出型号和方向（底边最厚），再校正透视；批量导入时有把握的直接拉正，没把握的框好等确认；单张导入先检查选框，认不出时显示整张原图。支持 instax mini、SQUARE、WIDE 与 Polaroid i-Type/600、Go，认不出型号的相纸按原比例框画面。也可以手动调整四角或选择相纸，拖角时手指旁会出现放大镜。第一次导入前先列出四个最常见的失败原因；没认出相纸时，选框下面直接给出「重拍这张 / 换一张 / 手动拖四角」，也可以随时点「拍之前看四点」重新查看。框选界面会提示可能的反光位置、裁边、可用像素不足或细节偏少，给出补拍建议；可展开查看、忽略本张提醒，或直接拉正。普通照片可按原比例处理。 |
 | **02 / 减少反光** | 换个角度补拍后尝试对齐并合成，或用画笔手动修补小光斑。合成后可按住对比合成前，再决定保留还是撤回。两张照片在同一位置都有反光时无法通过合成恢复细节。 |
-| **03 / 色彩与相纸** | 使用滤镜、亮度、对比、色温和颗粒调整照片；保留原框，选择代码绘制的相纸样式，或绘制、上传自己的边框。 |
+| **03 / 色彩与相纸** | 使用滤镜、亮度、对比、色温和颗粒调整照片；保留原框，选择代码绘制的相纸样式，或绘制、上传自己的边框。调好一张后，可以把它套用到选中的其他照片：滤镜、调整、边框、字体和日期样式一次复制，文字、故事和具体日期本身不动；每张被套用的照片都记了一步撤销。 |
 | **04 / 留下字迹** | 为照片添加文字、选择字体，并加上胶片相机风格的日期印章。 |
 | **05 / 写下回忆** | 为每张照片记录地点、人物和一句故事，可选择把地点、人物印在白边上。「照片里的日期」与「翻拍日期」分开记录：默认按翻拍日期推测，可改成拍立得当天；记不清时可以记录到年月、季节、年份、「大约某年」或「不记得」，相册与时间线会按所选精度展示和排序。还可以拍下相纸背面，和正面存在一起，随时翻面查看。 |
 | **06 / 导出与拼页** | 导出整张相纸或只要画面，选择 JPEG、PNG 与尺寸；多张可打包为 ZIP 并附「回忆.txt」。有背面的照片可与正面并排导出或另存一张。把几张照片拼成手账贴纸墙、胶片接触印、旅行明信片或回忆时间线；调整照片顺序，换底色、胶带和摆放方式，存成以后还能接着改的相册页。 |
@@ -29,11 +29,12 @@
 | **08 / 本地草稿** | 在浏览器支持时自动保存照片、背面、四角、编辑设置、相册和相册页，下次打开时尝试恢复。编辑区显示等待保存、正在保存、已保存或保存失败；失败后可重试。只有浏览器实际完成写入后才显示已保存；「导出图片」用于另存到设备。可删除单张或清空草稿。打开时只读出每张的缩略图，正在编辑的那张和最近用过的两张才把大图放进内存，其余用到时再读，避免为整个收藏常驻解码大图；相册成品预览缓存最多保留 40 张。 |
 | **09 / 了解相机** | 根据选择的相机查看拍摄提示和推荐参数；通过程序化 3D 模型探索即时成像相机的通用内部结构。 |
 | **10 / 完整备份** | 从首页或相册进入「备份与恢复」，下载包含原图、正反面、文字、编辑参数、自定义边框、相册和拼页的备份文件。导入时先检查并预览内容，明确确认后才替换本机收藏；写入失败会回滚，恢复后可继续编辑。 |
+| **11 / 英文界面** | 首页页脚可以在中文和 English 之间切换，选择会记住。导入、拉正、调色、回忆、导出、相册和备份等主流程都有英文；机型教程和 3D 零件说明暂时仍是中文，页面上会注明。 |
 
 ## 开始使用
 
 1. 下载仓库，在浏览器中打开 **[相角.html](相角.html)**。
-2. 在首页选择「拍一张」或「导入照片」。检查选框并选择合适的相纸，再确认拉正；普通照片可以点「使用整张原图」，保留原始方向和比例。没有足够相纸特征时会先展示完整原图；批量导入时有把握的直接拉正，其余留在待确认队列。
+2. 在首页选择「拍一张」或「导入照片」。第一次会先看到四条拍摄检查（平着拍、四边留空、避开反光、手指别挡角），可以勾「以后不再提示」；之后没认出相纸时，选框下面还会直接给重拍、换一张和手动拖四角。检查选框并选择合适的相纸，再确认拉正；普通照片可以点「使用整张原图」，保留原始方向和比例。没有足够相纸特征时会先展示完整原图；批量导入时有把握的直接拉正，其余留在待确认队列。
 3. 拉正后调整照片、边框和文字，写下回忆。编辑区的保存状态表示当前浏览器中的草稿写入情况；点「导出图片」另存成品，也可打包保存或拼成相册页。
 4. 下次打开从首页选择「继续整理」或「我的相册」。想先了解工具时，可以主动打开示例体验。
 5. 手机扫描页默认收起相纸型号和相机教程。点当前相纸旁的「更换」选择型号，在「拍摄帮助与相机」查看教程或 3D。
@@ -45,7 +46,7 @@
 
 ### Windows 电脑版
 
-从 **[GitHub Releases](https://github.com/Jul11us/instant-album/releases/latest)** 下载 `XiangJiao-Setup-0.1.2.exe` 安装，或下载 `XiangJiao-0.1.2-win-x64-portable.zip` 解压后运行 `XiangJiao.exe`（Windows 10 / 11，64 位）。Release 同时提供单文件网页版、SHA-256 校验值和安装说明。和网页版相比：
+从 **[GitHub Releases](https://github.com/Jul11us/instant-album/releases/latest)** 下载 `XiangJiao-Setup-0.2.0.exe` 安装，或下载 `XiangJiao-0.2.0-win-x64-portable.zip` 解压后运行 `XiangJiao.exe`（Windows 10 / 11，64 位）。Release 同时提供单文件网页版、SHA-256 校验值和安装说明。和网页版相比：
 
 - 字体、Three.js 和纸面光影的库都打包在应用里，不联网也能用，不受 Google 字体在国内打不开的影响。
 - 草稿存在这台电脑的应用数据里（`%APPDATA%\相角`），清理浏览器不会影响；换电脑前用「备份与恢复」做一份完整备份。
@@ -59,6 +60,9 @@
 - 自动识别和反光处理是启发式方法，结果取决于照片、光线和背景。自动框选用 12 张标好四角的公开授权实拍检查：9 张拍到完整相纸的照片框出 7 张（5 张可在批量导入时直接拉正、2 张等确认），没有框错，3 张没有完整相纸的都留给手动；另用 260 张已知四角的合成场景检查，173 张完整相纸框出 160 张，其中 88 张达到批量自动拉正条件，没有一张符合自动条件的选框错误。白边颜色和背景太接近、相纸被挡住一角时仍可能认不出。反光合成尚未以真实拍立得的配对照片验证。记录与来源见 [scan-validation.md](docs/scan-validation.md)。
 - 扫描提醒在本机分析当前选框，不上传照片；识别不确定时先要求确认框选，再分析画面。拖角、旋转或更换相纸后会重新检查。亮斑和细节偏少也可能来自原片内容，提示不能确认反光或失焦，尚未用标注数据集评估准确率。背面不检查反光与清晰度；批量自动拉正的照片可点「重扫」查看提醒。
 - 渐变或多色边框可能无法自动识别为相纸；请手动选择相纸型号，或先选择相机。识别不到边缘时可手动调整四角。背面没有画面窗口，只按外形和正面的比例找卡片，找到了也要确认一下。
+- 拍摄提示在第一次导入前出现，勾「以后不再提示」后不再自动出现；这个选择只存在当前浏览器，清理站点数据后会重新出现。扫描页的「拍之前看四点」可以随时重新打开。
+- 「套用到其他照片」只复制滤镜、调整、边框、字体、贴纸和日期印章样式，不复制文字、故事、具体日期、背面和涂抹。每张被套用的照片会在自己的撤销历史里留一步，打开那张点「撤销」即可退回。
+- 英文界面覆盖导入、拉正、调色、回忆、导出、相册和备份等主流程；机型推荐参数、拍摄建议和 3D 零件说明仍是中文，页面会注明。语言选择存在当前浏览器，清理站点数据后回到中文。
 - 照片日期设为月份时，日期印章只印年月；设为季节、年份或「大约某年」时只印年份，设为「不记得」时不印日期。
 - 桌面端支持拖放、粘贴和多张导入；未识别的照片会进入待框选队列，拉正一张后自动继续下一张，也可以通过「继续框选」返回队列。待框选文件仅保留在当前页面，刷新前请完成拉正；完成后才会保存为草稿。
 - 高清导出依照片中实际可用的像素决定，最长边最高 3200 像素；补拍合成的照片最高为标准尺寸。
@@ -75,6 +79,7 @@
 |:--|:--|
 | [`src/app.html`](src/app.html) | 页面源码：HTML、CSS 与 JavaScript |
 | [`src/backup.js`](src/backup.js) | 完整备份格式、内容校验与导入解析；构建时内嵌到单文件网页 |
+| [`src/i18n.js`](src/i18n.js) | 英文界面的词表与文字替换；构建时内嵌到单文件网页 |
 | [`相角.html`](相角.html) | 可直接打开的构建结果 |
 | [`build.py`](build.py) | 将示例照片嵌入页面 |
 | [`product-facts.md`](product-facts.md) | 相机规格、拍摄建议与来源 |
@@ -90,9 +95,9 @@ python build.py .
 
 构建会生成 `相角.html` 和本地预览用的 `preview.html`。Google Fonts、Three.js 和 [Shaders](https://shaders.com/) 通过网络加载；Three.js 版本为 0.160.0，Shaders 版本为 4.0.4（MIT 许可）。纸面光影需要可用的 WebGPU 和网络；不支持、加载失败或离线时保留普通的纸色背景。启用系统「减少动态效果」时，光影会保持静止；代码已为 Shaders 禁用使用统计。
 
-首页动效的视觉参考是 React Bits 的 [Bounce Cards](https://www.reactbits.dev/components/bounce-cards)、[Tilted Card](https://www.reactbits.dev/components/tilted-card) 与 [Fade Content](https://www.reactbits.dev/animations/fade-content)。本项目使用独立编写的 CSS 和浏览器动画实现，没有引入 React Bits 源码、React、GSAP 或额外网络依赖。效果仅用于首页，只在鼠标停在照片上或点按时轮换，页面闲置时不播放；启用「减少动态效果」时只在点按时直接切换，并关闭悬停轮换、摊开、倾斜与入场动画。实现范围见 [home-motion.md](docs/home-motion.md)。
+首页动效的视觉参考是 React Bits 的 [Bounce Cards](https://www.reactbits.dev/components/bounce-cards)、[Tilted Card](https://www.reactbits.dev/components/tilted-card) 与 [Fade Content](https://www.reactbits.dev/animations/fade-content)。本项目使用独立编写的 CSS 和浏览器动画实现，没有引入 React Bits 源码、React、GSAP 或额外网络依赖。效果仅用于首页，只在鼠标停在照片上或点按时轮换，页面闲置时不播放；启用「减少动态效果」时只在点按时直接切换，并关闭悬停轮换、摊开、倾斜与入场动画。实现范围见 [home-motion.md](docs/home-motion.md)。英文界面的覆盖范围和新增词条的做法见 [english-ui.md](docs/english-ui.md)。
 
-浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。`python tests/detect_report.py` 打印自动框选在标注实拍上的准确率表；`tests/synthetic_prints.py` 生成并评估已知四角的合成场景（需要 OpenCV），用法见文件开头。
+浏览器回归测试需要 Python Playwright 与 Chromium。运行 `tests/` 中的 `test_*.py` 脚本，可通过 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有的 Chromium 可执行文件。`python tests/detect_report.py` 打印自动框选在标注实拍上的准确率表；`tests/synthetic_prints.py` 生成并评估已知四角的合成场景（需要 OpenCV），用法见文件开头。`tests/test_batch_and_lang.py` 覆盖首次拍摄提示、批量套用和英文界面。
 
 电脑版需要 Node.js 和 Python。在 `desktop/` 目录里：
 
@@ -116,9 +121,10 @@ Mac 版需要 macOS 13 或更新版本（[Electron 兼容性说明](https://www.
 
 **An instant photo workspace for the pictures you can hold.**
 
-相角 (“photo corners”) is a single-file web app for making a digital album of instant photographs. Straighten a scanned print, keep its front and back together, and note the date, place and anything written on the back. The interface looks like an old album page, with cream mounting paper and photo corners. It is currently in Chinese.
+相角 (“photo corners”) is a single-file web app for making a digital album of instant photographs. Straighten a scanned print, keep its front and back together, and note the date, place and anything written on the back. The interface looks like an old album page, with cream mounting paper and photo corners. The interface switches between Chinese and English from the home footer and remembers the choice; camera-specific guidance, shooting tips and 3D part descriptions remain in Chinese and are labelled.
 
-- **Scan:** Find the print by its picture window and the white border around it; the border proportions identify the film format and which edge is the bottom. Confident detections are straightened directly during batch import; single imports and uncertain detections stop for review, and otherwise the full image is shown. Adjust the corners with a magnifier or choose a film format; ordinary photographs can retain their original proportions.
+- **Scan:** Find the print by its picture window and the white border around it; the border proportions identify the film format and which edge is the bottom. Confident detections are straightened directly during batch import; single imports and uncertain detections stop for review, and otherwise the full image is shown. Adjust the corners with a magnifier or choose a film format; ordinary photographs can retain their original proportions. Before the first import, four common causes of failed detection are listed; when no print is found, the scan screen offers a retake, another photo and manual corner dragging.
+- **Apply to others:** Copy the filters, adjustments, frame, type, sticker and date-stamp style to selected photos at once. Their own captions, stories, dates, backs and brush marks are left alone, and each applied photo keeps an undo step.
 - **Start & return:** The home screen offers capture, import, the last edited photo and the library. The sample editor is opt-in. Uncertain detections require confirmation; “Use the full original” preserves an ordinary photo’s orientation and aspect ratio.
 - **A personal photo shelf:** The paper stack is visible on mobile too. Returning users see their edited photographs and recent keepsakes; previews update when edits change. Film formats and camera help are collapsed until needed on the scan screen.
 - **Quiet motion:** Hover to cycle the home photographs, or rotate once with a tap, click, Enter or Space. Leaving the stack stops rotation; reduced motion uses instant swaps only after user input. Personal collections show only their own photographs, with rotation available when at least two exist. The headline and photographs enter gently once. These independently authored CSS/browser effects take visual inspiration from React Bits, add no runtime dependencies and do not affect exported images.

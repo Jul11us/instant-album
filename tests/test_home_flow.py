@@ -19,6 +19,7 @@ with sync_playwright() as p:
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
         page.goto(PAGE.as_uri())
+        page.evaluate("localStorage.setItem('tiejin.tipsSeen','1')")
         page.wait_for_function("() => !restoring")
         assert page.locator("#homeView").is_visible()
         for control in ("#homeImport", "#homeDemo", "#homeLibrary"):
